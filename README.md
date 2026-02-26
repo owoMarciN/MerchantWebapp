@@ -1,16 +1,153 @@
-# admin_web
+# RestaurantOS — Restaurant Management Dashboard
 
-A new Flutter project.
+A Flutter web application for restaurant owners to manage their menus, items, orders, and business profile. Built with Firebase and designed as a companion to the customer-facing Android app.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Routing](#routing)
+- [Authentication Flow](#authentication-flow)
+- [Storage Structure](#storage-structure)
+- [Environment & Configuration](#environment--configuration)
+
+---
+
+## Overview
+
+RestaurantOS is a web dashboard for restaurant owners and admins. After registering and being approved by the platform, restaurant owners can log in and manage their entire operation — from uploading a logo and banner to creating menus, adding items with photos and pricing, and monitoring incoming orders in real time.
+
+The app uses a guided onboarding flow that prompts restaurant owners to complete essential setup steps before going live.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Flutter Web |
+| Authentication | Firebase Auth |
+| Database | Cloud Firestore |
+| File Storage | Firebase Storage |
+| Navigation | GoRouter |
+| State / Preferences | SharedPreferences |
+| Maps | Google Maps Flutter + Places API |
+| Payments | Stripe (connect flow) |
+
+---
+
+## Features
+
+### Onboarding Checklist
+When a restaurant owner logs in for the first time, the Overview screen shows a progress card with the following required setup steps:
+- Set all the needed business information (eg. business location, payment processes used, instructions for delivery drivers)
+- Upload a restaurant logo
+- Upload a banner image
+- Create at least one menu with at least one item
+- Connect Stripe payments
+
+### Authentication
+- Multi-step registration: business details (name, NIP, REGON, phone) on step 1, owner profile (full name, phone, email, password) on step 2
+- New accounts are saved with `status: "Not Approved"` — the restaurant cannot log in until an admin approves the account in Firestore
+- Login checks the `status` field and blocks unapproved accounts
+
+### Menus & Items
+- Restaurants can create multiple menus with a banner image, title, and description
+- Each menu contains items with title, short info, description, price, photo, tags, and optional discount
+- Items support a live discount preview in the creation form
+- Tapping an item opens a pre-filled edit sheet with the option to delete
+
+### Orders
+- Real-time order stream filtered by `restaurantID`
+- Displays order ID, customer name, item count, status chip, and total amount to pay
+- Status chips: Pending, In Progress, Ready, Delivered
+
+### Settings
+- Upload / replace restaurant logo and banner (stored in Firebase Storage)
+- Edit restaurant name, phone, and address
+- Address picker opens the existing `MapDialog` and saves full address + coordinates (`lat`, `lng`) to Firestore
+- Edit owner name, phone, and profile photo
+- Change password and account deletion in the Danger Zone section
+
+---
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
+- Flutter SDK `>=3.0.0`
+- Firebase project with Auth, Firestore, and Storage enabled
+- Google Maps API key with Places API and Maps JavaScript API enabled
 
-A few resources to get you started if this is your first Flutter project:
+### Installation
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+git clone https://github.com/your-org/restaurant-os.git](https://github.com/owoMarciN/MerchantWebapp.git
+cd MerchantWebapp
+fvm flutter pub get
+```
+### Run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+To run the project just use the given `.vscode` given in the project. Ask for the `secrets.json` file from the Admin
+
+---
+
+## Routing
+
+Routing is handled by GoRouter with a `ShellRoute` that wraps all dashboard screens in `DashboardShell`.
+
+| Path | Screen |
+|---|---|
+| `/` | Landing page |
+| `/auth/login` | Login |
+| `/auth/register` | Registration |
+| `/dashboard` | Overview |
+| `/dashboard/orders` | Orders |
+| `/dashboard/menus` | Menus |
+| `/dashboard/analytics` | Analytics |
+| `/dashboard/settings` | Settings |
+
+Navigation uses `Router.neglect()` throughout to prevent browser history buildup when switching between dashboard tabs.
+
+---
+
+## Authentication Flow
+
+```
+Register
+  → Create Firebase Auth user
+  → Save to users/{uid} with status: "Not Approved"
+  → Save to restaurants/{uid} with status: "Not Approved"
+  → Sign out → redirect to landing page
+
+Login
+  → Firebase Auth sign in
+  → Read restaurants/{uid} from Firestore
+  → Check status == "Approved" → block if not
+  → Save uid, name, email, phone, photo to SharedPreferences
+  → Navigate to /dashboard
+
+Logout
+  → Firebase Auth sign out
+  → Navigate to /auth/login via Router.neglect()
+```
+
+---
+
+## Environment & Configuration
+
+The Google Maps API key is stored in `LocationService.googleMapsApiKey`. For web, it also needs to be added to `web/index.html` it's done automaticaly using `injectGoogleMapsScript` method in `main.dart`:
+
+```html
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+```
+
+For Firebase, the configuration is handled through `firebase_options.dart` generated by the FlutterFire CLI:
+
+```bash
+dart pub global activate flutterfire_cli
+flutterfire configure
+```
