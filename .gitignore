@@ -1,0 +1,84 @@
+# -------------------------------------------------------------------
+# IDE & Editor Specific
+# -------------------------------------------------------------------
+# VS Code: Share launch configs/extensions, ignore user-specific state
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+/android/.idea/
+
+# -------------------------------------------------------------------
+# Flutter / Dart / Pub
+# -------------------------------------------------------------------
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# -------------------------------------------------------------------
+# Android Specific (Optimized for Gradle KTS)
+# -------------------------------------------------------------------
+.gradle/
+**/android/.gradle/
+**/android/local.properties
+**/android/captures/
+**/android/.cxx/
+
+# Auto-generated Flutter files for Android
+**/android/app/src/main/*/io/flutter/plugins/GeneratedPluginRegistrant.*
+
+# Build artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# -------------------------------------------------------------------
+# Secrets, Configs, and Security
+# -------------------------------------------------------------------
+# Firebase & Environment
+**/android/app/google-services.json
+/lib/firebase_options.dart
+.env
+backend/.env
+frontend/.env
+secrets.json
+
+# Signing keys (Never commit these!)
+**/android/key.properties
+**/*.keystore
+**/*.jks
+
+# -------------------------------------------------------------------
+# Miscellaneous / OS Specific
+# -------------------------------------------------------------------
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.buildlog/
+.history
+.svn/
+
+# Local helper scripts
+clean.bat
+run.bat
+build_apk.bat
+
+# Symbolication / Obfuscation
+app.*.symbols
+app.*.map.json
+
+# FVM Version Cache
+.fvm/

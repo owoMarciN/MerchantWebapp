@@ -1,0 +1,51 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter (Debug - Algolia)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "web-server",
+        "--web-port",
+        "8080",
+        "--web-hostname",
+        "localhost",
+        "--dart-define-from-file",
+        "secrets.json"
+      ]
+    },
+    {
+      "name": "Flutter (Profile - Algolia)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "args": [
+        "-d",
+        "web-server",
+        "--web-port",
+        "8080",
+        "--dart-define-from-file",
+        "secrets.json"
+      ]
+    },
+    {
+      "name": "Flutter (Release - Algolia)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": [
+        "-d",
+        "web-server",
+        "--web-port",
+        "8080",
+        "--dart-define-from-file",
+        "secrets.json"
+      ]
+    }
+  ]
+}
