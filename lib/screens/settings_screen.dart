@@ -553,6 +553,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
         colorScheme: widget.colorScheme,
       ),
     );
+    
     if (result != null) {
       setState(() {
         _address = result["address"] as String;
@@ -1152,8 +1153,8 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
     if (result != null && mounted) {
       setState(() {
         _address = result['address'] as String? ?? result.toString();
-        _lat = result['lat'] as double?;
-        _lng = result['lng'] as double?;
+        _lat = result['latitude'] as double?;
+        _lng = result['longitude'] as double?;
       });
     }
   }
