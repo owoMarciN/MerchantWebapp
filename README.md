@@ -12,7 +12,6 @@ A Flutter web application for restaurant owners to manage their menus, items, or
 - [Getting Started](#getting-started)
 - [Routing](#routing)
 - [Authentication Flow](#authentication-flow)
-- [Storage Structure](#storage-structure)
 - [Environment & Configuration](#environment--configuration)
 
 ---
