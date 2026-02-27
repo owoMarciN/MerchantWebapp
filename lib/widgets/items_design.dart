@@ -1,17 +1,18 @@
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:user_app/models/items.dart';
+import 'package:user_app/widgets/edit_sheet_components.dart'; 
 
 class ItemsDesignWidget extends StatelessWidget {
   final Items? model;
-  final BuildContext? context;
-  const ItemsDesignWidget({super.key, this.model, this.context});
+  const ItemsDesignWidget({super.key, this.model});
 
   void _openEditSheet(BuildContext context) {
+    if (model == null) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -39,7 +40,6 @@ class ItemsDesignWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             Stack(
               children: [
                 SizedBox(
@@ -64,12 +64,11 @@ class ItemsDesignWidget extends StatelessWidget {
                               ),
                             );
                           },
-                          errorBuilder: (_, __, ___) => _placeholder(brandColors),
+                          errorBuilder: (_, __, ___) => customImagePlaceholder(brandColors), 
                         )
-                      : _placeholder(brandColors),
+                      : customImagePlaceholder(brandColors),
                 ),
-
-                // Discount badge
+                // Discount Badge
                 if (model?.hasDiscount == true)
                   Positioned(
                     top: 10,
@@ -86,8 +85,7 @@ class ItemsDesignWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                // Likes badge
+                // Likes Badge
                 Positioned(
                   top: 10,
                   right: 10,
@@ -112,80 +110,75 @@ class ItemsDesignWidget extends StatelessWidget {
                 ),
               ],
             ),
-
             Padding(
               padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    model?.title ?? 'Untitled Item',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    model?.shortInfo ?? '',
-                    style: TextStyle(fontSize: 12, color: brandColors.muted),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  // Tags
-                  if (model?.tags != null && model!.tags!.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: model!.tags!.map((tag) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: brandColors.navy?.withValues(alpha: 0.2) ?? Colors.transparent),
-                        ),
-                        child: Text(tag, style: TextStyle(fontSize: 12, color: Colors.white)),
-                      )).toList(),
-                    ),
-                  ],
-
-                  const SizedBox(height: 10),
-
-                  // Price
-                  Row(
-                    children: [
-                      Text(
-                        'PLN ${model?.discountedPrice.toStringAsFixed(2) ?? '0.00'}',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
-                      ),
-                      if (model?.hasDiscount == true) ...[
-                        const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          'PLN ${model!.price!.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: brandColors.muted,
-                            decoration: TextDecoration.lineThrough,
-                          ),
+                          model?.title ?? 'Untitled Item',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          model?.shortInfo ?? '',
+                          style: TextStyle(fontSize: 12, color: brandColors.muted),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Text(
+                              'PLN ${model?.discountedPrice.toStringAsFixed(2) ?? '0.00'}',
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                            ),
+                            if (model?.hasDiscount == true) ...[
+                              const SizedBox(width: 8),
+                              Text(
+                                'PLN ${model!.price!.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: brandColors.muted,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ],
-                    ],
+                    ),
                   ),
+                  ElevatedButton(
+                    style:  ElevatedButton.styleFrom(
+                      backgroundColor: brandColors.muted!.withValues(alpha: 0.3)
+                    ),
+                    onPressed: () => _openEditSheet(context),
+                    child: Row(
+                      children: [
+                        Text(
+                          "Edit Item", 
+                          style: TextStyle(
+                            color: brandColors.accentGreen,
+                            fontWeight: FontWeight.bold
+                          )
+                        ),
+                        const SizedBox(width: 10),
+                        Icon(Icons.change_circle, color: brandColors.accentGreen),
+                      ]
+                    )
+                  )
                 ],
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _placeholder(BrandColors brandColors) {
-    return Container(
-      color: brandColors.navy?.withValues(alpha: 0.05),
-      child: Center(
-        child: Icon(Icons.fastfood_rounded, size: 40, color: brandColors.muted),
       ),
     );
   }
@@ -213,6 +206,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
   Uint8List? _imageBytes;
   String? _imageFileName;
   bool _isLoading = false;
+
+  String? _tagError;
 
   @override
   void initState() {
@@ -242,12 +237,26 @@ class _EditItemSheetState extends State<_EditItemSheet> {
 
   void _addTag() {
     final tag = _tagController.text.trim();
-    if (tag.isNotEmpty && !_tags.contains(tag)) {
-      setState(() {
+    String? validationResult;
+
+    if (tag.isEmpty) {
+      validationResult = 'Please enter a tag';
+    } else if (!RegExp(r'^[A-Z]').hasMatch(tag)) {
+      validationResult = 'First letter must be capitalized';
+    } else if (!RegExp(r'^[a-zA-Z]+$').hasMatch(tag)) {
+      validationResult = 'Only letters are allowed';
+    } else if (_tags.contains(tag)) {
+      validationResult = 'Tag already exists';
+    }
+
+    setState(() {
+      _tagError = validationResult;
+      
+      if (validationResult == null) {
         _tags.add(tag);
         _tagController.clear();
-      });
-    }
+      }
+    });
   }
 
   void _removeTag(String tag) => setState(() => _tags.remove(tag));
@@ -268,6 +277,7 @@ class _EditItemSheetState extends State<_EditItemSheet> {
 
     try {
       String imageUrl = widget.item.imageUrl ?? '';
+      String? oldUrl = widget.item.imageUrl;
 
       if (_imageBytes != null) {
         final String fileName = '${DateTime.now().millisecondsSinceEpoch}_$_imageFileName';
@@ -279,8 +289,30 @@ class _EditItemSheetState extends State<_EditItemSheet> {
             .child(widget.item.menuID!)
             .child('items')
             .child(fileName);
+            
         await ref.putData(_imageBytes!);
         imageUrl = await ref.getDownloadURL();
+
+        if (oldUrl != null && oldUrl.isNotEmpty) {
+          try {
+            await FirebaseStorage.instance.refFromURL(oldUrl).delete();
+          } catch (e) {
+            String message = "Update failed";
+            if (e is FirebaseException) {
+              if (e.code == 'permission-denied') message = "You don't have permission to edit this.";
+              if (e.code == 'network-request-failed') message = "Check your internet connection.";
+            }
+
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: Colors.redAccent,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        }
       }
 
       await FirebaseFirestore.instance
@@ -332,6 +364,11 @@ class _EditItemSheetState extends State<_EditItemSheet> {
     setState(() => _isLoading = true);
 
     try {
+      if (widget.item.imageUrl != null && widget.item.imageUrl!.isNotEmpty) {
+        final storageRef = FirebaseStorage.instance.refFromURL(widget.item.imageUrl!);
+        await storageRef.delete();
+      }
+      
       await FirebaseFirestore.instance
           .collection('restaurants')
           .doc(widget.item.restaurantID)
@@ -364,8 +401,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
         color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      padding: EdgeInsets.fromLTRB(28, 24, 28, 28 + keyboardHeight),
       child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(28, 24, 28, 28 + keyboardHeight),
         child: Form(
           key: _formKey,
           child: Column(
@@ -376,20 +413,38 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Edit Item', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                
                   Row(
                     children: [
-                      IconButton(
+                      ElevatedButton(
+                        style:  ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pink.withValues(alpha: 0.3)
+                        ),
                         onPressed: _delete,
-                        icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Delete Item", 
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold
+                              )
+                            ),
+                            const SizedBox(width: 16),
+                            Icon(Icons.delete_rounded, color: Colors.redAccent),
+                          ]
+                        )
                       ),
+                      const SizedBox(width: 10),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: Icon(Icons.close_rounded, color: brandColors.muted),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
+
               const SizedBox(height: 20),
 
               // Image picker
@@ -410,8 +465,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                       ? Image.memory(_imageBytes!, fit: BoxFit.cover)
                       : widget.item.imageUrl != null
                           ? Image.network(widget.item.imageUrl!, fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => _imagePlaceholder(brandColors))
-                          : _imagePlaceholder(brandColors),
+                              errorBuilder: (_, __, ___) => customImagePlaceholder(brandColors))
+                          : customImagePlaceholder(brandColors),
                 ),
               ),
               const SizedBox(height: 8),
@@ -421,23 +476,24 @@ class _EditItemSheetState extends State<_EditItemSheet> {
               const SizedBox(height: 20),
 
               TextFormField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  labelText: 'Item Title',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                controller: _titleController, 
+                decoration: customInputDecoration(
+                  label: 'Item Title', 
+                  colorScheme: colorScheme, 
+                  brandColors: brandColors
                 ),
+                
                 validator: (v) => v == null || v.trim().isEmpty ? 'Title is required' : null,
               ),
               const SizedBox(height: 16),
 
               TextFormField(
                 controller: _shortInfoController,
-                decoration: InputDecoration(
-                  labelText: 'Short shortInfo',
-                  hintText: 'e.g. Crispy and Tasty',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: customInputDecoration(
+                  label: 'Short Info',
+                  hint: 'e.g. Crispy and Tasty',
+                  colorScheme: colorScheme, 
+                  brandColors: brandColors
                 ),
                 validator: (v) => v == null || v.trim().isEmpty ? 'shortInfo is required' : null,
               ),
@@ -446,10 +502,10 @@ class _EditItemSheetState extends State<_EditItemSheet> {
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: customInputDecoration(
+                  label: 'Description',
+                  colorScheme: colorScheme, 
+                  brandColors: brandColors
                 ),
                 validator: (v) => v == null || v.trim().isEmpty ? 'Description is required' : null,
               ),
@@ -458,11 +514,11 @@ class _EditItemSheetState extends State<_EditItemSheet> {
               TextFormField(
                 controller: _priceController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: 'Price (PLN)',
+                decoration: customInputDecoration(
+                  label: 'Price (PLN)',
                   prefixText: 'PLN ',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  colorScheme: colorScheme, 
+                  brandColors: brandColors
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Price is required';
@@ -478,16 +534,23 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                   Expanded(
                     child: TextFormField(
                       controller: _tagController,
-                      decoration: InputDecoration(
-                        labelText: 'Tags',
-                        hintText: 'e.g. Vegan',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: customInputDecoration(
+                        label: 'Tags',
+                        hint: 'e.g. Vegan',
+                        colorScheme: colorScheme,
+                        brandColors: brandColors,
+                        errorText: _tagError,
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+                      ],
+                      onChanged: (value) {
+                        if (_tagError != null) { setState(() => _tagError = null); }
+                      },
                       onFieldSubmitted: (_) => _addTag(),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 16),
                   IconButton(
                     onPressed: _addTag,
                     style: IconButton.styleFrom(
@@ -521,7 +584,7 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                 decoration: BoxDecoration(
                   color: _hasDiscount
                       ? brandColors.accentGreen?.withValues(alpha: 0.08)
-                      : colorScheme.surface,
+                      : colorScheme.surfaceBright,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: _hasDiscount
@@ -624,22 +687,6 @@ class _EditItemSheetState extends State<_EditItemSheet> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _imagePlaceholder(BrandColors brandColors) {
-    return Container(
-      color: brandColors.navy?.withValues(alpha: 0.05),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_photo_alternate_outlined, size: 40, color: brandColors.muted),
-            const SizedBox(height: 8),
-            Text('Tap to upload image', style: TextStyle(fontSize: 12, color: brandColors.muted)),
-          ],
         ),
       ),
     );

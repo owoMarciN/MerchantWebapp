@@ -62,17 +62,25 @@ class ItemsScreen extends StatelessWidget {
                     .orderBy("publishedDate", descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.hasError) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return SliverToBoxAdapter(
-                      child: Center(child: Text("Error: ${snapshot.error}")),
+                      child: Center(child: circularProgress(),
+                      ),
                     );
                   }
 
-                  if (!snapshot.hasData) {
-                    return SliverToBoxAdapter(child: Center(child: circularProgress()));
+                  if (snapshot.hasError) {
+                    return SliverToBoxAdapter(
+                      child: Center(
+                        child: Text(
+                          "Error: ${snapshot.error}", 
+                          style: TextStyle(color: brandColors.muted)
+                        ),
+                      ),
+                    );
                   }
 
-                  if (snapshot.data!.docs.isEmpty) {
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return SliverFillRemaining(
                       child: Center(
                         child: Column(
@@ -102,7 +110,7 @@ class ItemsScreen extends StatelessWidget {
                         iModel.itemID = doc.id;
                         iModel.menuID = model!.menuID;
                         iModel.restaurantID = model!.restaurantID;
-                        return ItemsDesignWidget(model: iModel, context: context);
+                        return ItemsDesignWidget(model: iModel);
                       },
                     ),
                   );

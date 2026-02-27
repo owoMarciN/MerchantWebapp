@@ -4,36 +4,62 @@ import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/widgets/progress_bar.dart';
 
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
+
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  final String? _restaurantID = currentUid;
 
   @override
   Widget build(BuildContext context) {
     final brandColors = Theme.of(context).extension<BrandColors>()!;
     final colorScheme = Theme.of(context).colorScheme;
-    final String? restaurantID = currentUid;
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection("orders")
-          .where("restaurantID", isEqualTo: restaurantID)
-          .orderBy("orderTime", descending: true)
+          .where("restaurantID", isEqualTo: _restaurantID)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: circularProgress());
         }
 
-        if (snapshot.data!.docs.isEmpty) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Something went wrong', style: TextStyle(color: brandColors.muted)),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.receipt_long_rounded, size: 64, color: brandColors.muted),
-                const SizedBox(height: 16),
-                const Text('No orders yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: colorScheme.outline),
+                  ),
+                  child: Icon(Icons.receipt_long_rounded, size: 48, color: brandColors.muted),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'No orders right now',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                ),
                 const SizedBox(height: 8),
-                Text('Incoming orders will appear here', style: TextStyle(fontSize: 14, color: brandColors.muted)),
+                Text(
+                  'When customers place orders they will appear here.',
+                  style: TextStyle(fontSize: 14, color: brandColors.muted),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           );

@@ -51,6 +51,7 @@ final ThemeData darkTheme = ThemeData(
   scaffoldBackgroundColor: const Color(0xFF1D1D36),
   colorScheme: const ColorScheme.dark(
     surface: Color(0xFF13131F),
+    surfaceBright: Color.fromARGB(255, 36, 36, 60),
     primary: Color(0xFF003DFF),
     onPrimary: Colors.white,
     outline: Color(0xFF1E1E30),

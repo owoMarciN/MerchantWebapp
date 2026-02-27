@@ -29,8 +29,9 @@ class _MenusScreenState extends State<MenusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String? restaurantID = sharedPreferences!.getString("uid");
+    final String? restaurantID = currentUid;
     final brandColors = Theme.of(context).extension<BrandColors>()!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Stack(
       children: [
@@ -44,23 +45,50 @@ class _MenusScreenState extends State<MenusScreen> {
                   .orderBy("publishedDate", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return SliverToBoxAdapter(
-                    child: Center(child: circularProgress()),
+                    child: Center(child: circularProgress(),
+                    ),
                   );
                 }
 
-                if (snapshot.data!.docs.isEmpty) {
+                if (snapshot.hasError) {
+                  return SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(
+                        "Error: ${snapshot.error}", 
+                        style: TextStyle(color: brandColors.muted)
+                      ),
+                    ),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return SliverFillRemaining(
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.restaurant_menu_rounded, size: 64, color: brandColors.muted),
-                          const SizedBox(height: 16),
-                          const Text('No menus yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: colorScheme.outline),
+                            ),
+                            child: Icon(Icons.restaurant_menu_rounded, size: 48, color: brandColors.muted),
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'No menus yet',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                          ),
                           const SizedBox(height: 8),
-                          Text('Tap + to add your first menu', style: TextStyle(fontSize: 14, color: brandColors.muted)),
+                          Text(
+                            'Tap + to add your first menu',
+                            style: TextStyle(fontSize: 14, color: brandColors.muted),
+                            textAlign: TextAlign.center,
+                          ),
                         ],
                       ),
                     ),
@@ -79,7 +107,7 @@ class _MenusScreenState extends State<MenusScreen> {
                       Menus mModel = Menus.fromJson(doc.data()! as Map<String, dynamic>);
                       mModel.menuID = doc.id;
                       mModel.restaurantID = restaurantID;
-                      return MenusDesignWidget(model: mModel, context: context);
+                      return MenusDesignWidget(model: mModel);
                     },
                   ),
                 );

@@ -55,30 +55,48 @@ class _DashboardShellState extends State<DashboardShell> {
             .snapshots(),
         builder: (context, snap) {
           final data = snap.data?.data() as Map<String, dynamic>?;
-          final bool setupComplete =
-              (data?["logoUrl"] ?? "").toString().isNotEmpty &&
-              (data?["bannerUrl"] ?? "").toString().isNotEmpty &&
-              data?["stripeConnected"] == true;
 
-          return Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            body: Row(
-              children: [
-                if (isWide)
-                  _buildSidebar(context, selected, brandColors, colorScheme, setupComplete),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildTopBar(context, isWide, brandColors, colorScheme),
-                      Expanded(child: widget.child),
-                    ],
-                  ),
+          return StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .doc(restaurantID)
+                .snapshots(),
+            builder: (context, userSnap) {
+              final userData = userSnap.data?.data() as Map<String, dynamic>?;
+
+              final bool setupComplete =
+                  (data?["logoUrl"] ?? "").toString().isNotEmpty &&
+                  (data?["bannerUrl"] ?? "").toString().isNotEmpty &&
+                  (data?["address"] ?? "").toString().isNotEmpty &&
+                  (userData?["photoUrl"] ?? "").toString().isNotEmpty &&
+                  data?["stripeConnected"] == true;
+
+              return Scaffold(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                body: Row(
+                  children: [
+                    if (isWide)
+                      _buildSidebar(
+                        context, selected, brandColors, colorScheme,
+                        setupComplete,
+                        data?["logoUrl"] as String?,
+                        userData?["photoUrl"] as String?,
+                      ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _buildTopBar(context, isWide, brandColors, colorScheme, userData?["photoUrl"] as String?),
+                          Expanded(child: widget.child),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            bottomNavigationBar: isWide
-                ? null
-                : _buildBottomNav(context, selected, brandColors, colorScheme),
+                bottomNavigationBar: isWide
+                    ? null
+                    : _buildBottomNav(context, selected, brandColors, colorScheme),
+              );
+            },
           );
         },
       ),
@@ -91,8 +109,11 @@ class _DashboardShellState extends State<DashboardShell> {
     BrandColors brandColors,
     ColorScheme colorScheme,
     bool setupComplete,
+    String? restaurantLogoUrl,
+    String? ownerPhotoUrl,
   ) {
-    final String? photoUrl = getUserPref<String>("photo");
+    final String? logoUrl = restaurantLogoUrl?.isNotEmpty == true ? restaurantLogoUrl : null;
+    final String? photoUrl = ownerPhotoUrl?.isNotEmpty == true ? ownerPhotoUrl : getUserPref<String>("photo");
 
     return Container(
       width: 220,
@@ -106,10 +127,10 @@ class _DashboardShellState extends State<DashboardShell> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                photoUrl != null && photoUrl.isNotEmpty
+                logoUrl != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(photoUrl, width: 32, height: 32, fit: BoxFit.cover),
+                        child: Image.network(logoUrl, width: 32, height: 32, fit: BoxFit.cover),
                       )
                     : Container(
                         width: 32,
@@ -135,7 +156,6 @@ class _DashboardShellState extends State<DashboardShell> {
 
           const SizedBox(height: 24),
 
-          // Setup prompt
           if (!setupComplete) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -267,8 +287,9 @@ class _DashboardShellState extends State<DashboardShell> {
     bool isWide,
     BrandColors brandColors,
     ColorScheme colorScheme,
+    String? livePhotoUrl,
   ) {
-    final String? photoUrl = getUserPref<String>("photo");
+    final String? photoUrl = livePhotoUrl?.isNotEmpty == true ? livePhotoUrl : getUserPref<String>("photo");
 
     return Container(
       height: 60,
@@ -291,6 +312,12 @@ class _DashboardShellState extends State<DashboardShell> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           const Spacer(),
+          _TopBarButton(
+            icon: Icons.add_rounded,
+            label: 'New Banner',
+            color: brandColors.navy!,
+          ),
+          const SizedBox(width: 12),
           _iconBtn(brandColors, colorScheme, Icons.notifications_none_rounded),
           const SizedBox(width: 8),
           PopupMenuButton(
