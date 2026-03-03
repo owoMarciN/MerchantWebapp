@@ -69,7 +69,7 @@ class _DashboardShellState extends State<DashboardShell> {
                   (data?["bannerUrl"] ?? "").toString().isNotEmpty &&
                   (data?["address"] ?? "").toString().isNotEmpty &&
                   (userData?["photoUrl"] ?? "").toString().isNotEmpty &&
-                  data?["stripeConnected"] == true;
+                  (data?["iban"] ?? "").toString().trim().isNotEmpty;
 
               return Scaffold(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -113,7 +113,7 @@ class _DashboardShellState extends State<DashboardShell> {
     String? ownerPhotoUrl,
   ) {
     final String? logoUrl = restaurantLogoUrl?.isNotEmpty == true ? restaurantLogoUrl : null;
-    final String? photoUrl = ownerPhotoUrl?.isNotEmpty == true ? ownerPhotoUrl : getUserPref<String>("photo");
+    final String? photoUrl = ownerPhotoUrl?.isNotEmpty == true ? ownerPhotoUrl : getUserPref<String>("photoUrl");
 
     return Container(
       width: 220,
@@ -144,7 +144,7 @@ class _DashboardShellState extends State<DashboardShell> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    getUserPref<String>("name") ?? 'RestaurantOS',
+                    getUserPref<String>("accountName") ?? 'RestaurantOS',
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -222,7 +222,7 @@ class _DashboardShellState extends State<DashboardShell> {
                     : null,
               ),
               title: Text(
-                getUserPref<String>("name") ?? 'My Account',
+                getUserPref<String>("accountName") ?? 'My Account',
                 style: TextStyle(fontSize: 12, color: brandColors.muted),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -289,7 +289,7 @@ class _DashboardShellState extends State<DashboardShell> {
     ColorScheme colorScheme,
     String? livePhotoUrl,
   ) {
-    final String? photoUrl = livePhotoUrl?.isNotEmpty == true ? livePhotoUrl : getUserPref<String>("photo");
+    final String? photoUrl = livePhotoUrl?.isNotEmpty == true ? livePhotoUrl : getUserPref<String>("photoUrl");
 
     return Container(
       height: 60,
@@ -343,12 +343,12 @@ class _DashboardShellState extends State<DashboardShell> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        getUserPref<String>("name") ?? 'Restaurant',
+                        getUserPref<String>("businessName") ?? 'Restaurant',
                         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        getUserPref<String>("email") ?? 'business@email.com',
+                        getUserPref<String>("accountEmail") ?? 'account@email.com',
                         style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       const SizedBox(height: 12),

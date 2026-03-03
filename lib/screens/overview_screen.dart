@@ -79,16 +79,52 @@ class _OverviewScreenState extends State<OverviewScreen> {
     final bool hasLogo = (_restaurantData?["logoUrl"] ?? "").toString().isNotEmpty;
     final bool hasBanner = (_restaurantData?["bannerUrl"] ?? "").toString().isNotEmpty;
     final bool hasAddress = (_restaurantData?["address"] ?? "").toString().isNotEmpty;
-    final bool hasStripe = _restaurantData?["stripeConnected"] == true;
     final bool hasProfilePhoto = (_userData?["photoUrl"] ?? "").toString().isNotEmpty;
+    final bool hasIban = (_restaurantData?["iban"] ?? "").toString().trim().isNotEmpty;
 
     final List<_SetupTask> tasks = [
-      _SetupTask(icon: Icons.add_a_photo_rounded, title: 'Upload Restaurant Logo', description: 'Customers will see your logo across the app.', done: hasLogo, route: '/dashboard/settings'),
-      _SetupTask(icon: Icons.panorama_rounded, title: 'Add a Banner Image', description: 'A banner makes your storefront visually appealing.', done: hasBanner, route: '/dashboard/settings'),
-      _SetupTask(icon: Icons.location_on_rounded, title: 'Set Restaurant Address', description: 'Let customers know where to find you.', done: hasAddress, route: '/dashboard/settings'),
-      _SetupTask(icon: Icons.person_rounded, title: 'Add a Profile Photo', description: 'Put a face to your restaurant owner account.', done: hasProfilePhoto, route: '/dashboard/settings'),
-      _SetupTask(icon: Icons.restaurant_menu_rounded, title: 'Create a Menu & Add Items', description: 'Organise your offerings into menus with dishes and prices.', done: _hasMenus, route: '/dashboard/menus'),
-      _SetupTask(icon: Icons.credit_card_rounded, title: 'Connect Stripe Payments', description: 'Accept online payments from customers via Stripe.', done: hasStripe, route: '/dashboard/settings'),
+      _SetupTask(
+        icon: Icons.add_a_photo_rounded,
+        title: 'Upload Restaurant Logo',
+        description: 'Customers will see your logo across the app.',
+        done: hasLogo,
+        route: '/dashboard/settings',
+      ),
+      _SetupTask(
+        icon: Icons.panorama_rounded,
+        title: 'Add a Banner Image',
+        description: 'A banner makes your storefront visually appealing.',
+        done: hasBanner,
+        route: '/dashboard/settings',
+      ),
+      _SetupTask(
+        icon: Icons.location_on_rounded,
+        title: 'Set Restaurant Address',
+        description: 'Let customers know where to find you.',
+        done: hasAddress,
+        route: '/dashboard/settings',
+      ),
+      _SetupTask(
+        icon: Icons.person_rounded,
+        title: 'Add a Profile Photo',
+        description: 'Put a face to your restaurant owner account.',
+        done: hasProfilePhoto,
+        route: '/dashboard/settings',
+      ),
+      _SetupTask(
+        icon: Icons.restaurant_menu_rounded,
+        title: 'Create a Menu & Add Items',
+        description: 'Organise your offerings into menus with dishes and prices.',
+        done: _hasMenus,
+        route: '/dashboard/menus',
+      ),
+      _SetupTask(
+        icon: Icons.account_balance_rounded,
+        title: 'Add Bank Account (IBAN)',
+        description: 'Required to receive payouts from customer orders.',
+        done: hasIban,
+        route: '/dashboard/settings',
+      ),
     ];
 
     final int completedCount = tasks.where((t) => t.done).length;
@@ -101,7 +137,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welcome back, ${getUserPref<String>("name") ?? "Chef"} 👋',
+            'Welcome back, ${getUserPref<String>("accountName") ?? "Chef"} 👋',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
@@ -162,15 +198,18 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Get your restaurant ready', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    const Text('Get your restaurant ready',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
-                    Text('$completedCount of ${tasks.length} steps completed', style: TextStyle(fontSize: 12, color: brandColors.muted)),
+                    Text('$completedCount of ${tasks.length} steps completed',
+                        style: TextStyle(fontSize: 12, color: brandColors.muted)),
                   ],
                 ),
               ),
               Text(
                 '${(progress * 100).toInt()}%',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: brandColors.navy),
+                style: TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w700, color: brandColors.navy),
               ),
             ],
           ),
@@ -185,8 +224,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          ...tasks.asMap().entries.map((entry) =>
-              _buildTaskRow(context, entry.value, entry.key, tasks.length, brandColors, colorScheme)),
+          ...tasks.asMap().entries.map((entry) => _buildTaskRow(
+              context, entry.value, entry.key, tasks.length, brandColors, colorScheme)),
         ],
       ),
     );
@@ -219,7 +258,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: task.done
-                          ? brandColors.accentGreen?.withValues(alpha: 0.4) ?? colorScheme.outline
+                          ? brandColors.accentGreen?.withValues(alpha: 0.4) ??
+                              colorScheme.outline
                           : colorScheme.outline,
                     ),
                   ),
@@ -245,7 +285,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(task.description, style: TextStyle(fontSize: 12, color: brandColors.muted, height: 1.4)),
+                      Text(task.description,
+                          style: TextStyle(
+                              fontSize: 12, color: brandColors.muted, height: 1.4)),
                     ],
                   ),
                 ),
@@ -257,7 +299,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           color: brandColors.accentGreen?.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('Done', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: brandColors.accentGreen)),
+                        child: Text('Done',
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: brandColors.accentGreen)),
                       )
                     : Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -265,7 +311,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           color: brandColors.navy?.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('Set up', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: brandColors.navy)),
+                        child: Text('Set up',
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: brandColors.navy)),
                       ),
               ],
             ),
@@ -280,7 +330,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Widget _sectionLabel(String text, BrandColors brandColors) {
     return Text(
       text,
-      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: brandColors.muted, letterSpacing: 1.2),
+      style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          color: brandColors.muted,
+          letterSpacing: 1.2),
     );
   }
 
@@ -291,8 +345,16 @@ class _OverviewScreenState extends State<OverviewScreen> {
           .where("restaurantID", isEqualTo: _restaurantID)
           .snapshots(),
       builder: (context, snap) {
-        final int totalOrders = snap.data?.docs.length ?? 0;
-        final int pendingOrders = snap.data?.docs.where((d) => (d.data() as Map)["status"] == "Pending").length ?? 0;
+        final docs = snap.data?.docs ?? [];
+        final int totalOrders = docs.length;
+        final int pendingOrders =
+            docs.where((d) => (d.data() as Map)["status"] == "normal").length;
+        final int completedOrders =
+            docs.where((d) => (d.data() as Map)["status"] == "delivered").length;
+        final double totalRevenue = docs.fold(0.0, (overallSum, d) {
+          final raw = (d.data() as Map)["totalAmount"]?.toString() ?? "0";
+          return overallSum + (double.tryParse(raw) ?? 0);
+        });
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -307,10 +369,30 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 mainAxisExtent: 96,
               ),
               children: [
-                _StatCard(label: 'Total Orders', value: '$totalOrders', icon: Icons.shopping_bag_rounded, color: brandColors.navy!, colorScheme: colorScheme),
-                _StatCard(label: 'Pending', value: '$pendingOrders', icon: Icons.pending_actions_rounded, color: const Color(0xFFD97706), colorScheme: colorScheme),
-                _StatCard(label: 'Total Revenue', value: '—', icon: Icons.payments_rounded, color: brandColors.accentGreen!, colorScheme: colorScheme),
-                _StatCard(label: 'Avg Rating', value: '—', icon: Icons.star_rounded, color: const Color(0xFFEF4444), colorScheme: colorScheme),
+                _StatCard(
+                    label: 'Total Orders',
+                    value: '$totalOrders',
+                    icon: Icons.shopping_bag_rounded,
+                    color: brandColors.navy!,
+                    colorScheme: colorScheme),
+                _StatCard(
+                    label: 'Pending',
+                    value: '$pendingOrders',
+                    icon: Icons.pending_actions_rounded,
+                    color: const Color(0xFFD97706),
+                    colorScheme: colorScheme),
+                _StatCard(
+                    label: 'Completed',
+                    value: '$completedOrders',
+                    icon: Icons.check_circle_rounded,
+                    color: brandColors.accentGreen!,
+                    colorScheme: colorScheme),
+                _StatCard(
+                    label: 'Total Revenue',
+                    value: '${totalRevenue.toStringAsFixed(2)} PLN',
+                    icon: Icons.payments_rounded,
+                    color: const Color(0xFF8B5CF6),
+                    colorScheme: colorScheme),
               ],
             );
           },
@@ -324,6 +406,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
       stream: FirebaseFirestore.instance
           .collection("orders")
           .where("restaurantID", isEqualTo: _restaurantID)
+          .orderBy("orderTime", descending: true)
           .limit(5)
           .snapshots(),
       builder: (context, snapshot) {
@@ -336,7 +419,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
               border: Border.all(color: colorScheme.outline),
             ),
             child: Center(
-              child: Text('No orders yet', style: TextStyle(fontSize: 13, color: brandColors.muted)),
+              child: Text('No orders yet',
+                  style: TextStyle(fontSize: 13, color: brandColors.muted)),
             ),
           );
         }
@@ -357,29 +441,82 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     Expanded(flex: 3, child: _TableHeader('CUSTOMER')),
                     Expanded(flex: 2, child: _TableHeader('ITEMS')),
                     Expanded(flex: 3, child: _TableHeader('STATUS')),
-                    Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: _TableHeader('TOTAL'))),
+                    Expanded(
+                        flex: 2,
+                        child: Align(
+                            alignment: Alignment.centerRight,
+                            child: _TableHeader('TOTAL'))),
                   ],
                 ),
               ),
               Divider(height: 1, color: colorScheme.outline),
               ...snapshot.data!.docs.map((doc) {
                 final d = doc.data() as Map<String, dynamic>;
-                final String status = d["status"] ?? "Pending";
-                final String customer = d["customerName"] ?? "—";
+                final String status = d["status"] ?? "normal";
+                final String customer = d["userID"] ?? "—";
                 final int items = (d["itemIDs"] as List?)?.length ?? 0;
-                final double total = (d["totalAmount"] ?? 0).toDouble();
-                final String shortId = '#${doc.id.substring(0, doc.id.length.clamp(0, 8))}';
+                final double total =
+                    double.tryParse(d["totalAmount"]?.toString() ?? "0") ?? 0;
+                final Timestamp? ts = d["orderTime"] as Timestamp?;
+                final String timeLabel = ts != null
+                    ? _formatTime(ts.toDate())
+                    : "—";
+                final String shortId =
+                    '#${doc.id.substring(0, doc.id.length.clamp(0, 8))}';
                 return Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                       child: Row(
                         children: [
-                          Expanded(flex: 3, child: Text(shortId, style: TextStyle(fontSize: 12, color: brandColors.muted, fontFamily: 'monospace'))),
-                          Expanded(flex: 3, child: Text(customer, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500))),
-                          Expanded(flex: 2, child: Text('$items item${items == 1 ? '' : 's'}', style: TextStyle(fontSize: 13, color: brandColors.muted))),
-                          Expanded(flex: 3, child: _StatusChip(status: status, brandColors: brandColors)),
-                          Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: Text('${total.toStringAsFixed(2)} PLN', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)))),
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(shortId,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: brandColors.muted,
+                                        fontFamily: 'monospace')),
+                                const SizedBox(height: 2),
+                                Text(timeLabel,
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        color: brandColors.muted)),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                              flex: 3,
+                              child: Text(customer,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500),
+                                  overflow: TextOverflow.ellipsis)),
+                          Expanded(
+                              flex: 2,
+                              child: Text(
+                                  '$items item${items == 1 ? '' : 's'}',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: brandColors.muted))),
+                          Expanded(
+                              flex: 3,
+                              child: _StatusChip(
+                                  status: status,
+                                  brandColors: brandColors)),
+                          Expanded(
+                              flex: 2,
+                              child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                      '${total.toStringAsFixed(2)} PLN',
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight:
+                                              FontWeight.w600)))),
                         ],
                       ),
                     ),
@@ -393,9 +530,18 @@ class _OverviewScreenState extends State<OverviewScreen> {
       },
     );
   }
+
+  String _formatTime(DateTime dt) {
+    final now = DateTime.now();
+    final diff = now.difference(dt);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}';
+  }
 }
 
-// ─── Supporting widgets ────────────────────────────────────────────────────
+// ─── Supporting widgets ───────────────────────────────────────────────────────
 
 class _SetupTask {
   final IconData icon;
@@ -403,7 +549,13 @@ class _SetupTask {
   final String description;
   final bool done;
   final String route;
-  const _SetupTask({required this.icon, required this.title, required this.description, required this.done, required this.route});
+  const _SetupTask({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.done,
+    required this.route,
+  });
 }
 
 class _StatCard extends StatelessWidget {
@@ -411,7 +563,13 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final ColorScheme colorScheme;
-  const _StatCard({required this.label, required this.value, required this.icon, required this.color, required this.colorScheme});
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.colorScheme,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -431,11 +589,17 @@ class _StatCard extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8)),
                 child: Icon(icon, size: 16, color: color),
               ),
               const SizedBox(width: 10),
-              Flexible(child: Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis)),
+              Flexible(
+                  child: Text(value,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w700),
+                      overflow: TextOverflow.ellipsis)),
             ],
           ),
           const SizedBox(height: 8),
@@ -454,18 +618,22 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = switch (status) {
-      'Pending' => (const Color(0xFFFEF3C7).withValues(alpha: 0.5), const Color(0xFFD97706)),
-      'In Progress' => (brandColors.navy!.withValues(alpha: 0.15), brandColors.navy!),
-      'Ready' => (brandColors.accentGreen!.withValues(alpha: 0.15), brandColors.accentGreen!),
-      'Delivered' => (brandColors.muted!.withValues(alpha: 0.1), brandColors.muted!),
+      'normal' => (const Color(0xFFFEF3C7).withValues(alpha: 0.5), const Color(0xFFD97706)),
+      'processing' => (brandColors.navy!.withValues(alpha: 0.15), brandColors.navy!),
+      'ready' => (brandColors.accentGreen!.withValues(alpha: 0.15), brandColors.accentGreen!),
+      'delivered' => (brandColors.muted!.withValues(alpha: 0.1), brandColors.muted!),
+      'cancelled' => (const Color(0xFFEF4444).withValues(alpha: 0.1), const Color(0xFFEF4444)),
       _ => (brandColors.muted!.withValues(alpha: 0.1), brandColors.muted!),
     };
     return UnconstrainedBox(
       alignment: Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
-        child: Text(status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
+        decoration:
+            BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
+        child: Text(status,
+            style: TextStyle(
+                fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
       ),
     );
   }
@@ -476,6 +644,11 @@ class _TableHeader extends StatelessWidget {
   const _TableHeader(this.text);
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Color(0xFF8A8AA8), letterSpacing: 0.8));
+    return Text(text,
+        style: const TextStyle(
+            fontSize: 10.5,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF8A8AA8),
+            letterSpacing: 0.8));
   }
 }

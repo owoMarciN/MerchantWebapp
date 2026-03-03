@@ -183,6 +183,53 @@ void _snack(BuildContext context, String msg, {bool error = false}) {
   ));
 }
 
+// Walidator IBAN — sprawdza format, długość i sumę kontrolną (mod-97)
+String? _validateIban(String? value) {
+  if (value == null || value.trim().isEmpty) return null; // pole opcjonalne
+
+  // Usuń spacje i zamień na wielkie litery
+  final iban = value.replaceAll(' ', '').toUpperCase();
+
+  // Sprawdź czy zawiera tylko litery i cyfry
+  if (!RegExp(r'^[A-Z0-9]+$').hasMatch(iban)) {
+    return 'IBAN może zawierać tylko litery i cyfry';
+  }
+
+  // Sprawdź prefix kraju i długość
+  final countryCode = iban.substring(0, 2);
+  final expectedLengths = <String, int>{
+    'PL': 28, 'DE': 22, 'GB': 22, 'FR': 27, 'NL': 18,
+    'ES': 24, 'IT': 27, 'BE': 16, 'AT': 20, 'CH': 21,
+    'CZ': 24, 'SK': 24, 'HU': 28, 'RO': 24, 'HR': 21,
+  };
+
+  final expectedLength = expectedLengths[countryCode];
+  if (expectedLength == null) {
+    return 'Nieobsługiwany kraj ($countryCode)';
+  }
+  if (iban.length != expectedLength) {
+    return 'IBAN dla $countryCode musi mieć $expectedLength znaków (masz ${iban.length})';
+  }
+
+  // Sprawdź sumę kontrolną (mod-97)
+  final rearranged = iban.substring(4) + iban.substring(0, 4);
+  final numeric = rearranged.split('').map((c) {
+    final code = c.codeUnitAt(0);
+    return code >= 65 ? (code - 55).toString() : c;
+  }).join();
+
+  BigInt remainder = BigInt.zero;
+  for (final ch in numeric.split('')) {
+    remainder = (remainder * BigInt.from(10) + BigInt.parse(ch)) % BigInt.from(97);
+  }
+
+  if (remainder != BigInt.one) {
+    return 'Nieprawidłowy numer IBAN (błędna suma kontrolna)';
+  }
+
+  return null;
+}
+
 // ─── Section Header ───────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
@@ -589,6 +636,7 @@ class _BusinessInfoCard extends StatefulWidget {
 class _BusinessInfoCardState extends State<_BusinessInfoCard> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
+  late final TextEditingController _ibanController;
   late final PhoneController _mobileController;
   String _address = '';
   double? _lat;
@@ -600,6 +648,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.data["name"] ?? '');
+    _ibanController = TextEditingController(text: widget.data["iban"] ?? '');
     _mobileController = PhoneController(
       initialValue:
           PhoneNumber(isoCode: IsoCode.PL, nsn: widget.data["businessMobile"] ?? ''),
@@ -608,6 +657,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
     _lat = (widget.data["lat"] as num?)?.toDouble();
     _lng = (widget.data["lng"] as num?)?.toDouble();
     _nameController.addListener(_onEdit);
+    _ibanController.addListener(_onEdit);
     _mobileController.addListener(_onEdit);
   }
 
@@ -616,6 +666,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
     super.didUpdateWidget(oldWidget);
     if (!_edited) {
       _nameController.text = widget.data["name"] ?? '';
+      _ibanController.text = widget.data["iban"] ?? '';
       _address = widget.data["address"] ?? '';
       _lat = (widget.data["lat"] as num?)?.toDouble();
       _lng = (widget.data["lng"] as num?)?.toDouble();
@@ -627,6 +678,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
   @override
   void dispose() {
     _nameController.dispose();
+    _ibanController.dispose();
     _mobileController.dispose();
     super.dispose();
   }
@@ -658,6 +710,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
     try {
       final name = _nameController.text.trim();
       final mobile = _mobileController.value.international;
+      final iban = _ibanController.text.trim();
 
       await FirebaseFirestore.instance
           .collection('restaurants')
@@ -665,6 +718,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
           .update({
         'name': name,
         'businessMobile': mobile,
+        'iban': iban,
         'address': _address,
         if (_lat != null) 'lat': _lat,
         if (_lng != null) 'lng': _lng,
@@ -709,6 +763,13 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
                   CustomPhoneField(
                     label: 'Business Phone',
                     controller: _mobileController,
+                  ),
+                  const SizedBox(height: 12),
+                  CustomTextField(
+                    hintText: 'IBAN Account Number',
+                    controller: _ibanController,
+                    data: Icons.account_balance_rounded,
+                    customValidator: _validateIban,
                   ),
                   const SizedBox(height: 12),
                   InkWell(
@@ -776,10 +837,6 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
 }
 
 // ─── User Profile Card ────────────────────────────────────────────────────────
-// Photo staged locally on pick. On Save:
-//   (1) validate form, (2) upload new photo, (3) delete old photo,
-//   (4) write name + phone + photoUrl to Firestore in one update.
-
 class _UserProfileCard extends StatefulWidget {
   final String? restaurantID;
   final Map<String, dynamic> data;
@@ -866,11 +923,9 @@ class _UserProfileCardState extends State<_UserProfileCard> {
         await ref.putData(_stagedBytes!);
         photoUrl = await ref.getDownloadURL();
 
-        // 2. Delete old photo — new URL is confirmed so safe to delete
         await _deleteOldFile(oldPhotoUrl);
       }
 
-      // 3. Single Firestore write with all updated fields
       await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.restaurantID)
@@ -1032,7 +1087,6 @@ class _UserProfileCardState extends State<_UserProfileCard> {
 }
 
 // ─── Danger Zone ──────────────────────────────────────────────────────────────
-
 class _DangerCard extends StatelessWidget {
   final BrandColors brandColors;
   final ColorScheme colorScheme;
@@ -1127,7 +1181,6 @@ class _DangerCard extends StatelessWidget {
 }
 
 // ─── Map Picker Dialog ────────────────────────────────────────────────────────
-
 class _MapPickerDialog extends StatefulWidget {
   final double? initialLat;
   final double? initialLng;
@@ -1306,7 +1359,6 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
 }
 
 // ─── Shared Components ────────────────────────────────────────────────────────
-
 class _Card extends StatelessWidget {
   final Widget child;
   final ColorScheme colorScheme;

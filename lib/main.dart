@@ -11,7 +11,6 @@ import 'package:user_app/models/language.dart';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:user_app/assistant_methods/address_changer.dart';
 import 'package:user_app/assistant_methods/locale_provider.dart';
 
 import 'package:user_app/global/global.dart';
@@ -58,16 +57,12 @@ void main() async {
   LocaleProvider localeProvider = LocaleProvider();
   await localeProvider.loadLocale();
 
-  AddressChanger addressChanger = AddressChanger();
-  await addressChanger.loadSavedAddress();
-
   setPathUrlStrategy();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: localeProvider),
-        ChangeNotifierProvider.value(value: addressChanger),
       ],
       child: const AdminApp()
     ),

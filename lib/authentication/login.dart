@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       final restaurantData = restaurantSnapshot.data()!;
-      if (restaurantData["status"] != "Approved" && restaurantData["status"] != "Active") {
+      if (restaurantData["status"] == "Not Approved") {
         await firebaseAuth.signOut();
         if (!mounted) return;
         Navigator.pop(context);
@@ -126,24 +126,14 @@ class _LoginScreenState extends State<LoginScreen> {
       // Save info locally
       await sharedPreferences!.setString("uid", currentUser.uid);
       await saveUserPref<String>("accountName", userData["name"] ?? "");
+      await saveUserPref<String>("accountEmail", userData["email"] ?? "");
       await saveUserPref<String>("phone", userData["phone"] ?? "");
       await saveUserPref<String>("photoUrl", userData["photoUrl"] ?? "");
-
-      print('Account Name: ${userData["name"]}');
-      print('Phone: ${userData["phone"]}');
-      print('Photo URL: ${userData["photoUrl"]}');
 
       await saveUserPref<String>("businessName", restaurantData["name"] ?? "");
       await saveUserPref<String>("businessMobile", restaurantData["businessMobile"] ?? "");
       await saveUserPref<String>("logoUrl", restaurantData["logoUrl"] ?? "");
       await saveUserPref<String>("bannerUrl", restaurantData["bannerUrl"] ?? "");
-
-      print('--- Business Data Saved ---');
-      print('Business Name: ${restaurantData["name"]}');
-      print('Business Mobile: ${restaurantData["businessMobile"]}');
-      print('Logo URL: ${restaurantData["logoUrl"]}');
-      print('Banner URL: ${restaurantData["bannerUrl"]}');
-      print('---------------------------');
 
       if (!mounted) return;
       Navigator.pop(context);
