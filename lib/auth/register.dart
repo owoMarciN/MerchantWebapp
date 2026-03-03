@@ -11,6 +11,7 @@ import 'package:user_app/widgets/error_dialog.dart';
 import 'package:user_app/widgets/loading_dialog.dart';
 import 'package:user_app/extensions/context_translate_ext.dart';
 import 'package:go_router/go_router.dart';
+import 'package:user_app/widgets/unified_snackbar.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -34,7 +35,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _ownerNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   late final PhoneController _ownerPhoneController;
 
   @override
@@ -86,11 +88,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const LoadingDialog(message: "Creating Partner Account..."),
+      builder: (_) =>
+          const LoadingDialog(message: "Creating Partner Account..."),
     );
 
     try {
-      final UserCredential auth = await firebaseAuth.createUserWithEmailAndPassword(
+      final UserCredential auth =
+          await firebaseAuth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
@@ -106,12 +110,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Navigator.pop(context);
         context.go('/');
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Your account is pending approval. Please sign in once verified."),
-            duration: Duration(seconds: 5),
-          ),
-        );
+        unifiedSnackBar(context,
+            "Your account is pending approval. Please sign in once verified.");
       }
     } catch (error) {
       if (!mounted) return;
@@ -124,7 +124,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _saveRestaurantToFirestore(User currentUser) async {
-    await FirebaseFirestore.instance.collection('restaurants').doc(currentUser.uid).set({
+    await FirebaseFirestore.instance
+        .collection('restaurants')
+        .doc(currentUser.uid)
+        .set({
       "restaurantID": currentUser.uid,
       "name": _businessNameController.text.trim(),
       "nip": _nipController.text.trim(),
@@ -138,7 +141,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _saveUserToFirestore(User currentUser) async {
-    await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).set({
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .set({
       "userID": currentUser.uid,
       "name": _ownerNameController.text.trim(),
       "email": currentUser.email,
@@ -161,7 +167,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: isWeb ? 40 : 20, vertical: 20),
+              padding: EdgeInsets.symmetric(
+                  horizontal: isWeb ? 40 : 20, vertical: 20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -180,8 +187,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       );
                     },
                     child: _currentStep == 0
-                        ? KeyedSubtree(key: const ValueKey(0), child: _buildBusinessStep())
-                        : KeyedSubtree(key: const ValueKey(1), child: _buildAdminStep()),
+                        ? KeyedSubtree(
+                            key: const ValueKey(0), child: _buildBusinessStep())
+                        : KeyedSubtree(
+                            key: const ValueKey(1), child: _buildAdminStep()),
                   ),
                 ],
               ),
@@ -195,9 +204,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildStepIndicator() {
     return Row(
       children: [
-        _StepDot(number: 1, label: 'Business', active: _currentStep == 0, done: _currentStep > 0),
-        Expanded(child: Divider(color: _currentStep > 0 ? Colors.blueAccent : Colors.grey[300])),
-        _StepDot(number: 2, label: 'Admin Profile', active: _currentStep == 1, done: false),
+        _StepDot(
+            number: 1,
+            label: 'Business',
+            active: _currentStep == 0,
+            done: _currentStep > 0),
+        Expanded(
+            child: Divider(
+                color:
+                    _currentStep > 0 ? Colors.blueAccent : Colors.grey[300])),
+        _StepDot(
+            number: 2,
+            label: 'Admin Profile',
+            active: _currentStep == 1,
+            done: false),
       ],
     );
   }
@@ -218,7 +238,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             controller: _nipController,
             hintText: 'NIP',
             validator: FieldValidator.nip,
-
           ),
           CustomTextField(
             data: Icons.tag_rounded,
@@ -238,14 +257,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onPressed: _nextStep,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Continue', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text('Continue',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14)),
                   SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                  Icon(Icons.arrow_forward_rounded,
+                      color: Colors.white, size: 18),
                 ],
               ),
             ),
@@ -298,14 +323,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: OutlinedButton(
                     onPressed: _prevStep,
                     style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.arrow_back_rounded, size: 18),
                         SizedBox(width: 8),
-                        Text('Back', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        Text('Back',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14)),
                       ],
                     ),
                   ),
@@ -319,9 +347,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text('Sign Up', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                    child: const Text('Sign Up',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14)),
                   ),
                 ),
               ),
@@ -338,7 +371,11 @@ class _StepDot extends StatelessWidget {
   final String label;
   final bool active;
   final bool done;
-  const _StepDot({required this.number, required this.label, required this.active, required this.done});
+  const _StepDot(
+      {required this.number,
+      required this.label,
+      required this.active,
+      required this.done});
 
   @override
   Widget build(BuildContext context) {
@@ -368,7 +405,9 @@ class _StepDot extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w600)),
+        Text(label,
+            style: TextStyle(
+                fontSize: 10, color: color, fontWeight: FontWeight.w600)),
       ],
     );
   }

@@ -5,11 +5,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/responsive_ext.dart';
 import 'package:user_app/models/items.dart';
 import 'package:user_app/models/menus.dart';
 import 'package:user_app/widgets/items_design.dart';
 import 'package:user_app/widgets/progress_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:user_app/widgets/unified_snackbar.dart';
 
 class ItemsScreen extends StatelessWidget {
   final Menus? model;
@@ -100,7 +102,7 @@ class ItemsScreen extends StatelessWidget {
                   return SliverPadding(
                     padding: const EdgeInsets.fromLTRB(28, 24, 28, 100),
                     sliver: SliverMasonryGrid.count(
-                      crossAxisCount: MediaQuery.of(context).size.width > 700 ? 3 : 1,
+                      crossAxisCount: context.gridCols4,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       childCount: snapshot.data!.docs.length,
@@ -206,7 +208,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_imageBytes == null) {
-      _showError('Please select an item image.');
+      unifiedSnackBar(context, 'Please select an item image.', error: true);
       return;
     }
 
@@ -260,16 +262,10 @@ class _AddItemSheetState extends State<_AddItemSheet> {
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
-      _showError(e.toString());
+      unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
-    );
   }
 
   @override

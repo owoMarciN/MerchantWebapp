@@ -6,10 +6,13 @@ import 'package:flutter/services.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:user_app/global/global.dart';
+import 'package:user_app/methods/assistant_methods.dart';
+import 'package:user_app/methods/validators.dart';
 import 'package:user_app/widgets/map_dialog.dart';
 import 'package:user_app/widgets/custom_text_field.dart';
 import 'package:user_app/widgets/custom_phone_field.dart';
 import 'package:user_app/widgets/progress_bar.dart';
+import 'package:user_app/widgets/unified_snackbar.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -60,60 +63,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 500),
+                  constraints: const BoxConstraints(maxWidth: 600),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final bool isWide = constraints.maxWidth > 700;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _SectionHeader(
                             icon: Icons.storefront_rounded,
                             title: 'Business',
-                            subtitle: 'Manage your restaurant profile and media',
+                            subtitle:
+                                'Manage your restaurant profile and media',
                             brandColors: brandColors,
                           ),
                           const SizedBox(height: 16),
-                          isWide
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: _LogoCard(
-                                        restaurantID: _restaurantID,
-                                        currentUrl: restaurantData["logoUrl"] ?? "",
-                                        brandColors: brandColors,
-                                        colorScheme: colorScheme,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: _BannerCard(
-                                        restaurantID: _restaurantID,
-                                        currentUrl: restaurantData["bannerUrl"] ?? "",
-                                        brandColors: brandColors,
-                                        colorScheme: colorScheme,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Column(
-                                  children: [
-                                    _LogoCard(
-                                      restaurantID: _restaurantID,
-                                      currentUrl: restaurantData["logoUrl"] ?? "",
-                                      brandColors: brandColors,
-                                      colorScheme: colorScheme,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    _BannerCard(
-                                      restaurantID: _restaurantID,
-                                      currentUrl: restaurantData["bannerUrl"] ?? "",
-                                      brandColors: brandColors,
-                                      colorScheme: colorScheme,
-                                    ),
-                                  ],
-                                ),
+                          _LogoCard(
+                            restaurantID: _restaurantID,
+                            currentUrl: restaurantData["logoUrl"] ?? "",
+                            brandColors: brandColors,
+                            colorScheme: colorScheme,
+                          ),
+                          const SizedBox(height: 16),
+                          _BannerCard(
+                            restaurantID: _restaurantID,
+                            currentUrl: restaurantData["bannerUrl"] ?? "",
+                            brandColors: brandColors,
+                            colorScheme: colorScheme,
+                          ),
                           const SizedBox(height: 16),
                           _BusinessInfoCard(
                             restaurantID: _restaurantID,
@@ -161,77 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
-
-/// Deletes a Firebase Storage file by download URL.
-/// Silently ignores object-not-found so it is safe to call on empty or
-/// already-deleted URLs.
-Future<void> _deleteOldFile(String url) async {
-  if (url.isEmpty || !url.contains('firebasestorage')) return;
-  try {
-    await FirebaseStorage.instance.refFromURL(url).delete();
-  } on FirebaseException catch (e) {
-    if (e.code != 'object-not-found') rethrow;
-  }
-}
-
-void _snack(BuildContext context, String msg, {bool error = false}) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    content: Text(msg),
-    backgroundColor: error ? Colors.redAccent : null,
-    behavior: SnackBarBehavior.floating,
-  ));
-}
-
-// Walidator IBAN — sprawdza format, długość i sumę kontrolną (mod-97)
-String? _validateIban(String? value) {
-  if (value == null || value.trim().isEmpty) return null; // pole opcjonalne
-
-  // Usuń spacje i zamień na wielkie litery
-  final iban = value.replaceAll(' ', '').toUpperCase();
-
-  // Sprawdź czy zawiera tylko litery i cyfry
-  if (!RegExp(r'^[A-Z0-9]+$').hasMatch(iban)) {
-    return 'IBAN może zawierać tylko litery i cyfry';
-  }
-
-  // Sprawdź prefix kraju i długość
-  final countryCode = iban.substring(0, 2);
-  final expectedLengths = <String, int>{
-    'PL': 28, 'DE': 22, 'GB': 22, 'FR': 27, 'NL': 18,
-    'ES': 24, 'IT': 27, 'BE': 16, 'AT': 20, 'CH': 21,
-    'CZ': 24, 'SK': 24, 'HU': 28, 'RO': 24, 'HR': 21,
-  };
-
-  final expectedLength = expectedLengths[countryCode];
-  if (expectedLength == null) {
-    return 'Nieobsługiwany kraj ($countryCode)';
-  }
-  if (iban.length != expectedLength) {
-    return 'IBAN dla $countryCode musi mieć $expectedLength znaków (masz ${iban.length})';
-  }
-
-  // Sprawdź sumę kontrolną (mod-97)
-  final rearranged = iban.substring(4) + iban.substring(0, 4);
-  final numeric = rearranged.split('').map((c) {
-    final code = c.codeUnitAt(0);
-    return code >= 65 ? (code - 55).toString() : c;
-  }).join();
-
-  BigInt remainder = BigInt.zero;
-  for (final ch in numeric.split('')) {
-    remainder = (remainder * BigInt.from(10) + BigInt.parse(ch)) % BigInt.from(97);
-  }
-
-  if (remainder != BigInt.one) {
-    return 'Nieprawidłowy numer IBAN (błędna suma kontrolna)';
-  }
-
-  return null;
-}
-
 // ─── Section Header ───────────────────────────────────────────────────────────
-
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -265,7 +171,8 @@ class _SectionHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
             Text(subtitle,
                 style: TextStyle(fontSize: 12, color: brandColors.muted)),
           ],
@@ -276,9 +183,6 @@ class _SectionHeader extends StatelessWidget {
 }
 
 // ─── Logo Card ────────────────────────────────────────────────────────────────
-// Flow: tap Choose → image previewed locally → tap Upload →
-//   (1) upload new file, (2) update Firestore, (3) delete old file.
-
 class _LogoCard extends StatefulWidget {
   final String? restaurantID;
   final String currentUrl;
@@ -302,8 +206,8 @@ class _LogoCardState extends State<_LogoCard> {
   bool _uploading = false;
 
   Future<void> _stageImage() async {
-    final result =
-        await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.image, withData: true);
     if (result == null || result.files.first.bytes == null) return;
     setState(() {
       _stagedBytes = result.files.first.bytes;
@@ -315,7 +219,6 @@ class _LogoCardState extends State<_LogoCard> {
     if (_stagedBytes == null) return;
     setState(() => _uploading = true);
     try {
-      // 1. Upload new file to Storage
       final ref = FirebaseStorage.instance
           .ref()
           .child('restaurants')
@@ -325,23 +228,24 @@ class _LogoCardState extends State<_LogoCard> {
       await ref.putData(_stagedBytes!);
       final newUrl = await ref.getDownloadURL();
 
-      // 2. Persist new URL to Firestore
       await FirebaseFirestore.instance
           .collection('restaurants')
           .doc(widget.restaurantID)
           .update({'logoUrl': newUrl});
 
-      // 3. Delete old file — Firestore already points to new URL so this is safe
-      await _deleteOldFile(widget.currentUrl);
+      await deleteOldFile(widget.currentUrl);
 
       await saveUserPref<String>("logoUrl", newUrl);
 
       if (mounted) {
-        setState(() { _stagedBytes = null; _stagedName = null; });
-        _snack(context, 'Logo updated');
+        setState(() {
+          _stagedBytes = null;
+          _stagedName = null;
+        });
+        unifiedSnackBar(context, 'Logo updated');
       }
     } catch (e) {
-      if (mounted) _snack(context, e.toString(), error: true);
+      if (mounted) unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -389,12 +293,18 @@ class _LogoCardState extends State<_LogoCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      hasStaged ? 'New logo ready' : hasLogo ? 'Logo uploaded' : 'No logo yet',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      hasStaged
+                          ? 'New logo ready'
+                          : hasLogo
+                              ? 'Logo uploaded'
+                              : 'No logo yet',
+                      style: const TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     Text('Recommended: 512×512px, PNG or JPG',
-                        style: TextStyle(fontSize: 11, color: widget.brandColors.muted)),
+                        style: TextStyle(
+                            fontSize: 11, color: widget.brandColors.muted)),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -405,12 +315,17 @@ class _LogoCardState extends State<_LogoCard> {
                             style: OutlinedButton.styleFrom(
                               foregroundColor: widget.brandColors.navy,
                               side: BorderSide(
-                                  color: widget.brandColors.navy?.withValues(alpha: 0.4) ?? Colors.grey),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  color: widget.brandColors.navy
+                                          ?.withValues(alpha: 0.4) ??
+                                      Colors.grey),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                             ),
                             icon: const Icon(Icons.image_rounded, size: 14),
-                            label: const Text('Choose', style: TextStyle(fontSize: 12)),
+                            label: const Text('Choose',
+                                style: TextStyle(fontSize: 12)),
                           ),
                         ),
                         if (hasStaged) ...[
@@ -423,13 +338,17 @@ class _LogoCardState extends State<_LogoCard> {
                                 backgroundColor: widget.brandColors.navy,
                                 foregroundColor: Colors.white,
                                 elevation: 0,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
                               ),
                               icon: _uploading
                                   ? const SizedBox(
-                                      width: 12, height: 12,
-                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
                                   : const Icon(Icons.upload_rounded, size: 14),
                               label: Text(_uploading ? 'Uploading…' : 'Upload',
                                   style: const TextStyle(fontSize: 12)),
@@ -450,8 +369,6 @@ class _LogoCardState extends State<_LogoCard> {
 }
 
 // ─── Banner Card ──────────────────────────────────────────────────────────────
-// Same staged pattern: tap area to choose → preview → Upload button appears.
-
 class _BannerCard extends StatefulWidget {
   final String? restaurantID;
   final String currentUrl;
@@ -475,8 +392,8 @@ class _BannerCardState extends State<_BannerCard> {
   bool _uploading = false;
 
   Future<void> _stageImage() async {
-    final result =
-        await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.image, withData: true);
     if (result == null || result.files.first.bytes == null) return;
     setState(() {
       _stagedBytes = result.files.first.bytes;
@@ -488,7 +405,6 @@ class _BannerCardState extends State<_BannerCard> {
     if (_stagedBytes == null) return;
     setState(() => _uploading = true);
     try {
-      // 1. Upload new file
       final ref = FirebaseStorage.instance
           .ref()
           .child('restaurants')
@@ -498,23 +414,24 @@ class _BannerCardState extends State<_BannerCard> {
       await ref.putData(_stagedBytes!);
       final newUrl = await ref.getDownloadURL();
 
-      // 2. Update Firestore
       await FirebaseFirestore.instance
           .collection('restaurants')
           .doc(widget.restaurantID)
           .update({'bannerUrl': newUrl});
 
-      // 3. Delete old file
-      await _deleteOldFile(widget.currentUrl);
+      await deleteOldFile(widget.currentUrl);
 
       await saveUserPref<String>("bannerUrl", newUrl);
 
       if (mounted) {
-        setState(() { _stagedBytes = null; _stagedName = null; });
-        _snack(context, 'Banner updated');
+        setState(() {
+          _stagedBytes = null;
+          _stagedName = null;
+        });
+        unifiedSnackBar(context, 'Banner updated');
       }
     } catch (e) {
-      if (mounted) _snack(context, e.toString(), error: true);
+      if (mounted) unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -530,7 +447,8 @@ class _BannerCardState extends State<_BannerCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _CardTitle(title: 'Restaurant Banner', brandColors: widget.brandColors),
+          _CardTitle(
+              title: 'Restaurant Banner', brandColors: widget.brandColors),
           const SizedBox(height: 16),
           GestureDetector(
             onTap: _uploading ? null : _stageImage,
@@ -542,7 +460,8 @@ class _BannerCardState extends State<_BannerCard> {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: hasStaged
-                      ? widget.brandColors.navy?.withValues(alpha: 0.4) ?? widget.colorScheme.outline
+                      ? widget.brandColors.navy?.withValues(alpha: 0.4) ??
+                          widget.colorScheme.outline
                       : widget.colorScheme.outline,
                   width: hasStaged ? 2 : 1,
                 ),
@@ -554,7 +473,8 @@ class _BannerCardState extends State<_BannerCard> {
                       Container(
                         color: Colors.black.withValues(alpha: 0.25),
                         child: const Center(
-                          child: Icon(Icons.edit_rounded, color: Colors.white, size: 24),
+                          child: Icon(Icons.edit_rounded,
+                              color: Colors.white, size: 24),
                         ),
                       ),
                     ])
@@ -565,8 +485,10 @@ class _BannerCardState extends State<_BannerCard> {
                             color: Colors.black.withValues(alpha: 0.3),
                             child: Center(
                               child: _uploading
-                                  ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                                  : const Icon(Icons.edit_rounded, color: Colors.white, size: 28),
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2)
+                                  : const Icon(Icons.edit_rounded,
+                                      color: Colors.white, size: 28),
                             ),
                           ),
                         ])
@@ -577,10 +499,14 @@ class _BannerCardState extends State<_BannerCard> {
                                 size: 32, color: widget.brandColors.muted),
                             const SizedBox(height: 8),
                             Text('Click to choose banner',
-                                style: TextStyle(fontSize: 12, color: widget.brandColors.muted)),
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: widget.brandColors.muted)),
                             const SizedBox(height: 4),
                             Text('Recommended: 1200×800px',
-                                style: TextStyle(fontSize: 10, color: widget.brandColors.muted)),
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: widget.brandColors.muted)),
                           ],
                         ),
             ),
@@ -596,15 +522,19 @@ class _BannerCardState extends State<_BannerCard> {
                   backgroundColor: widget.brandColors.navy,
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
                 icon: _uploading
                     ? const SizedBox(
-                        width: 14, height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
                     : const Icon(Icons.upload_rounded, size: 16),
                 label: Text(_uploading ? 'Uploading…' : 'Upload Banner',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w600)),
               ),
             ),
           ],
@@ -650,8 +580,8 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
     _nameController = TextEditingController(text: widget.data["name"] ?? '');
     _ibanController = TextEditingController(text: widget.data["iban"] ?? '');
     _mobileController = PhoneController(
-      initialValue:
-          PhoneNumber(isoCode: IsoCode.PL, nsn: widget.data["businessMobile"] ?? ''),
+      initialValue: PhoneNumber(
+          isoCode: IsoCode.PL, nsn: widget.data["businessMobile"] ?? ''),
     );
     _address = widget.data["address"] ?? '';
     _lat = (widget.data["lat"] as num?)?.toDouble();
@@ -729,10 +659,10 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
 
       if (mounted) {
         setState(() => _edited = false);
-        _snack(context, 'Business info saved');
+        unifiedSnackBar(context, 'Business info saved');
       }
     } catch (e) {
-      if (mounted) _snack(context, e.toString(), error: true);
+      if (mounted) unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -740,99 +670,111 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
 
   @override
   Widget build(BuildContext context) {
-    return _Card(
-      colorScheme: widget.colorScheme,
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _CardTitle(title: 'Business Info', brandColors: widget.brandColors),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: Column(
-                children: [
-                  CustomTextField(
-                    hintText: 'Restaurant Name',
-                    controller: _nameController,
-                    data: Icons.storefront_rounded,
-                    validator: FieldValidator.required,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomPhoneField(
-                    label: 'Business Phone',
-                    controller: _mobileController,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomTextField(
-                    hintText: 'IBAN Account Number',
-                    controller: _ibanController,
-                    data: Icons.account_balance_rounded,
-                    customValidator: _validateIban,
-                  ),
-                  const SizedBox(height: 12),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: _openMapPicker,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _address.isNotEmpty
-                              ? widget.brandColors.navy?.withValues(alpha: 0.4) ?? widget.colorScheme.outline
-                              : widget.colorScheme.outline,
+    return LayoutBuilder(builder: (context, constraints) {
+      final double horizontalPadding = constraints.maxWidth < 500 ? 16.0 : 48.0;
+      return _Card(
+        colorScheme: widget.colorScheme,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _CardTitle(
+                  title: 'Business Info', brandColors: widget.brandColors),
+              const SizedBox(height: 16),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Column(
+                  children: [
+                    CustomTextField(
+                      hintText: 'Restaurant Name',
+                      controller: _nameController,
+                      data: Icons.storefront_rounded,
+                      validator: FieldValidator.required,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomPhoneField(
+                      label: 'Business Phone',
+                      controller: _mobileController,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      hintText: 'IBAN Account Number',
+                      controller: _ibanController,
+                      data: Icons.account_balance_rounded,
+                      customValidator: validateIban,
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: _openMapPicker,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _address.isNotEmpty
+                                ? widget.brandColors.navy
+                                        ?.withValues(alpha: 0.4) ??
+                                    widget.colorScheme.outline
+                                : widget.colorScheme.outline,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.location_on_rounded,
+                                size: 18,
+                                color: _address.isNotEmpty
+                                    ? widget.brandColors.navy
+                                    : widget.brandColors.muted),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _address.isNotEmpty
+                                  ? Text(_address,
+                                      style: const TextStyle(
+                                          fontSize: 13, color: Colors.black),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis)
+                                  : Text('Set restaurant address',
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: widget.brandColors.muted)),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: widget.brandColors.navy
+                                    ?.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                _address.isNotEmpty ? 'Change' : 'Pick on map',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: widget.brandColors.navy),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.location_on_rounded,
-                              size: 18,
-                              color: _address.isNotEmpty
-                                  ? widget.brandColors.navy
-                                  : widget.brandColors.muted),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _address.isNotEmpty
-                                ? Text(_address,
-                                    style: const TextStyle(fontSize: 13, color: Colors.black),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis)
-                                : Text('Set restaurant address',
-                                    style: TextStyle(fontSize: 13, color: widget.brandColors.muted)),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: widget.brandColors.navy?.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              _address.isNotEmpty ? 'Change' : 'Pick on map',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: widget.brandColors.navy),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            if (_edited) ...[
-              const SizedBox(height: 16),
-              _SaveButton(saving: _saving, onPressed: _save),
+              if (_edited) ...[
+                const SizedBox(height: 16),
+                _SaveButton(saving: _saving, onPressed: _save),
+              ],
             ],
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -892,8 +834,8 @@ class _UserProfileCardState extends State<_UserProfileCard> {
   }
 
   Future<void> _stagePhoto() async {
-    final result =
-        await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.image, withData: true);
     if (result != null && result.files.first.bytes != null) {
       setState(() {
         _stagedBytes = result.files.first.bytes;
@@ -914,7 +856,6 @@ class _UserProfileCardState extends State<_UserProfileCard> {
 
     try {
       if (_stagedBytes != null) {
-        // 1. Upload new photo
         final ref = FirebaseStorage.instance
             .ref()
             .child('users')
@@ -923,7 +864,7 @@ class _UserProfileCardState extends State<_UserProfileCard> {
         await ref.putData(_stagedBytes!);
         photoUrl = await ref.getDownloadURL();
 
-        await _deleteOldFile(oldPhotoUrl);
+        await deleteOldFile(oldPhotoUrl);
       }
 
       await FirebaseFirestore.instance
@@ -941,10 +882,10 @@ class _UserProfileCardState extends State<_UserProfileCard> {
           _stagedBytes = null;
           _stagedName = null;
         });
-        _snack(context, 'Profile saved');
+        unifiedSnackBar(context, 'Profile saved');
       }
     } catch (e) {
-      if (mounted) _snack(context, e.toString(), error: true);
+      if (mounted) unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -976,10 +917,13 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                         height: 72,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: widget.brandColors.navy?.withValues(alpha: 0.08),
+                          color:
+                              widget.brandColors.navy?.withValues(alpha: 0.08),
                           border: Border.all(
                             color: hasStaged
-                                ? widget.brandColors.navy?.withValues(alpha: 0.5) ?? widget.colorScheme.outline
+                                ? widget.brandColors.navy
+                                        ?.withValues(alpha: 0.5) ??
+                                    widget.colorScheme.outline
                                 : widget.colorScheme.outline,
                             width: hasStaged ? 2 : 1,
                           ),
@@ -1007,7 +951,9 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                                 color: widget.colorScheme.surface, width: 2),
                           ),
                           child: Icon(
-                            hasStaged ? Icons.check_rounded : Icons.camera_alt_rounded,
+                            hasStaged
+                                ? Icons.check_rounded
+                                : Icons.camera_alt_rounded,
                             size: 12,
                             color: Colors.white,
                           ),
@@ -1026,7 +972,8 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                               fontSize: 15, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 2),
                       Text(widget.data["email"] ?? '',
-                          style: TextStyle(fontSize: 12, color: widget.brandColors.muted)),
+                          style: TextStyle(
+                              fontSize: 12, color: widget.brandColors.muted)),
                       const SizedBox(height: 4),
                       if (hasStaged)
                         Text(
@@ -1038,9 +985,11 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                         )
                       else
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: widget.brandColors.navy?.withValues(alpha: 0.08),
+                            color: widget.brandColors.navy
+                                ?.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -1106,7 +1055,7 @@ class _DangerCard extends StatelessWidget {
             title: 'Change Password',
             subtitle: 'Send a password reset email to your account',
             buttonLabel: 'Reset',
-            onTap: () => _snack(context, 'Password reset email sent'),
+            onTap: () => unifiedSnackBar(context, 'Password reset email sent'),
           ),
           Divider(height: 24, color: colorScheme.outline),
           _buildRow(
@@ -1156,7 +1105,8 @@ class _DangerCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               Text(subtitle,
                   style: TextStyle(fontSize: 12, color: brandColors.muted)),
@@ -1169,11 +1119,13 @@ class _DangerCard extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: Colors.redAccent,
             side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.5)),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           ),
           child: Text(buttonLabel,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              style:
+                  const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
         ),
       ],
     );
@@ -1226,7 +1178,7 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
 
   void _confirm() {
     if (_address.isEmpty) {
-      _snack(context, 'Please pick a location on the map first.');
+      unifiedSnackBar(context, 'Please pick a location on the map first.');
       return;
     }
     Navigator.pop(context, {'address': _address, 'lat': _lat, 'lng': _lng});
@@ -1249,8 +1201,8 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
                 color: widget.colorScheme.surface,
-                border:
-                    Border(bottom: BorderSide(color: widget.colorScheme.outline)),
+                border: Border(
+                    bottom: BorderSide(color: widget.colorScheme.outline)),
               ),
               child: Row(
                 children: [
@@ -1259,10 +1211,12 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                   const SizedBox(width: 10),
                   const Expanded(
                     child: Text('Restaurant Location',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w700)),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close_rounded, color: widget.brandColors.muted),
+                    icon: Icon(Icons.close_rounded,
+                        color: widget.brandColors.muted),
                     onPressed: () => Navigator.pop(context),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -1279,12 +1233,14 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: hasPicked
-                          ? widget.brandColors.accentGreen?.withValues(alpha: 0.06)
+                          ? widget.brandColors.accentGreen
+                              ?.withValues(alpha: 0.06)
                           : widget.brandColors.navy?.withValues(alpha: 0.04),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: hasPicked
-                            ? widget.brandColors.accentGreen?.withValues(alpha: 0.3) ??
+                            ? widget.brandColors.accentGreen
+                                    ?.withValues(alpha: 0.3) ??
                                 widget.colorScheme.outline
                             : widget.colorScheme.outline,
                       ),
@@ -1293,7 +1249,9 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          hasPicked ? Icons.check_circle_rounded : Icons.location_off_rounded,
+                          hasPicked
+                              ? Icons.check_circle_rounded
+                              : Icons.location_off_rounded,
                           size: 18,
                           color: hasPicked
                               ? widget.brandColors.accentGreen
@@ -1305,7 +1263,8 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                             hasPicked ? _address : 'No location selected yet',
                             style: TextStyle(
                                 fontSize: 13,
-                                color: hasPicked ? null : widget.brandColors.muted,
+                                color:
+                                    hasPicked ? null : widget.brandColors.muted,
                                 height: 1.4),
                           ),
                         ),
@@ -1321,12 +1280,16 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: widget.brandColors.navy,
                         side: BorderSide(
-                            color: widget.brandColors.navy?.withValues(alpha: 0.4) ?? Colors.grey),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            color: widget.brandColors.navy
+                                    ?.withValues(alpha: 0.4) ??
+                                Colors.grey),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.map_rounded, size: 18),
                       label: Text(hasPicked ? 'Change on Map' : 'Open Map',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w600)),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -1341,11 +1304,13 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                         elevation: 0,
                         disabledBackgroundColor:
                             widget.brandColors.navy?.withValues(alpha: 0.3),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.check_rounded, size: 18),
                       label: const Text('Confirm Address',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ],
@@ -1363,7 +1328,8 @@ class _Card extends StatelessWidget {
   final Widget child;
   final ColorScheme colorScheme;
   final Color? borderColor;
-  const _Card({required this.child, required this.colorScheme, this.borderColor});
+  const _Card(
+      {required this.child, required this.colorScheme, this.borderColor});
 
   @override
   Widget build(BuildContext context) {
@@ -1410,14 +1376,16 @@ class _SaveButton extends StatelessWidget {
             backgroundColor: brandColors.navy,
             foregroundColor: Colors.white,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             padding: const EdgeInsets.symmetric(horizontal: 20),
           ),
           child: saving
               ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white))
               : const Text('Save Changes',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ),

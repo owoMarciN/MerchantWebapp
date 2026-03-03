@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/global/global.dart';
+import 'package:user_app/extensions/responsive_ext.dart';
 
 class DashboardShell extends StatefulWidget {
   final Widget child;
@@ -14,11 +15,24 @@ class DashboardShell extends StatefulWidget {
 
 class _DashboardShellState extends State<DashboardShell> {
   final List<_NavItem> _navItems = const [
-    _NavItem(icon: Icons.grid_view_rounded, label: 'Overview', path: '/dashboard'),
-    _NavItem(icon: Icons.receipt_long_rounded, label: 'Orders', path: '/dashboard/orders'),
-    _NavItem(icon: Icons.restaurant_menu_rounded, label: 'Menus', path: '/dashboard/menus'),
-    _NavItem(icon: Icons.bar_chart_rounded, label: 'Analytics', path: '/dashboard/analytics'),
-    _NavItem(icon: Icons.settings_rounded, label: 'Settings', path: '/dashboard/settings'),
+    _NavItem(
+        icon: Icons.grid_view_rounded, label: 'Overview', path: '/dashboard'),
+    _NavItem(
+        icon: Icons.receipt_long_rounded,
+        label: 'Orders',
+        path: '/dashboard/orders'),
+    _NavItem(
+        icon: Icons.restaurant_menu_rounded,
+        label: 'Menus',
+        path: '/dashboard/menus'),
+    _NavItem(
+        icon: Icons.bar_chart_rounded,
+        label: 'Analytics',
+        path: '/dashboard/analytics'),
+    _NavItem(
+        icon: Icons.settings_rounded,
+        label: 'Settings',
+        path: '/dashboard/settings'),
   ];
 
   int _selectedIndex(BuildContext context) {
@@ -35,7 +49,7 @@ class _DashboardShellState extends State<DashboardShell> {
   Widget build(BuildContext context) {
     final brandColors = Theme.of(context).extension<BrandColors>()!;
     final colorScheme = Theme.of(context).colorScheme;
-    final bool isWide = MediaQuery.of(context).size.width > 700;
+    final isWide = context.isWide;
     final int selected = _selectedIndex(context);
     final String? restaurantID = currentUid;
 
@@ -66,10 +80,10 @@ class _DashboardShellState extends State<DashboardShell> {
 
               final bool setupComplete =
                   (data?["logoUrl"] ?? "").toString().isNotEmpty &&
-                  (data?["bannerUrl"] ?? "").toString().isNotEmpty &&
-                  (data?["address"] ?? "").toString().isNotEmpty &&
-                  (userData?["photoUrl"] ?? "").toString().isNotEmpty &&
-                  (data?["iban"] ?? "").toString().trim().isNotEmpty;
+                      (data?["bannerUrl"] ?? "").toString().isNotEmpty &&
+                      (data?["address"] ?? "").toString().isNotEmpty &&
+                      (userData?["photoUrl"] ?? "").toString().isNotEmpty &&
+                      (data?["iban"] ?? "").toString().trim().isNotEmpty;
 
               return Scaffold(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -77,7 +91,10 @@ class _DashboardShellState extends State<DashboardShell> {
                   children: [
                     if (isWide)
                       _buildSidebar(
-                        context, selected, brandColors, colorScheme,
+                        context,
+                        selected,
+                        brandColors,
+                        colorScheme,
                         setupComplete,
                         data?["logoUrl"] as String?,
                         userData?["photoUrl"] as String?,
@@ -85,7 +102,8 @@ class _DashboardShellState extends State<DashboardShell> {
                     Expanded(
                       child: Column(
                         children: [
-                          _buildTopBar(context, isWide, brandColors, colorScheme, userData?["photoUrl"] as String?),
+                          _buildTopBar(context, isWide, brandColors,
+                              colorScheme, userData?["photoUrl"] as String?),
                           Expanded(child: widget.child),
                         ],
                       ),
@@ -94,7 +112,8 @@ class _DashboardShellState extends State<DashboardShell> {
                 ),
                 bottomNavigationBar: isWide
                     ? null
-                    : _buildBottomNav(context, selected, brandColors, colorScheme),
+                    : _buildBottomNav(
+                        context, selected, brandColors, colorScheme),
               );
             },
           );
@@ -112,8 +131,11 @@ class _DashboardShellState extends State<DashboardShell> {
     String? restaurantLogoUrl,
     String? ownerPhotoUrl,
   ) {
-    final String? logoUrl = restaurantLogoUrl?.isNotEmpty == true ? restaurantLogoUrl : null;
-    final String? photoUrl = ownerPhotoUrl?.isNotEmpty == true ? ownerPhotoUrl : getUserPref<String>("photoUrl");
+    final String? logoUrl =
+        restaurantLogoUrl?.isNotEmpty == true ? restaurantLogoUrl : null;
+    final String? photoUrl = ownerPhotoUrl?.isNotEmpty == true
+        ? ownerPhotoUrl
+        : getUserPref<String>("photoUrl");
 
     return Container(
       width: 220,
@@ -130,7 +152,8 @@ class _DashboardShellState extends State<DashboardShell> {
                 logoUrl != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(logoUrl, width: 32, height: 32, fit: BoxFit.cover),
+                        child: Image.network(logoUrl,
+                            width: 32, height: 32, fit: BoxFit.cover),
                       )
                     : Container(
                         width: 32,
@@ -139,13 +162,15 @@ class _DashboardShellState extends State<DashboardShell> {
                           color: brandColors.navy,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.restaurant_rounded, color: Colors.white, size: 18),
+                        child: const Icon(Icons.restaurant_rounded,
+                            color: Colors.white, size: 18),
                       ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     getUserPref<String>("accountName") ?? 'RestaurantOS',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w700),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -161,19 +186,23 @@ class _DashboardShellState extends State<DashboardShell> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () => Router.neglect(context, () => context.go('/dashboard')),
+                onTap: () =>
+                    Router.neglect(context, () => context.go('/dashboard')),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: brandColors.navy?.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: brandColors.navy?.withValues(alpha: 0.2) ?? Colors.transparent,
+                      color: brandColors.navy?.withValues(alpha: 0.2) ??
+                          Colors.transparent,
                     ),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.rocket_launch_rounded, size: 14, color: brandColors.navy),
+                      Icon(Icons.rocket_launch_rounded,
+                          size: 14, color: brandColors.navy),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -218,7 +247,8 @@ class _DashboardShellState extends State<DashboardShell> {
                     ? NetworkImage(photoUrl)
                     : null,
                 child: photoUrl == null || photoUrl.isEmpty
-                    ? Icon(Icons.person_rounded, size: 16, color: brandColors.navy)
+                    ? Icon(Icons.person_rounded,
+                        size: 16, color: brandColors.navy)
                     : null,
               ),
               title: Text(
@@ -289,7 +319,9 @@ class _DashboardShellState extends State<DashboardShell> {
     ColorScheme colorScheme,
     String? livePhotoUrl,
   ) {
-    final String? photoUrl = livePhotoUrl?.isNotEmpty == true ? livePhotoUrl : getUserPref<String>("photoUrl");
+    final String? photoUrl = livePhotoUrl?.isNotEmpty == true
+        ? livePhotoUrl
+        : getUserPref<String>("photoUrl");
 
     return Container(
       height: 60,
@@ -322,7 +354,8 @@ class _DashboardShellState extends State<DashboardShell> {
           const SizedBox(width: 8),
           PopupMenuButton(
             offset: const Offset(0, 44),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             constraints: const BoxConstraints(minWidth: 240),
             itemBuilder: (_) => <PopupMenuEntry>[
               PopupMenuItem(
@@ -338,18 +371,22 @@ class _DashboardShellState extends State<DashboardShell> {
                             ? NetworkImage(photoUrl)
                             : null,
                         child: photoUrl == null || photoUrl.isEmpty
-                            ? Icon(Icons.restaurant_rounded, size: 32, color: brandColors.navy)
+                            ? Icon(Icons.restaurant_rounded,
+                                size: 32, color: brandColors.navy)
                             : null,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         getUserPref<String>("businessName") ?? 'Restaurant',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        getUserPref<String>("accountEmail") ?? 'account@email.com',
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        getUserPref<String>("accountEmail") ??
+                            'account@email.com',
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       const SizedBox(height: 12),
                     ],
@@ -382,7 +419,8 @@ class _DashboardShellState extends State<DashboardShell> {
                 ]),
               ),
               PopupMenuItem(
-                onTap: () => Router.neglect(context, () => context.go('/dashboard/settings')),
+                onTap: () => Router.neglect(
+                    context, () => context.go('/dashboard/settings')),
                 child: const Row(children: [
                   Icon(Icons.settings_outlined, size: 16),
                   SizedBox(width: 12),
@@ -414,7 +452,8 @@ class _DashboardShellState extends State<DashboardShell> {
                   ? NetworkImage(photoUrl)
                   : null,
               child: photoUrl == null || photoUrl.isEmpty
-                  ? Icon(Icons.person_rounded, size: 16, color: brandColors.accentGreen)
+                  ? Icon(Icons.person_rounded,
+                      size: 16, color: brandColors.accentGreen)
                   : null,
             ),
           ),
@@ -423,7 +462,8 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 
-  Widget _iconBtn(BrandColors brandColors, ColorScheme colorScheme, IconData icon) {
+  Widget _iconBtn(
+      BrandColors brandColors, ColorScheme colorScheme, IconData icon) {
     return Container(
       width: 36,
       height: 36,
@@ -461,20 +501,24 @@ class _TopBarButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  const _TopBarButton({required this.icon, required this.label, required this.color});
+  const _TopBarButton(
+      {required this.icon, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
       child: Row(
         children: [
           Icon(icon, size: 16, color: Colors.white),
           const SizedBox(width: 6),
           Text(label,
               style: const TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white)),
         ],
       ),
     );

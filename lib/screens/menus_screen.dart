@@ -5,10 +5,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/responsive_ext.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/models/menus.dart';
 import 'package:user_app/widgets/menus_design.dart';
 import 'package:user_app/widgets/progress_bar.dart';
+import 'package:user_app/widgets/unified_snackbar.dart';
 
 class MenusScreen extends StatefulWidget {
   const MenusScreen({super.key});
@@ -47,7 +49,8 @@ class _MenusScreenState extends State<MenusScreen> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return SliverToBoxAdapter(
-                    child: Center(child: circularProgress(),
+                    child: Center(
+                      child: circularProgress(),
                     ),
                   );
                 }
@@ -55,10 +58,8 @@ class _MenusScreenState extends State<MenusScreen> {
                 if (snapshot.hasError) {
                   return SliverToBoxAdapter(
                     child: Center(
-                      child: Text(
-                        "Error: ${snapshot.error}", 
-                        style: TextStyle(color: brandColors.muted)
-                      ),
+                      child: Text("Error: ${snapshot.error}",
+                          style: TextStyle(color: brandColors.muted)),
                     ),
                   );
                 }
@@ -76,17 +77,20 @@ class _MenusScreenState extends State<MenusScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(color: colorScheme.outline),
                             ),
-                            child: Icon(Icons.restaurant_menu_rounded, size: 48, color: brandColors.muted),
+                            child: Icon(Icons.restaurant_menu_rounded,
+                                size: 48, color: brandColors.muted),
                           ),
                           const SizedBox(height: 20),
                           const Text(
                             'No menus yet',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Tap + to add your first menu',
-                            style: TextStyle(fontSize: 14, color: brandColors.muted),
+                            style: TextStyle(
+                                fontSize: 14, color: brandColors.muted),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -98,13 +102,14 @@ class _MenusScreenState extends State<MenusScreen> {
                 return SliverPadding(
                   padding: const EdgeInsets.fromLTRB(28, 24, 28, 100),
                   sliver: SliverMasonryGrid.count(
-                    crossAxisCount: MediaQuery.of(context).size.width > 700 ? 3 : 1,
+                    crossAxisCount: context.gridCols4,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                     childCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       var doc = snapshot.data!.docs[index];
-                      Menus mModel = Menus.fromJson(doc.data()! as Map<String, dynamic>);
+                      Menus mModel =
+                          Menus.fromJson(doc.data()! as Map<String, dynamic>);
                       mModel.menuID = doc.id;
                       mModel.restaurantID = restaurantID;
                       return MenusDesignWidget(model: mModel);
@@ -122,7 +127,9 @@ class _MenusScreenState extends State<MenusScreen> {
             onPressed: _openAddMenuSheet,
             backgroundColor: brandColors.navy,
             icon: const Icon(Icons.add_rounded, color: Colors.white),
-            label: const Text('Add Menu', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            label: const Text('Add Menu',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w600)),
           ),
         ),
       ],
@@ -162,7 +169,7 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_imageBytes == null) {
-      _showError('Please select a banner image.');
+      unifiedSnackBar(context, 'Please select a banner image.', error: true);
       return;
     }
 
@@ -170,7 +177,8 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
 
     try {
       final String restaurantID = currentUid!;
-      final String fileName = '${DateTime.now().millisecondsSinceEpoch}_$_imageFileName';
+      final String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_$_imageFileName';
 
       final ref = FirebaseStorage.instance
           .ref()
@@ -200,16 +208,10 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
-      _showError(e.toString());
+      unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("There was and error: $message")),
-    );
   }
 
   @override
@@ -240,7 +242,9 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Add Menu', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                const Text('Add Menu',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(Icons.close_rounded, color: brandColors.muted),
@@ -259,7 +263,9 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
                   color: brandColors.navy?.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: _imageBytes != null ? brandColors.navy! : colorScheme.outline,
+                    color: _imageBytes != null
+                        ? brandColors.navy!
+                        : colorScheme.outline,
                     width: _imageBytes != null ? 2 : 1,
                   ),
                 ),
@@ -271,11 +277,18 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add_photo_alternate_outlined, size: 40, color: brandColors.muted),
+                          Icon(Icons.add_photo_alternate_outlined,
+                              size: 40, color: brandColors.muted),
                           const SizedBox(height: 8),
-                          Text('Upload Banner Image', style: TextStyle(fontSize: 13, color: brandColors.muted, fontWeight: FontWeight.w500)),
+                          Text('Upload Banner Image',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: brandColors.muted,
+                                  fontWeight: FontWeight.w500)),
                           const SizedBox(height: 4),
-                          Text('Click to browse', style: TextStyle(fontSize: 11, color: brandColors.muted)),
+                          Text('Click to browse',
+                              style: TextStyle(
+                                  fontSize: 11, color: brandColors.muted)),
                         ],
                       ),
               ),
@@ -289,10 +302,13 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
               decoration: InputDecoration(
                 labelText: 'Menu Title',
                 hintText: 'e.g. Lunch Specials',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
-              validator: (v) => v == null || v.trim().isEmpty ? 'Title is required' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Title is required' : null,
             ),
 
             const SizedBox(height: 16),
@@ -304,10 +320,14 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
               decoration: InputDecoration(
                 labelText: 'Description',
                 hintText: 'Briefly describe this menu...',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
-              validator: (v) => v == null || v.trim().isEmpty ? 'Description is required' : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? 'Description is required'
+                  : null,
             ),
 
             const SizedBox(height: 24),
@@ -320,12 +340,19 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: brandColors.navy,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   elevation: 0,
                 ),
                 child: _isLoading
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Text('Create Menu', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                    : const Text('Create Menu',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 15)),
               ),
             ),
           ],

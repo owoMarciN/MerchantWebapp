@@ -4,6 +4,8 @@ import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/widgets/progress_bar.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:user_app/providers/order_stats_provider.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
@@ -339,195 +341,146 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   Widget _buildStatGrid(BrandColors brandColors, ColorScheme colorScheme) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection("orders")
-          .where("restaurantID", isEqualTo: _restaurantID)
-          .snapshots(),
-      builder: (context, snap) {
-        final docs = snap.data?.docs ?? [];
-        final int totalOrders = docs.length;
-        final int pendingOrders =
-            docs.where((d) => (d.data() as Map)["status"] == "normal").length;
-        final int completedOrders =
-            docs.where((d) => (d.data() as Map)["status"] == "delivered").length;
-        final double totalRevenue = docs.fold(0.0, (overallSum, d) {
-          final raw = (d.data() as Map)["totalAmount"]?.toString() ?? "0";
-          return overallSum + (double.tryParse(raw) ?? 0);
-        });
-
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            final int cols = constraints.maxWidth > 500 ? 4 : 2;
-            return GridView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: cols,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                mainAxisExtent: 96,
-              ),
-              children: [
-                _StatCard(
-                    label: 'Total Orders',
-                    value: '$totalOrders',
-                    icon: Icons.shopping_bag_rounded,
-                    color: brandColors.navy!,
-                    colorScheme: colorScheme),
-                _StatCard(
-                    label: 'Pending',
-                    value: '$pendingOrders',
-                    icon: Icons.pending_actions_rounded,
-                    color: const Color(0xFFD97706),
-                    colorScheme: colorScheme),
-                _StatCard(
-                    label: 'Completed',
-                    value: '$completedOrders',
-                    icon: Icons.check_circle_rounded,
-                    color: brandColors.accentGreen!,
-                    colorScheme: colorScheme),
-                _StatCard(
-                    label: 'Total Revenue',
-                    value: '${totalRevenue.toStringAsFixed(2)} PLN',
-                    icon: Icons.payments_rounded,
-                    color: const Color(0xFF8B5CF6),
-                    colorScheme: colorScheme),
-              ],
-            );
-          },
-        );
-      },
-    );
+    final stats = context.watch<OrderStatsProvider>();
+    return LayoutBuilder(builder: (context, constraints) {
+      final int cols = constraints.maxWidth > 500 ? 4 : 2;
+      return GridView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: cols, crossAxisSpacing: 14,
+          mainAxisSpacing: 14, mainAxisExtent: 96,
+        ),
+        children: [
+          _StatCard(label: 'Total Orders', value: '${stats.totalOrders}',
+              icon: Icons.shopping_bag_rounded, color: brandColors.navy!, colorScheme: colorScheme),
+          _StatCard(label: 'Pending', value: '${stats.pendingOrders}',
+              icon: Icons.pending_actions_rounded, color: const Color(0xFFD97706), colorScheme: colorScheme),
+          _StatCard(label: 'Completed', value: '${stats.completedOrders}',
+              icon: Icons.check_circle_rounded, color: brandColors.accentGreen!, colorScheme: colorScheme),
+          _StatCard(label: 'Total Revenue', value: '${stats.totalRevenue.toStringAsFixed(2)} PLN',
+              icon: Icons.payments_rounded, color: const Color(0xFF8B5CF6), colorScheme: colorScheme),
+        ],
+      );
+    });
   }
 
   Widget _buildOrdersTable(BrandColors brandColors, ColorScheme colorScheme) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection("orders")
-          .where("restaurantID", isEqualTo: _restaurantID)
-          .orderBy("orderTime", descending: true)
-          .limit(5)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.hasError || snapshot.data!.docs.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: colorScheme.outline),
-            ),
-            child: Center(
-              child: Text('No orders yet',
-                  style: TextStyle(fontSize: 13, color: brandColors.muted)),
-            ),
-          );
-        }
+    final stats = context.watch<OrderStatsProvider>();
+    final recentDocs = stats.docs.take(5).toList();
 
-        return Container(
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
+    if (recentDocs.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outline),
+            border: Border.all(color: colorScheme.outline)),
+        child: Center(child: Text('No orders yet',
+            style: TextStyle(fontSize: 13, color: brandColors.muted))),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colorScheme.outline),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Row(
+              children: const [
+                Expanded(flex: 3, child: _TableHeader('ORDER ID')),
+                Expanded(flex: 3, child: _TableHeader('CUSTOMER')),
+                Expanded(flex: 2, child: _TableHeader('ITEMS')),
+                Expanded(flex: 3, child: _TableHeader('STATUS')),
+                Expanded(
+                    flex: 2,
+                    child: Align(
+                        alignment: Alignment.centerRight,
+                        child: _TableHeader('TOTAL'))),
+              ],
+            ),
           ),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                child: Row(
-                  children: const [
-                    Expanded(flex: 3, child: _TableHeader('ORDER ID')),
-                    Expanded(flex: 3, child: _TableHeader('CUSTOMER')),
-                    Expanded(flex: 2, child: _TableHeader('ITEMS')),
-                    Expanded(flex: 3, child: _TableHeader('STATUS')),
-                    Expanded(
-                        flex: 2,
-                        child: Align(
-                            alignment: Alignment.centerRight,
-                            child: _TableHeader('TOTAL'))),
-                  ],
-                ),
-              ),
-              Divider(height: 1, color: colorScheme.outline),
-              ...snapshot.data!.docs.map((doc) {
-                final d = doc.data() as Map<String, dynamic>;
-                final String status = d["status"] ?? "normal";
-                final String customer = d["userID"] ?? "—";
-                final int items = (d["itemIDs"] as List?)?.length ?? 0;
-                final double total =
-                    double.tryParse(d["totalAmount"]?.toString() ?? "0") ?? 0;
-                final Timestamp? ts = d["orderTime"] as Timestamp?;
-                final String timeLabel = ts != null
-                    ? _formatTime(ts.toDate())
-                    : "—";
-                final String shortId =
-                    '#${doc.id.substring(0, doc.id.length.clamp(0, 8))}';
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(shortId,
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        color: brandColors.muted,
-                                        fontFamily: 'monospace')),
-                                const SizedBox(height: 2),
-                                Text(timeLabel,
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        color: brandColors.muted)),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                              flex: 3,
-                              child: Text(customer,
+          Divider(height: 1, color: colorScheme.outline),
+          ...recentDocs.map((doc) {
+            final d = doc.data() as Map<String, dynamic>;
+            final String status = d["status"] ?? "normal";
+            final String customer = d["userID"] ?? "—";
+            final int items = (d["itemIDs"] as List?)?.length ?? 0;
+            final double total =
+                double.tryParse(d["totalAmount"]?.toString() ?? "0") ?? 0;
+            final Timestamp? ts = d["orderTime"] as Timestamp?;
+            final String timeLabel = ts != null
+                ? _formatTime(ts.toDate())
+                : "—";
+            final String shortId =
+                '#${doc.id.substring(0, doc.id.length.clamp(0, 8))}';
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(shortId,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: brandColors.muted,
+                                    fontFamily: 'monospace')),
+                            const SizedBox(height: 2),
+                            Text(timeLabel,
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: brandColors.muted)),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                          flex: 3,
+                          child: Text(customer,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500),
+                              overflow: TextOverflow.ellipsis)),
+                      Expanded(
+                          flex: 2,
+                          child: Text(
+                              '$items item${items == 1 ? '' : 's'}',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: brandColors.muted))),
+                      Expanded(
+                          flex: 3,
+                          child: _StatusChip(
+                              status: status,
+                              brandColors: brandColors)),
+                      Expanded(
+                          flex: 2,
+                          child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                  '${total.toStringAsFixed(2)} PLN',
                                   style: const TextStyle(
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w500),
-                                  overflow: TextOverflow.ellipsis)),
-                          Expanded(
-                              flex: 2,
-                              child: Text(
-                                  '$items item${items == 1 ? '' : 's'}',
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: brandColors.muted))),
-                          Expanded(
-                              flex: 3,
-                              child: _StatusChip(
-                                  status: status,
-                                  brandColors: brandColors)),
-                          Expanded(
-                              flex: 2,
-                              child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                      '${total.toStringAsFixed(2)} PLN',
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight:
-                                              FontWeight.w600)))),
-                        ],
-                      ),
-                    ),
-                    Divider(height: 1, color: colorScheme.outline),
-                  ],
-                );
-              }),
-            ],
-          ),
-        );
-      },
+                                      fontWeight:
+                                          FontWeight.w600)))),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, color: colorScheme.outline),
+              ],
+            );
+          }),
+        ],
+      ),
     );
   }
 

@@ -10,8 +10,11 @@ import 'package:user_app/l10n/app_localizations.dart';
 import 'package:user_app/models/language.dart';
 
 import 'package:provider/provider.dart';
+import 'package:user_app/providers/locale_provider.dart';
+import 'package:user_app/providers/menu_provider.dart';
+import 'package:user_app/providers/order_stats_provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:user_app/assistant_methods/locale_provider.dart';
 
 import 'package:user_app/global/global.dart';
 import 'package:user_app/screens/landing_page_screen.dart';
@@ -19,7 +22,7 @@ import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:user_app/screens/dashboard_shell.dart';
-import 'package:user_app/authentication/auth_screen.dart';
+import 'package:user_app/auth/auth_screen.dart';
 import 'package:user_app/screens/splash_screen.dart';
 import 'package:dynamic_path_url_strategy/dynamic_path_url_strategy.dart';
 
@@ -44,7 +47,8 @@ void main() async {
   }
 
   await FirebaseAppCheck.instance.activate(
-    providerWeb: ReCaptchaV3Provider("6LdxDXYsAAAAAMUEjjSL0wbJUGB3uYPPX8mzZoec"), 
+    providerWeb:
+        ReCaptchaV3Provider("6LdxDXYsAAAAAMUEjjSL0wbJUGB3uYPPX8mzZoec"),
   );
 
   // Initialize SharedPreferences
@@ -60,12 +64,11 @@ void main() async {
   setPathUrlStrategy();
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: localeProvider),
-      ],
-      child: const AdminApp()
-    ),
+    MultiProvider(providers: [
+      ChangeNotifierProvider.value(value: localeProvider),
+      ChangeNotifierProvider(create: (_) => OrderStatsProvider(currentUid ?? '')),
+      ChangeNotifierProvider(create: (_) => MenuProvider(currentUid ?? '')),
+    ], child: const AdminApp()),
   );
 }
 
@@ -76,7 +79,9 @@ final GoRouter _router = GoRouter(
       path: '/splash',
       builder: (context, state) => const MySplashScreen(),
     ),
-    GoRoute(path: '/auth/:mode', builder: (context, state) { 
+    GoRoute(
+      path: '/auth/:mode',
+      builder: (context, state) {
         final mode = state.pathParameters['mode'] ?? 'login';
         return AuthScreen(initialShowLogin: mode == 'login');
       },
@@ -85,10 +90,17 @@ final GoRouter _router = GoRouter(
       builder: (context, state, child) => DashboardShell(child: child),
       routes: [
         GoRoute(path: '/dashboard', builder: (_, __) => const OverviewScreen()),
-        GoRoute(path: '/dashboard/orders', builder: (_, __) => const OrdersScreen()),
-        GoRoute(path: '/dashboard/menus', builder: (_, __) => const MenusScreen()),
-        GoRoute(path: '/dashboard/analytics', builder: (_, __) => const AnalyticsScreen()),
-        GoRoute(path: '/dashboard/settings', builder: (_, __) => const SettingsScreen()),
+        GoRoute(
+            path: '/dashboard/orders',
+            builder: (_, __) => const OrdersScreen()),
+        GoRoute(
+            path: '/dashboard/menus', builder: (_, __) => const MenusScreen()),
+        GoRoute(
+            path: '/dashboard/analytics',
+            builder: (_, __) => const AnalyticsScreen()),
+        GoRoute(
+            path: '/dashboard/settings',
+            builder: (_, __) => const SettingsScreen()),
       ],
     ),
   ],
@@ -114,13 +126,13 @@ class AdminApp extends StatelessWidget {
         return Locale(lang.code, lang.countryCode);
       }).toList(),
 
-      localizationsDelegates: const[
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      
+
       localeResolutionCallback: (locale, supportedLocales) {
         if (locale == null) return supportedLocales.first;
         for (var supportedLocale in supportedLocales) {
@@ -136,14 +148,16 @@ class AdminApp extends StatelessWidget {
 
 void injectGoogleMapsScript(String apiKey) {
   const scriptId = 'google-maps-sdk';
-  
+
   if (web.document.getElementById(scriptId) == null) {
-    final script = web.document.createElement('script') as web.HTMLScriptElement;
+    final script =
+        web.document.createElement('script') as web.HTMLScriptElement;
     script.id = scriptId;
-    script.src = "https://maps.googleapis.com/maps/api/js?key=$apiKey&libraries=places";
+    script.src =
+        "https://maps.googleapis.com/maps/api/js?key=$apiKey&libraries=places";
     script.async = true;
     script.defer = true;
-    
+
     web.document.head?.appendChild(script);
   }
 }

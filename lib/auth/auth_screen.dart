@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:user_app/authentication/login.dart';
-import 'package:user_app/authentication/register.dart';
+import 'package:user_app/auth/login.dart';
+import 'package:user_app/auth/register.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:go_router/go_router.dart';
 

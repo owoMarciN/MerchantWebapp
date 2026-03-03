@@ -53,6 +53,7 @@ dependencies:
   dynamic_path_url_strategy: ^1.0.0
   file_picker: ^10.3.10
   web: ^1.1.1
+  flutter_iban_tools: ^0.1.2
 
 dev_dependencies:
   flutter_test:

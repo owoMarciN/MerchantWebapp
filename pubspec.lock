@@ -289,6 +289,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.2"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -478,6 +486,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.19"
+  flutter_iban_tools:
+    dependency: "direct main"
+    description:
+      name: flutter_iban_tools
+      sha256: "10012a979de8006de917b8308766c868345e84940e6d16a96f73ce0bde6dd593"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   flutter_lints:
     dependency: "direct dev"
     description:

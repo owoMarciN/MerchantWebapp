@@ -1,8 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
-import 'package:user_app/global/global.dart';
+import 'package:user_app/extensions/responsive_ext.dart';
+import 'package:user_app/providers/order_stats_provider.dart';
 import 'package:user_app/widgets/progress_bar.dart';
+import 'package:user_app/providers/menu_provider.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -12,218 +14,45 @@ class AnalyticsScreen extends StatefulWidget {
 }
 
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
-  final String? _restaurantID = currentUid;
-  bool _isLoading = true;
-
   int _rangeDays = 7;
-
-  double _totalRevenue = 0;
-  double _todayRevenue = 0;
-  int _totalOrders = 0;
-  int _todayOrders = 0;
-  double _avgOrderValue = 0;
-
-  Map<String, double> _revenueByDay = {};
-
-  Map<String, int> _statusCounts = {};
-
-  Map<String, int> _itemCounts = {};
-
-  Map<String, String> _itemNames = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _loadAnalytics();
-  }
-
-  Future<void> _loadAnalytics() async {
-    if (_restaurantID == null) return;
-    setState(() => _isLoading = true);
-
-    try {
-      final now = DateTime.now();
-      final rangeStart = now.subtract(Duration(days: _rangeDays));
-      final todayStart = DateTime(now.year, now.month, now.day);
-
-      final snap = await FirebaseFirestore.instance
-          .collection("orders")
-          .where("restaurantID", isEqualTo: _restaurantID)
-          .where("orderTime",
-              isGreaterThanOrEqualTo: Timestamp.fromDate(rangeStart))
-          .get();
-
-      double totalRevenue = 0;
-      double todayRevenue = 0;
-      int totalOrders = snap.docs.length;
-      int todayOrders = 0;
-      final Map<String, double> revenueByDay = {};
-      final Map<String, int> statusCounts = {};
-      final Map<String, int> itemCounts = {};
-
-      for (int i = _rangeDays - 1; i >= 0; i--) {
-        final day = now.subtract(Duration(days: i));
-        revenueByDay[_dayLabel(day)] = 0;
-      }
-
-      for (final doc in snap.docs) {
-        final d = doc.data();
-
-        final double amount =
-            double.tryParse(d["totalAmount"]?.toString() ?? "0") ?? 0;
-        final Timestamp? ts = d["orderTime"] as Timestamp?;
-        final String status = d["status"]?.toString() ?? "normal";
-        final List itemIDs = (d["itemIDs"] as List?) ?? [];
-
-        totalRevenue += amount;
-
-        // Today stats
-        if (ts != null) {
-          final orderDate = ts.toDate();
-          if (orderDate.isAfter(todayStart)) {
-            todayRevenue += amount;
-            todayOrders++;
-          }
-
-          final label = _dayLabel(orderDate);
-          if (revenueByDay.containsKey(label)) {
-            revenueByDay[label] = (revenueByDay[label] ?? 0) + amount;
-          }
-        }
-
-        // Status breakdown
-        statusCounts[status] = (statusCounts[status] ?? 0) + 1;
-
-        // Item frequency
-        for (final id in itemIDs) {
-          final key = id.toString();
-          itemCounts[key] = (itemCounts[key] ?? 0) + 1;
-        }
-      }
-
-      // Fetch item names for top 5 most ordered items
-      final topItemIds = (itemCounts.entries.toList()
-            ..sort((a, b) => b.value.compareTo(a.value)))
-          .take(5)
-          .map((e) => e.key)
-          .toList();
-
-      final Map<String, String> itemNames = {};
-      for (final itemId in topItemIds) {
-        final menusSnap = await FirebaseFirestore.instance
-            .collection("restaurants")
-            .doc(_restaurantID)
-            .collection("menus")
-            .get();
-
-        for (final menu in menusSnap.docs) {
-          final itemSnap = await FirebaseFirestore.instance
-              .collection("restaurants")
-              .doc(_restaurantID)
-              .collection("menus")
-              .doc(menu.id)
-              .collection("items")
-              .doc(itemId)
-              .get();
-
-          if (itemSnap.exists) {
-            itemNames[itemId] = itemSnap.data()?["name"]?.toString() ?? itemId;
-            break;
-          }
-        }
-
-        itemNames.putIfAbsent(itemId, () => itemId);
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _totalRevenue = totalRevenue;
-        _todayRevenue = todayRevenue;
-        _totalOrders = totalOrders;
-        _todayOrders = todayOrders;
-        _avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-        _revenueByDay = revenueByDay;
-        _statusCounts = statusCounts;
-        _itemCounts = itemCounts;
-        _itemNames = itemNames;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  String _dayLabel(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
-  }
 
   @override
   Widget build(BuildContext context) {
     final brandColors = Theme.of(context).extension<BrandColors>()!;
     final colorScheme = Theme.of(context).colorScheme;
 
-    if (_isLoading) return Center(child: circularProgress());
+    // Listen to the provider
+    final stats = context.watch<OrderStatsProvider>();
+    final menu = context.watch<MenuProvider>();
+
+    if (stats.isLoading || menu.isLoading) {
+      return Center(child: circularProgress());
+    }
+
+    // Determine values based on selected range
+    final displayRevenue =
+        _rangeDays == 7 ? stats.last7dRevenue : stats.last30dRevenue;
+    final displayOrders =
+        _rangeDays == 7 ? stats.last7dOrders : stats.last30dOrders;
+    final chartData = stats.revenueForRange(_rangeDays);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(28, 28, 28, 48),
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionLabel('AT A GLANCE', brandColors),
           const SizedBox(height: 14),
-          LayoutBuilder(builder: (context, constraints) {
-            final int cols = constraints.maxWidth > 500 ? 4 : 2;
-            return GridView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: cols,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                mainAxisExtent: 96,
-              ),
-              children: [
-                _StatCard(
-                  label: 'Revenue (${_rangeDays}d)',
-                  value: '${_totalRevenue.toStringAsFixed(2)} PLN',
-                  icon: Icons.payments_rounded,
-                  color: brandColors.accentGreen!,
-                  colorScheme: colorScheme,
-                ),
-                _StatCard(
-                  label: 'Orders (${_rangeDays}d)',
-                  value: '$_totalOrders',
-                  icon: Icons.shopping_bag_rounded,
-                  color: brandColors.navy!,
-                  colorScheme: colorScheme,
-                ),
-                _StatCard(
-                  label: 'Today\'s Revenue',
-                  value: '${_todayRevenue.toStringAsFixed(2)} PLN',
-                  icon: Icons.today_rounded,
-                  color: const Color(0xFF8B5CF6),
-                  colorScheme: colorScheme,
-                ),
-                _StatCard(
-                  label: 'Avg Order Value',
-                  value: '${_avgOrderValue.toStringAsFixed(2)} PLN',
-                  icon: Icons.trending_up_rounded,
-                  color: const Color(0xFFD97706),
-                  colorScheme: colorScheme,
-                ),
-              ],
-            );
-          }),
+          _buildStatGrid(
+              displayRevenue, displayOrders, stats, brandColors, colorScheme),
           const SizedBox(height: 32),
           Row(
             children: [
               Expanded(child: _sectionLabel('REVENUE OVER TIME', brandColors)),
               _RangeToggle(
                 selected: _rangeDays,
-                onChanged: (v) {
-                  setState(() => _rangeDays = v);
-                  _loadAnalytics();
-                },
+                onChanged: (v) => setState(() => _rangeDays = v),
                 brandColors: brandColors,
                 colorScheme: colorScheme,
               ),
@@ -231,7 +60,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
           const SizedBox(height: 14),
           _RevenueChart(
-            data: _revenueByDay,
+            data: chartData,
             brandColors: brandColors,
             colorScheme: colorScheme,
           ),
@@ -239,8 +68,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           _sectionLabel('ORDER STATUS BREAKDOWN', brandColors),
           const SizedBox(height: 14),
           _StatusBreakdown(
-            counts: _statusCounts,
-            total: _totalOrders,
+            counts: stats.statusCounts,
+            total: stats.totalOrders,
             brandColors: brandColors,
             colorScheme: colorScheme,
           ),
@@ -248,8 +77,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           _sectionLabel('MOST ORDERED ITEMS', brandColors),
           const SizedBox(height: 14),
           _PopularItems(
-            itemCounts: _itemCounts,
-            itemNames: _itemNames,
+            itemCounts: stats.itemCounts,
+            itemNames: menu.itemNames,
             brandColors: brandColors,
             colorScheme: colorScheme,
           ),
@@ -258,12 +87,60 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
+  Widget _buildStatGrid(double rev, int ord, OrderStatsProvider stats,
+      BrandColors brands, ColorScheme scheme) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final int cols = context.gridCols421;
+
+      return GridView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: cols,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          mainAxisExtent: 90,
+        ),
+        children: [
+          _StatCard(
+            label: 'Revenue (${_rangeDays}d)',
+            value: '${rev.toStringAsFixed(2)} PLN',
+            icon: Icons.payments_rounded,
+            color: brands.accentGreen!,
+            colorScheme: scheme,
+          ),
+          _StatCard(
+            label: 'Orders (${_rangeDays}d)',
+            value: '$ord',
+            icon: Icons.shopping_bag_rounded,
+            color: brands.navy!,
+            colorScheme: scheme,
+          ),
+          _StatCard(
+            label: 'Today\'s Sales',
+            value: '${stats.todayRevenue.toStringAsFixed(2)} PLN',
+            icon: Icons.today_rounded,
+            color: const Color(0xFF8B5CF6),
+            colorScheme: scheme,
+          ),
+          _StatCard(
+            label: 'Avg Order',
+            value: '${stats.avgOrderValue.toStringAsFixed(2)} PLN',
+            icon: Icons.trending_up_rounded,
+            color: const Color(0xFFD97706),
+            colorScheme: scheme,
+          ),
+        ],
+      );
+    });
+  }
+
   Widget _sectionLabel(String text, BrandColors brandColors) {
     return Text(
       text,
       style: TextStyle(
-          fontSize: 10.5,
-          fontWeight: FontWeight.w700,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
           color: brandColors.muted,
           letterSpacing: 1.2),
     );
@@ -537,18 +414,7 @@ class _PopularItems extends StatelessWidget {
         .toList();
 
     if (sorted.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outline),
-        ),
-        child: Center(
-          child: Text('No item data yet',
-              style: TextStyle(fontSize: 13, color: brandColors.muted)),
-        ),
-      );
+      return _buildEmptyState();
     }
 
     final int maxCount = sorted.first.value;
@@ -557,57 +423,84 @@ class _PopularItems extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outline),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         children: sorted.asMap().entries.map((entry) {
-          final int rank = entry.key + 1;
+          final int index = entry.key;
+          final int rank = index + 1;
           final String id = entry.value.key;
           final int count = entry.value.value;
           final String name = itemNames[id] ?? id;
-          final double pct = count / maxCount;
+          final double pct = maxCount > 0 ? count / maxCount : 0;
 
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding:
+                EdgeInsets.only(bottom: index == sorted.length - 1 ? 0 : 20),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 20,
+                // Rank Badge
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: rank <= 3
+                        ? brandColors.navy?.withValues(alpha: 0.1)
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
                   child: Text(
                     '$rank',
                     style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: brandColors.muted),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: rank <= 3 ? brandColors.navy : brandColors.muted,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
+                // Item Info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text(name,
-                                style: const TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.w600),
-                                overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          Text('$count orders',
-                              style: TextStyle(
-                                  fontSize: 12, color: brandColors.muted)),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$count orders',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: brandColors.muted,
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(100),
                         child: LinearProgressIndicator(
                           value: pct,
-                          backgroundColor: colorScheme.outline,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(brandColors.navy!),
+                          backgroundColor: colorScheme.surfaceContainerHighest,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            brandColors.navy ?? colorScheme.primary,
+                          ),
                           minHeight: 6,
                         ),
                       ),
@@ -618,6 +511,28 @@ class _PopularItems extends StatelessWidget {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.inventory_2_outlined, color: brandColors.muted, size: 32),
+          const SizedBox(height: 12),
+          Text(
+            'No item data for this period',
+            style: TextStyle(fontSize: 13, color: brandColors.muted),
+          ),
+        ],
       ),
     );
   }

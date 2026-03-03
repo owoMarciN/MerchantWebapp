@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:go_router/go_router.dart';
+import 'package:user_app/extensions/responsive_ext.dart';
 
 class LandingPageScreen extends StatelessWidget {
   const LandingPageScreen({super.key});
@@ -26,8 +27,9 @@ class LandingPageScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNav(BuildContext context, BrandColors brand, ColorScheme scheme) {
-    final bool isWide = MediaQuery.of(context).size.width > 700;
+  Widget _buildNav(
+      BuildContext context, BrandColors brand, ColorScheme scheme) {
+    final isWide = context.isWide;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isWide ? 60 : 20, vertical: 16),
@@ -46,28 +48,28 @@ class LandingPageScreen extends StatelessWidget {
             const SizedBox(width: 40),
           ],
           _OutlineButton(
-            label: 'Login',
-            brand: brand,
-            scheme: scheme,
-            onTap: () => context.go('/auth/login')
-          ),
+              label: 'Login',
+              brand: brand,
+              scheme: scheme,
+              onTap: () => context.go('/auth/login')),
           const SizedBox(width: 12),
           _PrimaryButton(
-            label: 'Get Started',
-            brand: brand,
-            onTap: () => context.go('/auth/register')
-          ),
+              label: 'Get Started',
+              brand: brand,
+              onTap: () => context.go('/auth/register')),
         ],
       ),
     );
   }
 
-  Widget _buildHero(BuildContext context, BrandColors brand, ColorScheme scheme) {
+  Widget _buildHero(
+      BuildContext context, BrandColors brand, ColorScheme scheme) {
     final bool isWide = MediaQuery.of(context).size.width > 700;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: isWide ? 60 : 24, vertical: isWide ? 120 : 72),
+      padding: EdgeInsets.symmetric(
+          horizontal: isWide ? 60 : 24, vertical: isWide ? 120 : 72),
       child: Column(
         children: [
           Container(
@@ -75,7 +77,9 @@ class LandingPageScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: brand.navy?.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(100),
-              border: Border.all(color: brand.navy?.withValues(alpha: 0.4) ?? Colors.transparent),
+              border: Border.all(
+                  color:
+                      brand.navy?.withValues(alpha: 0.4) ?? Colors.transparent),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -84,7 +88,10 @@ class LandingPageScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   'Now live in Wrocław',
-                  style: TextStyle(fontSize: 12, color: brand.accentGreen, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: brand.accentGreen,
+                      fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -119,17 +126,16 @@ class LandingPageScreen extends StatelessWidget {
             alignment: WrapAlignment.center,
             children: [
               _PrimaryButton(
-                label: 'Register Your Restaurant',
-                brand: brand, 
-                onTap: () {}, 
-                large: true
-              ),
+                  label: 'Register Your Restaurant',
+                  brand: brand,
+                  onTap: () {},
+                  large: true),
               _OutlineButton(
-                label: 'See How it Works', 
-                brand: brand, 
-                scheme: scheme, 
-                onTap: () {}, 
-              large: true),
+                  label: 'See How it Works',
+                  brand: brand,
+                  scheme: scheme,
+                  onTap: () {},
+                  large: true),
             ],
           ),
           const SizedBox(height: 80),
@@ -160,17 +166,23 @@ class LandingPageScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                _dot(Colors.redAccent), const SizedBox(width: 6),
-                _dot(Colors.orangeAccent), const SizedBox(width: 6),
+                _dot(Colors.redAccent),
+                const SizedBox(width: 6),
+                _dot(Colors.orangeAccent),
+                const SizedBox(width: 6),
                 _dot(Colors.greenAccent),
               ],
             ),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _previewStat('Orders Today', '148', brand.accentGreen!, brand)),
+                Expanded(
+                    child: _previewStat(
+                        'Orders Today', '148', brand.accentGreen!, brand)),
                 const SizedBox(width: 12),
-                Expanded(child: _previewStat('Active Menus', '12', brand.navy!, brand)),
+                Expanded(
+                    child:
+                        _previewStat('Active Menus', '12', brand.navy!, brand)),
               ],
             ),
           ],
@@ -179,9 +191,13 @@ class LandingPageScreen extends StatelessWidget {
     );
   }
 
-  Widget _dot(Color color) => Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle));
+  Widget _dot(Color color) => Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle));
 
-  Widget _previewStat(String label, String value, Color color, BrandColors brand) {
+  Widget _previewStat(
+      String label, String value, Color color, BrandColors brand) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -191,7 +207,9 @@ class LandingPageScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.bold, color: color)),
           Text(label, style: TextStyle(fontSize: 11, color: brand.muted)),
         ],
       ),
@@ -201,10 +219,15 @@ class LandingPageScreen extends StatelessWidget {
   Widget _buildLogoBanner(BuildContext context, BrandColors brand) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 32),
-      decoration: BoxDecoration(border: Border.symmetric(horizontal: BorderSide(color: Theme.of(context).colorScheme.outline))),
+      decoration: BoxDecoration(
+          border: Border.symmetric(
+              horizontal:
+                  BorderSide(color: Theme.of(context).colorScheme.outline))),
       child: Column(
         children: [
-          Text('TRUSTED BY RESTAURANTS', style: TextStyle(fontSize: 10, color: brand.muted, letterSpacing: 2)),
+          Text('TRUSTED BY RESTAURANTS',
+              style: TextStyle(
+                  fontSize: 10, color: brand.muted, letterSpacing: 2)),
           const SizedBox(height: 24),
           // ... Rest of your logo list
         ],
@@ -212,29 +235,45 @@ class LandingPageScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatures(BuildContext context, BrandColors brand, ColorScheme scheme) {
+  Widget _buildFeatures(
+      BuildContext context, BrandColors brand, ColorScheme scheme) {
     final bool isWide = MediaQuery.of(context).size.width > 700;
     final features = [
-      _Feature(Icons.restaurant_menu_rounded, 'Digital Menu', 'Your menu goes live instantly.', brand.navy!),
-      _Feature(Icons.image_rounded, 'Custom Banners', 'Full creative control.', const Color(0xFF8B5CF6)),
-      _Feature(Icons.bar_chart_rounded, 'Sales Analytics', 'Track peak hours.', brand.accentGreen!),
+      _Feature(Icons.restaurant_menu_rounded, 'Digital Menu',
+          'Your menu goes live instantly.', brand.navy!),
+      _Feature(Icons.image_rounded, 'Custom Banners', 'Full creative control.',
+          const Color(0xFF8B5CF6)),
+      _Feature(Icons.bar_chart_rounded, 'Sales Analytics', 'Track peak hours.',
+          brand.accentGreen!),
     ];
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isWide ? 60 : 24, vertical: 100),
+      padding:
+          EdgeInsets.symmetric(horizontal: isWide ? 60 : 24, vertical: 100),
       child: Column(
         children: [
-          Text('FEATURES', style: TextStyle(color: brand.muted, letterSpacing: 2)),
+          Text('FEATURES',
+              style: TextStyle(color: brand.muted, letterSpacing: 2)),
           const SizedBox(height: 60),
-          isWide 
-            ? Row(children: features.map((f) => Expanded(child: _FeatureCard(feature: f, brand: brand, scheme: scheme))).toList())
-            : Column(children: features.map((f) => _FeatureCard(feature: f, brand: brand, scheme: scheme)).toList()),
+          isWide
+              ? Row(
+                  children: features
+                      .map((f) => Expanded(
+                          child: _FeatureCard(
+                              feature: f, brand: brand, scheme: scheme)))
+                      .toList())
+              : Column(
+                  children: features
+                      .map((f) => _FeatureCard(
+                          feature: f, brand: brand, scheme: scheme))
+                      .toList()),
         ],
       ),
     );
   }
 
-  Widget _buildCta(BuildContext context, BrandColors brand, ColorScheme scheme) {
+  Widget _buildCta(
+      BuildContext context, BrandColors brand, ColorScheme scheme) {
     return Container(
       margin: const EdgeInsets.all(24),
       padding: const EdgeInsets.all(48),
@@ -244,16 +283,19 @@ class LandingPageScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text('Ready to grow?', style: TextStyle(fontSize: 32, color: Colors.white, fontWeight: FontWeight.bold)),
+          const Text('Ready to grow?',
+              style: TextStyle(
+                  fontSize: 32,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {},
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: brand.navyDark),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white, foregroundColor: brand.navyDark),
             child: const Text(
               'Register Now',
-              style: TextStyle(
-                fontWeight: FontWeight.bold
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           )
         ],
@@ -286,7 +328,8 @@ class _FeatureCard extends StatelessWidget {
   final _Feature feature;
   final BrandColors brand;
   final ColorScheme scheme;
-  const _FeatureCard({required this.feature, required this.brand, required this.scheme});
+  const _FeatureCard(
+      {required this.feature, required this.brand, required this.scheme});
 
   @override
   Widget build(BuildContext context) {
@@ -301,16 +344,16 @@ class _FeatureCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(feature.icon, color: feature.color),
-              const SizedBox(width: 16),
-              Text(feature.title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-            ]
-          ),
+          Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Icon(feature.icon, color: feature.color),
+            const SizedBox(width: 16),
+            Text(feature.title,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.white)),
+          ]),
           const SizedBox(height: 8),
-          Text(feature.desc, style: TextStyle(color: brand.muted, fontSize: 13)),
+          Text(feature.desc,
+              style: TextStyle(color: brand.muted, fontSize: 13)),
         ],
       ),
     );
@@ -326,11 +369,13 @@ class _Logo extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(color: brand.navy, borderRadius: BorderRadius.circular(6)),
+          decoration: BoxDecoration(
+              color: brand.navy, borderRadius: BorderRadius.circular(6)),
           child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 20),
         ),
         const SizedBox(width: 8),
-        const Text('Freequick', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        const Text('Freequick',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       ],
     );
   }
@@ -341,7 +386,8 @@ class _NavLink extends StatelessWidget {
   final BrandColors brand;
   const _NavLink(this.label, {required this.brand});
   @override
-  Widget build(BuildContext context) => Text(label, style: TextStyle(color: brand.muted, fontWeight: FontWeight.w500));
+  Widget build(BuildContext context) => Text(label,
+      style: TextStyle(color: brand.muted, fontWeight: FontWeight.w500));
 }
 
 class _PrimaryButton extends StatelessWidget {
@@ -349,7 +395,11 @@ class _PrimaryButton extends StatelessWidget {
   final VoidCallback onTap;
   final BrandColors brand;
   final bool large;
-  const _PrimaryButton({required this.label, required this.onTap, required this.brand, this.large = false});
+  const _PrimaryButton(
+      {required this.label,
+      required this.onTap,
+      required this.brand,
+      this.large = false});
 
   @override
   Widget build(BuildContext context) {
@@ -358,7 +408,8 @@ class _PrimaryButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: brand.navy,
         foregroundColor: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: large ? 32 : 16, vertical: large ? 20 : 12),
+        padding: EdgeInsets.symmetric(
+            horizontal: large ? 32 : 16, vertical: large ? 20 : 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Text(label),
@@ -372,7 +423,12 @@ class _OutlineButton extends StatelessWidget {
   final BrandColors brand;
   final ColorScheme scheme;
   final bool large;
-  const _OutlineButton({required this.label, required this.onTap, required this.brand, required this.scheme, this.large = false});
+  const _OutlineButton(
+      {required this.label,
+      required this.onTap,
+      required this.brand,
+      required this.scheme,
+      this.large = false});
 
   @override
   Widget build(BuildContext context) {
@@ -381,7 +437,8 @@ class _OutlineButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: brand.accentGreen,
         side: BorderSide(color: scheme.outline),
-        padding: EdgeInsets.symmetric(horizontal: large ? 32 : 16, vertical: large ? 20 : 12),
+        padding: EdgeInsets.symmetric(
+            horizontal: large ? 32 : 16, vertical: large ? 20 : 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       child: Text(label),
