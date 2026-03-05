@@ -2,6 +2,18 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+/// Individual statistics for the restaurants.
+///
+/// Mount once at the app root (above DashboardShell) if you need it
+///
+/// Usage:
+///   ChangeNotifierProvider(
+///     create: (_) => LocalStatsProvider(),
+///     child: ...,
+///   )
+///
+///   final l = context.watch'<'LocalStatsProvider'>'();
+
 class LocalStatsProvider extends ChangeNotifier {
   LocalStatsProvider(String restaurantID) {
     _subscribe(restaurantID);

@@ -14,7 +14,7 @@ import 'package:flutter/foundation.dart';
 ///     child: ...,
 ///   )
 ///
-///   final g = context.watch<GlobalStatsProvider>();
+///   final g = context.watch'<'GlobalStatsProvider'>'();
 
 class GlobalStatsProvider extends ChangeNotifier {
   GlobalStatsProvider() {
