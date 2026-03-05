@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-class OrderStatsProvider extends ChangeNotifier {
-  OrderStatsProvider(String restaurantID) {
+class LocalStatsProvider extends ChangeNotifier {
+  LocalStatsProvider(String restaurantID) {
     _subscribe(restaurantID);
   }
 

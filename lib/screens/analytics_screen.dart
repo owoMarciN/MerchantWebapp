@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:user_app/extensions/responsive_ext.dart';
-import 'package:user_app/providers/order_stats_provider.dart';
+import 'package:user_app/providers/local_stats_provider.dart';
 import 'package:user_app/widgets/progress_bar.dart';
 import 'package:user_app/providers/menu_provider.dart';
 
@@ -22,7 +22,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Listen to the provider
-    final stats = context.watch<OrderStatsProvider>();
+    final stats = context.watch<LocalStatsProvider>();
     final menu = context.watch<MenuProvider>();
 
     if (stats.isLoading || menu.isLoading) {
@@ -87,7 +87,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildStatGrid(double rev, int ord, OrderStatsProvider stats,
+  Widget _buildStatGrid(double rev, int ord, LocalStatsProvider stats,
       BrandColors brands, ColorScheme scheme) {
     return LayoutBuilder(builder: (context, constraints) {
       final int cols = context.gridCols421;

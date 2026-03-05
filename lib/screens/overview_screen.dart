@@ -5,7 +5,7 @@ import 'package:user_app/global/global.dart';
 import 'package:user_app/widgets/progress_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:user_app/providers/order_stats_provider.dart';
+import 'package:user_app/providers/local_stats_provider.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
@@ -341,7 +341,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   Widget _buildStatGrid(BrandColors brandColors, ColorScheme colorScheme) {
-    final stats = context.watch<OrderStatsProvider>();
+    final stats = context.watch<LocalStatsProvider>();
     return LayoutBuilder(builder: (context, constraints) {
       final int cols = constraints.maxWidth > 500 ? 4 : 2;
       return GridView(
@@ -366,7 +366,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   Widget _buildOrdersTable(BrandColors brandColors, ColorScheme colorScheme) {
-    final stats = context.watch<OrderStatsProvider>();
+    final stats = context.watch<LocalStatsProvider>();
     final recentDocs = stats.docs.take(5).toList();
 
     if (recentDocs.isEmpty) {

@@ -12,7 +12,8 @@ import 'package:user_app/models/language.dart';
 import 'package:provider/provider.dart';
 import 'package:user_app/providers/locale_provider.dart';
 import 'package:user_app/providers/menu_provider.dart';
-import 'package:user_app/providers/order_stats_provider.dart';
+import 'package:user_app/providers/local_stats_provider.dart';
+import 'package:user_app/providers/global_stats_provider.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +32,8 @@ import 'package:user_app/screens/orders_screen.dart';
 import 'package:user_app/screens/menus_screen.dart';
 import 'package:user_app/screens/analytics_screen.dart';
 import 'package:user_app/screens/settings_screen.dart';
+import 'package:user_app/screens/how_screen.dart';
+import 'package:user_app/screens/pricing_offers_screen.dart';
 
 import 'package:user_app/services/location_service.dart';
 
@@ -66,7 +69,8 @@ void main() async {
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider.value(value: localeProvider),
-      ChangeNotifierProvider(create: (_) => OrderStatsProvider(currentUid ?? '')),
+      ChangeNotifierProvider(create: (_) => LocalStatsProvider(currentUid ?? '')),
+      ChangeNotifierProvider(create: (_) => GlobalStatsProvider()),
       ChangeNotifierProvider(create: (_) => MenuProvider(currentUid ?? '')),
     ], child: const AdminApp()),
   );
@@ -86,6 +90,9 @@ final GoRouter _router = GoRouter(
         return AuthScreen(initialShowLogin: mode == 'login');
       },
     ),
+    GoRoute(
+        path: '/how-it-works', builder: (_, __) => const HowItWorksScreen()),
+    GoRoute(path: '/pricing', builder: (_, __) => const PricingScreen()),
     ShellRoute(
       builder: (context, state, child) => DashboardShell(child: child),
       routes: [
