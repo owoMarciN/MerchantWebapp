@@ -13,7 +13,7 @@ class _RequestsScreenState extends State<RequestsScreen>
     with SingleTickerProviderStateMixin {
   // Tab 0 = Restaurant registrations, Tab 1 = Go Live requests
   late final TabController _tabController;
-  final String? _filter = 'pending';
+  final String _filter = 'pending';
 
   @override
   void initState() {
@@ -43,7 +43,8 @@ class _RequestsScreenState extends State<RequestsScreen>
             unselectedLabelColor: brand.muted,
             indicatorColor: const Color(0xFFEF4444),
             indicatorWeight: 2,
-            labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            labelStyle:
+                const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             tabs: const [
               Tab(text: 'Registrations'),
               Tab(text: 'Go Live Requests'),
@@ -197,15 +198,13 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.inbox_rounded,
-                          size: 40, color: brand.muted),
+                      Icon(Icons.inbox_rounded, size: 40, color: brand.muted),
                       const SizedBox(height: 12),
                       Text(
                         _filter != null
                             ? 'No ${_filter!} requests'
                             : 'No restaurants yet',
-                        style:
-                            TextStyle(fontSize: 14, color: brand.muted),
+                        style: TextStyle(fontSize: 14, color: brand.muted),
                       ),
                     ],
                   ),
@@ -386,10 +385,8 @@ class _GoLiveCardState extends State<_GoLiveCard> {
       if (opCount > 0) await batch.commit();
 
       // 3. Mark Go Live request as approved
-      await db
-          .collection('goLiveRequests')
-          .doc(restaurantID)
-          .update({'status': 'approved', 'reviewedAt': FieldValue.serverTimestamp()});
+      await db.collection('goLiveRequests').doc(restaurantID).update(
+          {'status': 'approved', 'reviewedAt': FieldValue.serverTimestamp()});
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -474,8 +471,8 @@ class _GoLiveCardState extends State<_GoLiveCard> {
                 ),
                 // Status badge
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: _badgeColor(status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -543,8 +540,8 @@ class _GoLiveCardState extends State<_GoLiveCard> {
                         status == 'approved'
                             ? 'Activated on ${_formatDate((d['reviewedAt'] as Timestamp?)?.toDate() ?? DateTime.now())}'
                             : 'Declined on ${_formatDate((d['reviewedAt'] as Timestamp?)?.toDate() ?? DateTime.now())}',
-                        style: TextStyle(
-                            fontSize: 12, color: widget.brand.muted),
+                        style:
+                            TextStyle(fontSize: 12, color: widget.brand.muted),
                       ),
           ),
         ],
@@ -554,17 +551,23 @@ class _GoLiveCardState extends State<_GoLiveCard> {
 
   Color _badgeColor(String status) {
     switch (status) {
-      case 'approved': return const Color(0xFF8B5CF6);
-      case 'declined': return const Color(0xFFEF4444);
-      default: return const Color(0xFFD97706);
+      case 'approved':
+        return const Color(0xFF8B5CF6);
+      case 'declined':
+        return const Color(0xFFEF4444);
+      default:
+        return const Color(0xFFD97706);
     }
   }
 
   String _badgeLabel(String status) {
     switch (status) {
-      case 'approved': return 'Activated';
-      case 'declined': return 'Declined';
-      default: return 'Pending Review';
+      case 'approved':
+        return 'Activated';
+      case 'declined':
+        return 'Declined';
+      default:
+        return 'Pending Review';
     }
   }
 
@@ -601,10 +604,7 @@ class _SetupChecklist extends StatelessWidget {
             .collection('restaurants')
             .doc(restaurantID)
             .get(),
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(restaurantID)
-            .get(),
+        FirebaseFirestore.instance.collection('users').doc(restaurantID).get(),
         FirebaseFirestore.instance
             .collection('restaurants')
             .doc(restaurantID)
@@ -614,15 +614,14 @@ class _SetupChecklist extends StatelessWidget {
       builder: (context, snap) {
         if (!snap.hasData) {
           return const SizedBox(
-              height: 20,
-              child: Center(
-                  child: LinearProgressIndicator()));
+              height: 20, child: Center(child: LinearProgressIndicator()));
         }
 
         final restaurantData =
-            (snap.data![0] as DocumentSnapshot).data() as Map<String, dynamic>?? {};
-        final userData =
-            (snap.data![1] as DocumentSnapshot).data() as Map<String, dynamic>? ?? {};
+            (snap.data![0] as DocumentSnapshot).data() as Map<String, dynamic>;
+        final userData = (snap.data![1] as DocumentSnapshot).data()
+                as Map<String, dynamic>? ??
+            {};
         final menusSnap = snap.data![2] as QuerySnapshot;
 
         final checks = [
@@ -681,9 +680,7 @@ class _SetupChecklist extends StatelessWidget {
                           ? Icons.check_circle_rounded
                           : Icons.radio_button_unchecked_rounded,
                       size: 13,
-                      color: c.done
-                          ? const Color(0xFF10B981)
-                          : brand.muted,
+                      color: c.done ? const Color(0xFF10B981) : brand.muted,
                     ),
                     const SizedBox(width: 4),
                     Text(c.label,
@@ -767,20 +764,19 @@ class _RequestCard extends StatelessWidget {
                           style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w700)),
                       Text('Submitted $date',
-                          style: TextStyle(
-                              fontSize: 11, color: brand.muted)),
+                          style: TextStyle(fontSize: 11, color: brand.muted)),
                     ],
                   ),
                 ),
                 // Status badge
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: style.color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                        color: style.color.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: style.color.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     style.label,
@@ -803,8 +799,7 @@ class _RequestCard extends StatelessWidget {
                 const SizedBox(width: 24),
                 _DetailItem(label: 'REGON', value: regon, brand: brand),
                 const SizedBox(width: 24),
-                _DetailItem(
-                    label: 'Mobile', value: mobile, brand: brand),
+                _DetailItem(label: 'Mobile', value: mobile, brand: brand),
               ],
             ),
           ),
@@ -849,9 +844,7 @@ class _RequestCard extends StatelessWidget {
             label: 'Rejected');
       case 'suspended':
         return _StatusStyle(
-            icon: Icons.block_rounded,
-            color: Colors.grey,
-            label: 'Suspended');
+            icon: Icons.block_rounded, color: Colors.grey, label: 'Suspended');
       default:
         return _StatusStyle(
             icon: Icons.hourglass_top_rounded,
@@ -997,7 +990,9 @@ class _ActionRowState extends State<_ActionRow> {
             const Color(0xFF10B981),
           ),
         ),
-      if (widget.status == 'pending' || widget.status == 'approved' || widget.status == 'suspended')
+      if (widget.status == 'pending' ||
+          widget.status == 'approved' ||
+          widget.status == 'suspended')
         _ActionButton(
           label: 'Reject',
           icon: Icons.close_rounded,
@@ -1090,29 +1085,23 @@ class _FilterChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? color.withValues(alpha: 0.12) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: selected
-                ? color.withValues(alpha: 0.4)
-                : scheme.outline,
+            color: selected ? color.withValues(alpha: 0.4) : scheme.outline,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon,
-                size: 13,
-                color: selected ? color : brand.muted),
+            Icon(icon, size: 13, color: selected ? color : brand.muted),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight:
-                    selected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                 color: selected ? color : brand.muted,
               ),
             ),
@@ -1148,15 +1137,11 @@ class _ActionButton extends StatelessWidget {
         icon: Icon(icon, size: 14, color: color),
         label: Text(label,
             style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: color)),
+                fontSize: 12, fontWeight: FontWeight.w600, color: color)),
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: color.withValues(alpha: 0.4)),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     }
@@ -1166,16 +1151,12 @@ class _ActionButton extends StatelessWidget {
       icon: Icon(icon, size: 14, color: Colors.white),
       label: Text(label,
           style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white)),
+              fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         elevation: 0,
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -1188,21 +1169,17 @@ class _DetailItem extends StatelessWidget {
   final BrandColors brand;
 
   const _DetailItem(
-      {required this.label,
-      required this.value,
-      required this.brand});
+      {required this.label, required this.value, required this.brand});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: TextStyle(fontSize: 10, color: brand.muted)),
+        Text(label, style: TextStyle(fontSize: 10, color: brand.muted)),
         const SizedBox(height: 2),
         Text(value,
-            style: const TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w600)),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
       ],
     );
   }

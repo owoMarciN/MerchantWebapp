@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
-import 'package:user_app/global/global.dart';
 import 'package:user_app/methods/assistant_methods.dart';
 import 'package:user_app/models/menus.dart';
 import 'package:user_app/screens/items_screen.dart';
