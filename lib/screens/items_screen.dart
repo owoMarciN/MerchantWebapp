@@ -61,7 +61,7 @@ class ItemsScreen extends StatelessWidget {
                     .collection("menus")
                     .doc(model!.menuID)
                     .collection("items")
-                    .orderBy("publishedDate", descending: true)
+                    .orderBy("createdAt", descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -201,7 +201,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
       return resDoc.data()?['status']?.toString() ?? 'Pending';
     } catch (e) {
       Fluttertoast.showToast(msg: "Error fetching restaurant status: $e");
-      return 'Pending'; 
+      return 'pending'; 
     }
   }
 
@@ -248,7 +248,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
         'imageUrl': imageUrl,
         'restaurantID': restaurantID,
         'menuID': menuID,
-        'publishedDate': DateTime.now().toString(),
+        'createdAt': Timestamp.now(),
         'status': 'Available',
         'restaurantStatus': currentRestaurantStatus, 
         'discount': 0.0,

@@ -73,7 +73,7 @@ class ItemsDesignWidget extends StatelessWidget {
                         )
                       : customImagePlaceholder(brandColors),
                 ),
-                // Discount Badge
+                // Discount badge
                 if (model?.hasDiscount == true)
                   Positioned(
                     top: 10,
@@ -94,7 +94,7 @@ class ItemsDesignWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                // Likes Badge
+                // Likes badge
                 Positioned(
                   top: 10,
                   right: 10,
@@ -159,7 +159,7 @@ class ItemsDesignWidget extends StatelessWidget {
                                   fontSize: 12,
                                   color: brandColors.muted,
                                   decoration: TextDecoration.lineThrough,
-                                  height: 1.0, // Tightens space
+                                  height: 1.0,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -179,25 +179,23 @@ class ItemsDesignWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    width: 8,
-                  ),
+                  const SizedBox(width: 8),
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        backgroundColor:
-                            brandColors.muted!.withValues(alpha: 0.3),
-                      ),
-                      onPressed: () => _openEditSheet(context),
-                      child: Row(children: [
-                        Text("Edit Item",
-                            style: TextStyle(
-                                color: brandColors.accentGreen,
-                                fontWeight: FontWeight.bold)),
-                        const SizedBox(width: 10),
-                        Icon(Icons.change_circle,
-                            color: brandColors.accentGreen),
-                      ]))
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      backgroundColor:
+                          brandColors.muted!.withValues(alpha: 0.3),
+                    ),
+                    onPressed: () => _openEditSheet(context),
+                    child: Row(children: [
+                      Text('Edit Item',
+                          style: TextStyle(
+                              color: brandColors.accentGreen,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(width: 10),
+                      Icon(Icons.change_circle, color: brandColors.accentGreen),
+                    ]),
+                  ),
                 ],
               ),
             ),
@@ -207,6 +205,8 @@ class ItemsDesignWidget extends StatelessWidget {
     );
   }
 }
+
+// ── Edit sheet ────────────────────────────────────────────────────────────────
 
 class _EditItemSheet extends StatefulWidget {
   final Items item;
@@ -230,7 +230,6 @@ class _EditItemSheetState extends State<_EditItemSheet> {
   Uint8List? _imageBytes;
   String? _imageFileName;
   bool _isLoading = false;
-
   String? _tagError;
 
   @override
@@ -279,7 +278,6 @@ class _EditItemSheetState extends State<_EditItemSheet> {
 
     setState(() {
       _tagError = validationResult;
-
       if (validationResult == null) {
         _tags.add(tag);
         _tagController.clear();
@@ -326,7 +324,14 @@ class _EditItemSheetState extends State<_EditItemSheet> {
         imageChanged = true;
       }
 
-      final Map<String, dynamic> updateData = {
+      await FirebaseFirestore.instance
+          .collection('restaurants')
+          .doc(widget.item.restaurantID)
+          .collection('menus')
+          .doc(widget.item.menuID)
+          .collection('items')
+          .doc(widget.item.itemID)
+          .update({
         'title': _titleController.text.trim(),
         'shortInfo': _shortInfoController.text.trim(),
         'description': _descriptionController.text.trim(),
@@ -336,28 +341,49 @@ class _EditItemSheetState extends State<_EditItemSheet> {
             : 0.0,
         'tags': _tags,
         if (imageChanged) 'imageUrl': finalImageUrl,
-      };
+      });
 
-      await FirebaseFirestore.instance
-          .collection('restaurants')
-          .doc(widget.item.restaurantID)
-          .collection('menus')
-          .doc(widget.item.menuID)
-          .collection('items')
-          .doc(widget.item.itemID)
-          .update(updateData);
-
+      // Clean up old image after successful write
       if (imageChanged && oldUrl != null && oldUrl.isNotEmpty) {
         final String? errorMsg = await deleteOldFile(oldUrl);
         if (errorMsg != null && mounted) {
           unifiedSnackBar(
-              context, "Image updated, but cleanup of old file failed.",
+              context, 'Image updated, but cleanup of old file failed.',
               error: true);
         }
       }
 
       if (!mounted) return;
+      // Capture messenger before pop — once the sheet is gone its context
+      // is unmounted and any ScaffoldMessenger lookup against it will fail.
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle_outline_rounded,
+                    color: Colors.white, size: 20),
+                SizedBox(width: 12),
+                Text('Item saved successfully',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500)),
+              ],
+            ),
+            backgroundColor: const Color(0xFF1E293B),
+            behavior: SnackBarBehavior.floating,
+            elevation: 6,
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 2),
+            dismissDirection: DismissDirection.horizontal,
+          ),
+        );
     } catch (e) {
       if (!mounted) return;
       unifiedSnackBar(context, e.toString(), error: true);
@@ -367,18 +393,22 @@ class _EditItemSheetState extends State<_EditItemSheet> {
   }
 
   Future<void> _delete() async {
+    // Use a local dialogContext so Navigator.pop targets the dialog,
+    // not the sheet — the original code passed `context` (the sheet)
+    // into both pop calls, which could close the sheet instead of
+    // just the dialog.
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Item'),
         content: const Text(
             'Are you sure you want to delete this item? This cannot be undone.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () => Navigator.pop(dialogContext, false),
               child: const Text('Cancel')),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             child:
                 const Text('Delete', style: TextStyle(color: Colors.redAccent)),
           ),
@@ -386,14 +416,17 @@ class _EditItemSheetState extends State<_EditItemSheet> {
       ),
     );
 
-    if (confirm != true) return;
+    if (confirm != true || !mounted) return;
     setState(() => _isLoading = true);
 
+    // Capture messenger before the async gap and before pop.
+    final messenger = ScaffoldMessenger.of(context);
+
     try {
+      // Use deleteOldFile consistent with the rest of the codebase
+      // instead of calling FirebaseStorage.refFromURL directly.
       if (widget.item.imageUrl != null && widget.item.imageUrl!.isNotEmpty) {
-        final storageRef =
-            FirebaseStorage.instance.refFromURL(widget.item.imageUrl!);
-        await storageRef.delete();
+        await deleteOldFile(widget.item.imageUrl!);
       }
 
       await FirebaseFirestore.instance
@@ -407,12 +440,35 @@ class _EditItemSheetState extends State<_EditItemSheet> {
 
       if (!mounted) return;
       Navigator.pop(context);
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle_outline_rounded,
+                    color: Colors.white, size: 20),
+                SizedBox(width: 12),
+                Text('Item deleted successfully',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500)),
+              ],
+            ),
+            backgroundColor: const Color(0xFF1E293B),
+            behavior: SnackBarBehavior.floating,
+            elevation: 6,
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 2),
+            dismissDirection: DismissDirection.horizontal,
+          ),
+        );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(e.toString()), backgroundColor: Colors.redAccent),
-      );
+      unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -437,6 +493,7 @@ class _EditItemSheetState extends State<_EditItemSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -446,18 +503,19 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                   Row(
                     children: [
                       ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Colors.pink.withValues(alpha: 0.3)),
-                          onPressed: _delete,
-                          child: Row(children: [
-                            Text("Delete Item",
-                                style: TextStyle(
-                                    color: Colors.redAccent,
-                                    fontWeight: FontWeight.bold)),
-                            const SizedBox(width: 16),
-                            Icon(Icons.delete_rounded, color: Colors.redAccent),
-                          ])),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.pink.withValues(alpha: 0.3)),
+                        onPressed: _isLoading ? null : _delete,
+                        child: const Row(children: [
+                          Text('Delete Item',
+                              style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold)),
+                          SizedBox(width: 10),
+                          Icon(Icons.delete_rounded, color: Colors.redAccent),
+                        ]),
+                      ),
                       const SizedBox(width: 10),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -465,7 +523,7 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                             Icon(Icons.close_rounded, color: brandColors.muted),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
 
@@ -489,7 +547,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                   clipBehavior: Clip.antiAlias,
                   child: _imageBytes != null
                       ? Image.memory(_imageBytes!, fit: BoxFit.cover)
-                      : widget.item.imageUrl != null
+                      : widget.item.imageUrl != null &&
+                              widget.item.imageUrl!.isNotEmpty
                           ? Image.network(widget.item.imageUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
@@ -523,7 +582,7 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                     colorScheme: colorScheme,
                     brandColors: brandColors),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'shortInfo is required'
+                    ? 'Short info is required'
                     : null,
               ),
               const SizedBox(height: 16),
@@ -552,8 +611,9 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                     brandColors: brandColors),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Price is required';
-                  if (double.tryParse(v.trim()) == null)
+                  if (double.tryParse(v.trim()) == null) {
                     return 'Enter a valid number';
+                  }
                   return null;
                 },
               ),
@@ -575,7 +635,7 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
                       ],
-                      onChanged: (value) {
+                      onChanged: (_) {
                         if (_tagError != null) {
                           setState(() => _tagError = null);
                         }
@@ -693,11 +753,13 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                           ),
                           validator: (v) {
                             if (!_hasDiscount) return null;
-                            if (v == null || v.trim().isEmpty)
+                            if (v == null || v.trim().isEmpty) {
                               return 'Enter a discount percentage';
+                            }
                             final val = double.tryParse(v.trim());
-                            if (val == null || val <= 0 || val > 100)
+                            if (val == null || val <= 0 || val > 100) {
                               return 'Enter a value between 1 and 100';
+                            }
                             return null;
                           },
                         ),

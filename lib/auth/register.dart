@@ -129,14 +129,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         .doc(currentUser.uid)
         .set({
       "restaurantID": currentUser.uid,
+      "ownerUID": currentUser.uid,
       "name": _businessNameController.text.trim(),
       "nip": _nipController.text.trim(),
       "regon": _regonController.text.trim(),
       "businessMobile": _businessMobileController.value.international,
-      "status": "Not Approved",
+      "status": "pending",
       "logoUrl": "",
       "bannerUrl": "",
-      "createdAt": DateTime.now(),
+      "createdAt": Timestamp.now(),
     });
   }
 
@@ -150,9 +151,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       "email": currentUser.email,
       "phone": _ownerPhoneController.value.international,
       "photoUrl": "",
-      "createdAt": DateTime.now(),
-      "role": "restaurant_admin",
-      "status": "Not Approved",
+      "createdAt": Timestamp.now(),
+      "role": "restaurant",
+      "status": "pending",
     });
   }
 

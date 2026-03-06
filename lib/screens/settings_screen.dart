@@ -993,7 +993,7 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            widget.data["role"] ?? 'restaurant_admin',
+                            widget.data["role"] ?? 'restaurant',
                             style: TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w600,

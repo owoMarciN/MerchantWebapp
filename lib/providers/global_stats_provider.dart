@@ -64,7 +64,8 @@ class GlobalStatsProvider extends ChangeNotifier {
 
   // ── Restaurants ────────────────────────────────────────────────────────────
 
-  int totalRestaurants = 0;
+  int totalRestaurants = 0;   // all restaurants including pending/rejected
+  int liveRestaurants = 0;    // only approved + active (shown on landing page)
   int totalMenus = 0;
   int totalItems = 0;
 
@@ -192,13 +193,27 @@ class GlobalStatsProvider extends ChangeNotifier {
   }
 
   void _onRestaurantData(QuerySnapshot snap) async {
+    // All restaurants regardless of status — for admin total count
     totalRestaurants = snap.docs.length;
+    liveRestaurants = snap.docs.where((doc) {
+      final status =
+          (doc.data() as Map<String, dynamic>)['status']?.toString() ?? '';
+      return status == 'approved' || status == 'active';
+    }).length;
 
-    // Count menus and items across all restaurants in parallel
+    // Only count menus and items for restaurants that are live (approved or active).
+    // Pending / rejected / suspended restaurants should not contribute to
+    // the public-facing stats shown on the landing page.
+    final liveDocs = snap.docs.where((doc) {
+      final status =
+          (doc.data() as Map<String, dynamic>)['status']?.toString() ?? '';
+      return status == 'approved' || status == 'active';
+    }).toList();
+
     int menus = 0;
     int items = 0;
 
-    final futures = snap.docs.map((doc) async {
+    final futures = liveDocs.map((doc) async {
       final menusSnap = await FirebaseFirestore.instance
           .collection('restaurants')
           .doc(doc.id)

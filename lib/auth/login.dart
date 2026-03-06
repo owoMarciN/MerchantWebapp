@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/widgets/error_dialog.dart';
 import 'package:user_app/widgets/loading_dialog.dart';
-
 import 'package:user_app/widgets/custom_text_field.dart';
 import 'package:user_app/extensions/context_translate_ext.dart';
 import 'package:user_app/widgets/custom_password_field.dart';
-
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,16 +23,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> formValidation() async {
     if (_formKey.currentState!.validate()) {
-      await loginNow();
+      await _loginNow();
     } else {
       showDialog(
         context: context,
-        builder: (_) => ErrorDialog(message: context.t.errorEnterEmailOrPassword),
+        builder: (_) =>
+            ErrorDialog(message: context.t.errorEnterEmailOrPassword),
       );
     }
   }
 
-  Future<void> loginNow() async {
+  Future<void> _loginNow() async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -46,99 +45,85 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      
-      User? currentUser = authResult.user;
 
+      final User? currentUser = authResult.user;
       if (currentUser != null) {
-        await readUserAndRestaurantData(currentUser);
+        await _loadAndSaveUserData(currentUser);
       }
     } on FirebaseAuthException catch (error) {
       if (!mounted) return;
       Navigator.pop(context);
       showDialog(
         context: context,
-        builder: (_) => ErrorDialog(message: error.message ?? context.t.errorLoginFailed),
+        builder: (_) =>
+            ErrorDialog(message: error.message ?? context.t.errorLoginFailed),
       );
     }
   }
 
-  Future<void> readUserAndRestaurantData(User currentUser) async {
+  Future<void> _loadAndSaveUserData(User currentUser) async {
     try {
-      final userSnapshot = await FirebaseFirestore.instance
+      // ── 1. Check user record exists and has restaurant role ───────────────
+      final userSnap = await FirebaseFirestore.instance
           .collection("users")
           .doc(currentUser.uid)
           .get();
 
-      if (!userSnapshot.exists) {
-        await firebaseAuth.signOut();
+      if (!userSnap.exists) {
+        return _failWith("No user record found.");
+      }
+
+      final userData = userSnap.data()!;
+      final String role = userData["role"]?.toString() ?? "";
+
+      if (role == "admin") {
+        // Admin goes straight to admin panel — no restaurant doc needed
+        await sharedPreferences!.setString("uid", currentUser.uid);
+        await saveUserPref<String>("accountName", userData["name"] ?? "");
+        await saveUserPref<String>("accountEmail", userData["email"] ?? "");
         if (!mounted) return;
         Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (_) => const ErrorDialog(message: "No user record found."),
-        );
+        context.go('/admin/overview');
         return;
       }
 
-      final userData = userSnapshot.data()!;
-      if (userData["role"] != "restaurant_admin") {
-        await firebaseAuth.signOut();
-        if (!mounted) return;
-        Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (_) => const ErrorDialog(message: "This account is not a restaurant."),
-        );
-        return;
+      if (role != "restaurant") {
+        return _failWith("This app is for restaurant accounts only.");
       }
 
-      // Check if restaurant document exists
-      final restaurantSnapshot = await FirebaseFirestore.instance
+      // ── 2. Check restaurant record exists ─────────────────────────────────
+      final restaurantSnap = await FirebaseFirestore.instance
           .collection("restaurants")
           .doc(currentUser.uid)
           .get();
 
-      if (!restaurantSnapshot.exists) {
-        await firebaseAuth.signOut();
-        if (!mounted) return;
-        Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (_) => const ErrorDialog(message: "No restaurant record found."),
-        );
-        return;
+      if (!restaurantSnap.exists) {
+        return _failWith("No restaurant record found. Please contact support.");
       }
 
-      final restaurantData = restaurantSnapshot.data()!;
-      if (restaurantData["status"] == "Not Approved") {
-        await firebaseAuth.signOut();
-        if (!mounted) return;
-        Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (_) => const ErrorDialog(
-            message: "Your restaurant account is pending approval. You will be able to login once verified.",
-          ),
-        );
-        return;
-      }
+      final restaurantData = restaurantSnap.data()!;
 
-      // Save info locally
+      // ── 3. Save prefs ─────────────────────────────────────────────────────
+      // Status is intentionally NOT checked here.
+      // DashboardShell reads status from Firestore in real-time and shows
+      // the appropriate gate screen (pending / rejected / suspended).
+      // This way the user stays signed in and sees a proper explanation
+      // instead of a generic error dialog.
       await sharedPreferences!.setString("uid", currentUser.uid);
       await saveUserPref<String>("accountName", userData["name"] ?? "");
       await saveUserPref<String>("accountEmail", userData["email"] ?? "");
       await saveUserPref<String>("phone", userData["phone"] ?? "");
       await saveUserPref<String>("photoUrl", userData["photoUrl"] ?? "");
-
       await saveUserPref<String>("businessName", restaurantData["name"] ?? "");
-      await saveUserPref<String>("businessMobile", restaurantData["businessMobile"] ?? "");
+      await saveUserPref<String>(
+          "businessMobile", restaurantData["businessMobile"] ?? "");
       await saveUserPref<String>("logoUrl", restaurantData["logoUrl"] ?? "");
-      await saveUserPref<String>("bannerUrl", restaurantData["bannerUrl"] ?? "");
+      await saveUserPref<String>(
+          "bannerUrl", restaurantData["bannerUrl"] ?? "");
 
       if (!mounted) return;
       Navigator.pop(context);
       context.go('/splash');
-
     } catch (e) {
       if (firebaseAuth.currentUser != null) await firebaseAuth.signOut();
       if (!mounted) return;
@@ -148,6 +133,19 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (_) => ErrorDialog(message: e.toString()),
       );
     }
+  }
+
+  // Signs out and shows an error dialog.
+  // Only used for hard failures: wrong role, missing records.
+  // Status blocks (pending/rejected/suspended) are NOT handled here.
+  Future<void> _failWith(String message) async {
+    await firebaseAuth.signOut();
+    if (!mounted) return;
+    Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (_) => ErrorDialog(message: message),
+    );
   }
 
   @override
@@ -198,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.redAccent,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: const Text(

@@ -44,7 +44,7 @@ class _MenusScreenState extends State<MenusScreen> {
                   .collection("restaurants")
                   .doc(restaurantID)
                   .collection("menus")
-                  .orderBy("publishedDate", descending: true)
+                  .orderBy("createdAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -199,12 +199,13 @@ class _AddMenuSheetState extends State<_AddMenuSheet> {
         'description': _descriptionController.text.trim(),
         'bannerUrl': imageUrl,
         'restaurantID': restaurantID,
-        'publishedDate': DateTime.now(),
+        'createdAt': Timestamp.now(),
       });
 
       await docRef.update({'menuID': docRef.id});
 
       if (!mounted) return;
+      unifiedSnackBar(context, 'Menu created successfully');
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
