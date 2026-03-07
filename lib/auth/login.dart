@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _loadAndSaveUserData(User currentUser) async {
     try {
-      // ── 1. Check user record exists and has restaurant role ───────────────
+      // -- 1. Check user record exists and has restaurant role ---------------
       final userSnap = await FirebaseFirestore.instance
           .collection("users")
           .doc(currentUser.uid)
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return _failWith("This app is for restaurant accounts only.");
       }
 
-      // ── 2. Check restaurant record exists ─────────────────────────────────
+      // -- 2. Check restaurant record exists ---------------------------------
       final restaurantSnap = await FirebaseFirestore.instance
           .collection("restaurants")
           .doc(currentUser.uid)
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final restaurantData = restaurantSnap.data()!;
 
-      // ── 3. Save prefs ─────────────────────────────────────────────────────
+      // -- 3. Save prefs ------------------------------------------------------
       // Status is intentionally NOT checked here.
       // DashboardShell reads status from Firestore in real-time and shows
       // the appropriate gate screen (pending / rejected / suspended).

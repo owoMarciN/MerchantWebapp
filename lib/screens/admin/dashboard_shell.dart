@@ -17,6 +17,7 @@ class AdminDashboardShell extends StatelessWidget {
         icon: Icons.storefront_rounded,
         label: 'Join Requests',
         path: '/admin/join-requests'),
+    _NavItem(icon: Icons.people_rounded, label: 'Users', path: '/admin/users'),
   ];
 
   int _selectedIndex(BuildContext context) {
@@ -86,7 +87,7 @@ class AdminDashboardShell extends StatelessWidget {
   }
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────────────────
+// -- Sidebar ------------------------------------------------------------------
 class _AdminSidebar extends StatelessWidget {
   final List<_NavItem> navItems;
   final int selected;
@@ -169,7 +170,7 @@ class _AdminSidebar extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.admin_panel_settings_rounded,
-                      size: 16, color: Color(0xFFEF4444)),
+                      size: 24, color: Color(0xFFEF4444)),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -179,12 +180,12 @@ class _AdminSidebar extends StatelessWidget {
                       Text(
                         getUserPref<String>("accountName") ?? 'Admin',
                         style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w600),
+                            fontSize: 13, fontWeight: FontWeight.w600),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text('Administrator',
-                          style: TextStyle(fontSize: 10, color: brand.muted)),
+                          style: TextStyle(fontSize: 12, color: brand.muted)),
                     ],
                   ),
                 ),
@@ -198,7 +199,7 @@ class _AdminSidebar extends StatelessWidget {
   }
 }
 
-// ── Nav tile ──────────────────────────────────────────────────────────────────
+// -- Nav tile -----------------------------------------------------------------
 class _NavTile extends StatelessWidget {
   final _NavItem item;
   final bool isSelected;
@@ -251,7 +252,7 @@ class _NavTile extends StatelessWidget {
   }
 }
 
-// ── Top bar ───────────────────────────────────────────────────────────────────
+// -- Top bar ------------------------------------------------------------------
 class _AdminTopBar extends StatelessWidget {
   final bool isWide;
   final BrandColors brand;
@@ -291,7 +292,9 @@ class _AdminTopBar extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
           ],
           if (isWide)
-            Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            Text(label,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           const Spacer(),
 
           // Admin badge
@@ -305,11 +308,11 @@ class _AdminTopBar extends StatelessWidget {
             ),
             child: const Row(
               children: [
-                Icon(Icons.shield_rounded, size: 12, color: Color(0xFFEF4444)),
+                Icon(Icons.shield_rounded, size: 16, color: Color(0xFFEF4444)),
                 SizedBox(width: 4),
                 Text('Admin',
                     style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFFEF4444))),
               ],
@@ -319,9 +322,15 @@ class _AdminTopBar extends StatelessWidget {
 
           // Sign out
           PopupMenuButton(
-            offset: const Offset(0, 44),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            offset: const Offset(0, 50),
+            color: const Color(0xFF1E293B),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(                        // ← border
+                color: const Color(0xFFEF4444).withValues(alpha: 0.25),
+                width: 1.2,
+              ),
+            ),
             constraints: const BoxConstraints(minWidth: 200),
             itemBuilder: (_) => <PopupMenuEntry>[
               PopupMenuItem(
@@ -331,7 +340,7 @@ class _AdminTopBar extends StatelessWidget {
                   children: [
                     Text(
                       getUserPref<String>("accountName") ?? 'Admin',
-                      style: const TextStyle(
+                      style: const TextStyle(color: Colors.white,
                           fontSize: 13, fontWeight: FontWeight.w700),
                     ),
                     Text(
@@ -378,7 +387,7 @@ class _AdminTopBar extends StatelessWidget {
   }
 }
 
-// ── Bottom nav ────────────────────────────────────────────────────────────────
+// -- Bottom nav ---------------------------------------------------------------
 class _AdminBottomNav extends StatelessWidget {
   final List<_NavItem> navItems;
   final int selected;
@@ -413,7 +422,7 @@ class _AdminBottomNav extends StatelessWidget {
   }
 }
 
-// ── Data model ────────────────────────────────────────────────────────────────
+// -- Data model ---------------------------------------------------------------
 class _NavItem {
   final IconData icon;
   final String label;

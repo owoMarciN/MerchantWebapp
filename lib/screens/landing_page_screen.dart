@@ -52,7 +52,7 @@ class _LandingPageView extends StatelessWidget {
     );
   }
 
-  // ── Hero ──────────────────────────────────────────────────────────────────
+  // -- Hero ----------------------------------------------------------------------
 
   Widget _buildHero(
       BuildContext context, BrandColors brand, ColorScheme scheme) {
@@ -71,8 +71,8 @@ class _LandingPageView extends StatelessWidget {
               color: brand.navy?.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(100),
               border: Border.all(
-                  color: brand.navy?.withValues(alpha: 0.4) ??
-                      Colors.transparent),
+                  color:
+                      brand.navy?.withValues(alpha: 0.4) ?? Colors.transparent),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -120,14 +120,14 @@ class _LandingPageView extends StatelessWidget {
             children: [
               LandingPrimaryButton(
                 label: 'Register Your Restaurant',
-                onTap: () => Router.neglect(
-                    context, () => context.go('/auth/register')),
+                onTap: () =>
+                    Router.neglect(context, () => context.go('/auth/register')),
                 large: true,
               ),
               LandingOutlineButton(
                 label: 'See How it Works',
-                onTap: () => Router.neglect(
-                    context, () => context.go('/how-it-works')),
+                onTap: () =>
+                    Router.neglect(context, () => context.go('/how-it-works')),
                 large: true,
               ),
             ],
@@ -139,7 +139,7 @@ class _LandingPageView extends StatelessWidget {
     );
   }
 
-  // ── Dashboard preview (live numbers) ─────────────────────────────────────
+  // -- Dashboard preview (live numbers) -------------------------------------
 
   Widget _buildDashboardPreview(BuildContext context, BrandColors brand,
       ColorScheme scheme, GlobalStatsProvider stats) {
@@ -264,9 +264,7 @@ class _LandingPageView extends StatelessWidget {
             children: [
               Text(value,
                   style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: color)),
+                      fontSize: 22, fontWeight: FontWeight.bold, color: color)),
               if (live) ...[
                 const SizedBox(width: 6),
                 Container(
@@ -287,7 +285,7 @@ class _LandingPageView extends StatelessWidget {
     );
   }
 
-  // ── Live stats strip ──────────────────────────────────────────────────────
+  // -- Live stats strip -----------------------------------------------------------------------
 
   Widget _buildLiveStats(
       BuildContext context, BrandColors brand, ColorScheme scheme) {
@@ -332,8 +330,7 @@ class _LandingPageView extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: h, vertical: isWide ? 56 : 40),
       decoration: BoxDecoration(
         color: scheme.surface,
-        border: Border.symmetric(
-            horizontal: BorderSide(color: scheme.outline)),
+        border: Border.symmetric(horizontal: BorderSide(color: scheme.outline)),
       ),
       child: Column(
         children: [
@@ -365,7 +362,9 @@ class _LandingPageView extends StatelessWidget {
             if (constraints.maxWidth > 700) {
               return Row(
                 children: items
-                    .map((s) => Expanded(child: _LiveStatTile(stat: s, brand: brand, scheme: scheme)))
+                    .map((s) => Expanded(
+                        child: _LiveStatTile(
+                            stat: s, brand: brand, scheme: scheme)))
                     .toList(),
               );
             }
@@ -375,7 +374,8 @@ class _LandingPageView extends StatelessWidget {
               children: items
                   .map((s) => SizedBox(
                         width: (constraints.maxWidth - 12) / 2,
-                        child: _LiveStatTile(stat: s, brand: brand, scheme: scheme),
+                        child: _LiveStatTile(
+                            stat: s, brand: brand, scheme: scheme),
                       ))
                   .toList(),
             );
@@ -385,15 +385,15 @@ class _LandingPageView extends StatelessWidget {
     );
   }
 
-  // ── Logo banner ───────────────────────────────────────────────────────────
+  // -- Logo banner ----------------------------------------------------------------------------
 
   Widget _buildLogoBanner(BuildContext context, BrandColors brand) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 32),
       decoration: BoxDecoration(
           border: Border(
-              bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.outline))),
+              bottom:
+                  BorderSide(color: Theme.of(context).colorScheme.outline))),
       child: Column(
         children: [
           Text('TRUSTED BY RESTAURANTS',
@@ -406,7 +406,7 @@ class _LandingPageView extends StatelessWidget {
     );
   }
 
-  // ── Features ──────────────────────────────────────────────────────────────
+  // -- Features -------------------------------------------------------------------------------
 
   Widget _buildFeatures(
       BuildContext context, BrandColors brand, ColorScheme scheme) {
@@ -416,10 +416,10 @@ class _LandingPageView extends StatelessWidget {
     final features = [
       _Feature(Icons.restaurant_menu_rounded, 'Digital Menu',
           'Your menu goes live instantly.', brand.navy!),
-      _Feature(Icons.image_rounded, 'Custom Banners',
-          'Full creative control.', const Color(0xFF8B5CF6)),
-      _Feature(Icons.bar_chart_rounded, 'Sales Analytics',
-          'Track peak hours.', brand.accentGreen!),
+      _Feature(Icons.image_rounded, 'Custom Banners', 'Full creative control.',
+          const Color(0xFF8B5CF6)),
+      _Feature(Icons.bar_chart_rounded, 'Sales Analytics', 'Track peak hours.',
+          brand.accentGreen!),
     ];
 
     return Container(
@@ -446,7 +446,7 @@ class _LandingPageView extends StatelessWidget {
   }
 }
 
-// ── Live stat tile ────────────────────────────────────────────────────────────
+// -- Live stat tile -----------------------------------------------------------------------------
 
 class _LiveStat {
   final IconData icon;
@@ -497,7 +497,7 @@ class _LiveStatTile extends StatelessWidget {
   }
 }
 
-// ── Feature card ──────────────────────────────────────────────────────────────
+// -- Feature card -------------------------------------------------------------------------------
 
 class _Feature {
   final IconData icon;

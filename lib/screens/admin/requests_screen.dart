@@ -34,7 +34,7 @@ class _RequestsScreenState extends State<RequestsScreen>
 
     return Column(
       children: [
-        // ── Tab bar ─────────────────────────────────────────────────────────
+        // -- Tab bar ----------------------------------------------------------
         Container(
           color: scheme.surface,
           child: TabBar(
@@ -52,7 +52,7 @@ class _RequestsScreenState extends State<RequestsScreen>
           ),
         ),
 
-        // ── Tab views ────────────────────────────────────────────────────────
+        // -- Tab views --------------------------------------------------------
         Expanded(
           child: TabBarView(
             controller: _tabController,
@@ -67,7 +67,7 @@ class _RequestsScreenState extends State<RequestsScreen>
   }
 }
 
-// ── Registrations tab ─────────────────────────────────────────────────────────
+// -- Registrations tab --------------------------------------------------------
 
 class _RegistrationsTab extends StatefulWidget {
   final BrandColors brand;
@@ -92,7 +92,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
 
     return Column(
       children: [
-        // ── Filter bar ──────────────────────────────────────────────────────
+        // -- Filter bar -------------------------------------------------------
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           decoration: BoxDecoration(
@@ -173,7 +173,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
           ),
         ),
 
-        // ── List ─────────────────────────────────────────────────────────────
+        // -- List -------------------------------------------------------------
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: query.snapshots(),
@@ -234,7 +234,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
   }
 }
 
-// ── Go Live requests tab ─────────────────────────────────────────────────────
+// -- Go Live requests tab -----------------------------------------------------
 
 class _GoLiveRequestsTab extends StatelessWidget {
   final BrandColors brand;
@@ -321,7 +321,7 @@ class _GoLiveRequestsTab extends StatelessWidget {
       );
 }
 
-// ── Go Live card ──────────────────────────────────────────────────────────────
+// -- Go Live card -------------------------------------------------------------
 
 class _GoLiveCard extends StatefulWidget {
   final QueryDocumentSnapshot doc;
@@ -440,7 +440,7 @@ class _GoLiveCardState extends State<_GoLiveCard> {
       ),
       child: Column(
         children: [
-          // ── Header ───────────────────────────────────────────────────────
+          // -- Header ---------------------------------------------------------
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
             child: Row(
@@ -491,7 +491,7 @@ class _GoLiveCardState extends State<_GoLiveCard> {
             ),
           ),
 
-          // ── Setup checklist ───────────────────────────────────────────────
+          // -- Setup checklist -----------------------------------------------
           if (isPending)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
@@ -505,7 +505,7 @@ class _GoLiveCardState extends State<_GoLiveCard> {
           const SizedBox(height: 14),
           Divider(height: 1, color: widget.scheme.outline),
 
-          // ── Actions ───────────────────────────────────────────────────────
+          // -- Actions --------------------------------------------------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: _loading
@@ -582,7 +582,7 @@ class _GoLiveCardState extends State<_GoLiveCard> {
   }
 }
 
-// ── Setup checklist ───────────────────────────────────────────────────────────
+// -- Setup checklist ----------------------------------------------------------
 // Fetches the restaurant doc and checks what the owner has completed.
 
 class _SetupChecklist extends StatelessWidget {
@@ -706,7 +706,7 @@ class _Check {
   const _Check(this.label, this.done);
 }
 
-// ── Request card ──────────────────────────────────────────────────────────────
+// -- Request card -------------------------------------------------------------
 
 class _RequestCard extends StatelessWidget {
   final String docId;
@@ -741,7 +741,7 @@ class _RequestCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // ── Header ─────────────────────────────────────────────────────────
+          // -- Header ---------------------------------------------------------
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
             child: Row(
@@ -790,7 +790,7 @@ class _RequestCard extends StatelessWidget {
             ),
           ),
 
-          // ── Details grid ───────────────────────────────────────────────────
+          // -- Details grid ---------------------------------------------------
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
             child: Row(
@@ -807,7 +807,7 @@ class _RequestCard extends StatelessWidget {
           const SizedBox(height: 16),
           Divider(height: 1, color: scheme.outline),
 
-          // ── Actions ────────────────────────────────────────────────────────
+          // -- Actions --------------------------------------------------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: _ActionRow(
@@ -854,7 +854,7 @@ class _RequestCard extends StatelessWidget {
   }
 }
 
-// ── Action row ────────────────────────────────────────────────────────────────
+// -- Action row ---------------------------------------------------------------
 
 class _ActionRow extends StatefulWidget {
   final String docId;
@@ -1058,7 +1058,7 @@ class _ActionRowState extends State<_ActionRow> {
   }
 }
 
-// ── Filter chip ───────────────────────────────────────────────────────────────
+// -- Filter chip --------------------------------------------------------------
 
 class _FilterChip extends StatelessWidget {
   final String label;
@@ -1112,7 +1112,7 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-// ── Action button ─────────────────────────────────────────────────────────────
+// -- Action button ------------------------------------------------------------
 
 class _ActionButton extends StatelessWidget {
   final String label;
@@ -1162,7 +1162,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// ── Detail item ───────────────────────────────────────────────────────────────
+// -- Detail item --------------------------------------------------------------
 
 class _DetailItem extends StatelessWidget {
   final String label, value;
@@ -1185,7 +1185,7 @@ class _DetailItem extends StatelessWidget {
   }
 }
 
-// ── Data models ───────────────────────────────────────────────────────────────
+// -- Data models --------------------------------------------------------------
 
 class _StatusStyle {
   final IconData icon;

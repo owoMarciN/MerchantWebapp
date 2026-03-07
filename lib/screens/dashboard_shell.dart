@@ -28,6 +28,10 @@ class _DashboardShellState extends State<DashboardShell> {
         label: 'Menus',
         path: '/dashboard/menus'),
     _NavItem(
+        icon: Icons.campaign_rounded,
+        label: 'Promotions',
+        path: '/dashboard/promotions'),
+    _NavItem(
         icon: Icons.bar_chart_rounded,
         label: 'Analytics',
         path: '/dashboard/analytics'),
@@ -70,7 +74,7 @@ class _DashboardShellState extends State<DashboardShell> {
             .doc(restaurantID)
             .snapshots(),
         builder: (context, snap) {
-          // ── First load only ───────────────────────────────────────────────
+          // -- First load only ------------------------------------------------
           // Use snap.hasData so subsequent stream events never flash a spinner.
           // ConnectionState.waiting on re-emits would destroy the shell layout.
           if (!snap.hasData) {
@@ -79,7 +83,7 @@ class _DashboardShellState extends State<DashboardShell> {
             );
           }
 
-          // ── Missing document ──────────────────────────────────────────────
+          // -- Missing document -----------------------------------------------
           final data = snap.data!.data() as Map<String, dynamic>?;
           if (data == null) {
             return Scaffold(
@@ -92,7 +96,7 @@ class _DashboardShellState extends State<DashboardShell> {
             );
           }
 
-          // ── Status gate ───────────────────────────────────────────────────
+          // -- Status gate ----------------------------------------------------
           // Shown only when status is genuinely blocked.
           // snap.hasData means this evaluates against real Firestore data,
           // never against a transient loading state.
@@ -103,7 +107,7 @@ class _DashboardShellState extends State<DashboardShell> {
             );
           }
 
-          // ── Dashboard ─────────────────────────────────────────────────────
+          // -- Dashboard ------------------------------------------------------
           return StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('users')
@@ -174,7 +178,7 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 
-  // ── Sidebar ───────────────────────────────────────────────────────────────
+  // -- Sidebar ----------------------------------------------------------------
 
   Widget _buildSidebar(
     BuildContext context,
@@ -221,7 +225,7 @@ class _DashboardShellState extends State<DashboardShell> {
                           child: const Icon(
                             Icons.restaurant_rounded,
                             color: Colors.white,
-                            size: 18,
+                            size: 24,
                           ),
                         ),
                   const SizedBox(width: 10),
@@ -326,14 +330,14 @@ class _DashboardShellState extends State<DashboardShell> {
                       : null,
                   child: photoUrl == null || photoUrl.isEmpty
                       ? Icon(Icons.person_rounded,
-                          size: 16, color: brandColors.navy)
+                          size: 24, color: brandColors.navy)
                       : null,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     getUserPref<String>('accountName') ?? 'My Account',
-                    style: TextStyle(fontSize: 12, color: brandColors.muted),
+                    style: TextStyle(fontSize: 13, color: brandColors.muted),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -392,7 +396,7 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 
-  // ── Top bar ───────────────────────────────────────────────────────────────
+  // -- Top bar -------------------------------------------------------------------
 
   Widget _buildTopBar(
     BuildContext context,
@@ -428,20 +432,28 @@ class _DashboardShellState extends State<DashboardShell> {
 
           const Spacer(),
 
-          // Right side actions
-          _TopBarButton(
-            icon: Icons.add_rounded,
-            label: 'New Banner',
-            color: brandColors.navy!,
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              border: Border.all(color: colorScheme.outline),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.notifications_none, color: brandColors.muted),
           ),
-          const SizedBox(width: 12),
-          _iconBtn(brandColors, colorScheme, Icons.notifications_none_rounded),
-          const SizedBox(width: 8),
+          const SizedBox(width: 16),
 
           PopupMenuButton(
-            offset: const Offset(0, 44),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            offset: const Offset(0, 50),
+            color: const Color(0xFF1E293B),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                // ← border
+                color: brandColors.accentGreen!,
+                width: 1.2,
+              ),
+            ),
             constraints: const BoxConstraints(minWidth: 240),
             itemBuilder: (_) => <PopupMenuEntry>[
               PopupMenuItem(
@@ -467,7 +479,9 @@ class _DashboardShellState extends State<DashboardShell> {
                       Text(
                         getUserPref<String>('businessName') ?? 'Restaurant',
                         style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w700),
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -553,20 +567,7 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 
-  Widget _iconBtn(
-      BrandColors brandColors, ColorScheme colorScheme, IconData icon) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        border: Border.all(color: colorScheme.outline),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(icon, size: 18, color: brandColors.muted),
-    );
-  }
-
-  // ── Bottom nav ────────────────────────────────────────────────────────────
+  // -- Bottom nav -----------------------------------------------------------------------------
   Widget _buildBottomNav(
     BuildContext context,
     int selected,
@@ -589,7 +590,7 @@ class _DashboardShellState extends State<DashboardShell> {
   }
 }
 
-// ── Shared widgets ────────────────────────────────────────────────────────────
+// -- Shared widgets -----------------------------------------------------------------------------
 
 class _TopBarButton extends StatelessWidget {
   final IconData icon;
@@ -627,7 +628,7 @@ class _NavItem {
   const _NavItem({required this.icon, required this.label, required this.path});
 }
 
-// ── Go Live button ────────────────────────────────────────────────────────────
+// -- Go Live button -----------------------------------------------------------------------------
 
 class _GoLiveButton extends StatefulWidget {
   final String status;
@@ -915,7 +916,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
   }
 }
 
-// ── Status gate ───────────────────────────────────────────────────────────────
+// -- Status gate --------------------------------------------------------------
 
 class _StatusGate extends StatelessWidget {
   final String status;
@@ -931,7 +932,7 @@ class _StatusGate extends StatelessWidget {
         color: const Color(0xFFD97706),
         title: 'Your account is under review',
         message:
-            "We're reviewing your registration details. This usually takes 1–2 business days. We'll notify you by email once approved.",
+            "We're reviewing your registration details. This usually takes 1-2 business days. We'll notify you by email once approved.",
       ),
       'rejected': _GateConfig(
         icon: Icons.cancel_rounded,

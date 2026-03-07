@@ -206,7 +206,7 @@ class ItemsDesignWidget extends StatelessWidget {
   }
 }
 
-// ── Edit sheet ────────────────────────────────────────────────────────────────
+// -- Edit sheet --------------------------------------------------------------------
 
 class _EditItemSheet extends StatefulWidget {
   final Items item;

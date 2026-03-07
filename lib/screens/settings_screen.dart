@@ -137,7 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// ─── Section Header ───────────────────────────────────────────────────────────
+// --- Section Header ----------------------------------------------------------------------------
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -182,7 +182,7 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ─── Logo Card ────────────────────────────────────────────────────────────────
+// --- Logo Card --------------------------------------------------------------------
 class _LogoCard extends StatefulWidget {
   final String? restaurantID;
   final String currentUrl;
@@ -368,7 +368,7 @@ class _LogoCardState extends State<_LogoCard> {
   }
 }
 
-// ─── Banner Card ──────────────────────────────────────────────────────────────
+// --- Banner Card -------------------------------------------------------------------------------
 class _BannerCard extends StatefulWidget {
   final String? restaurantID;
   final String currentUrl;
@@ -544,7 +544,7 @@ class _BannerCardState extends State<_BannerCard> {
   }
 }
 
-// ─── Business Info Card ───────────────────────────────────────────────────────
+// --- Business Info Card ------------------------------------------------------------------------
 
 class _BusinessInfoCard extends StatefulWidget {
   final String? restaurantID;
@@ -778,7 +778,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
   }
 }
 
-// ─── User Profile Card ────────────────────────────────────────────────────────
+// --- User Profile Card -------------------------------------------------------------------------
 class _UserProfileCard extends StatefulWidget {
   final String? restaurantID;
   final Map<String, dynamic> data;
@@ -1035,7 +1035,7 @@ class _UserProfileCardState extends State<_UserProfileCard> {
   }
 }
 
-// ─── Danger Zone ──────────────────────────────────────────────────────────────
+// --- Danger Zone -------------------------------------------------------------------------------
 class _DangerCard extends StatelessWidget {
   final BrandColors brandColors;
   final ColorScheme colorScheme;
@@ -1132,7 +1132,7 @@ class _DangerCard extends StatelessWidget {
   }
 }
 
-// ─── Map Picker Dialog ────────────────────────────────────────────────────────
+// --- Map Picker Dialog -------------------------------------------------------------------------
 class _MapPickerDialog extends StatefulWidget {
   final double? initialLat;
   final double? initialLng;
@@ -1323,7 +1323,7 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
   }
 }
 
-// ─── Shared Components ────────────────────────────────────────────────────────
+// --- Shared Components -------------------------------------------------------------------------
 class _Card extends StatelessWidget {
   final Widget child;
   final ColorScheme colorScheme;

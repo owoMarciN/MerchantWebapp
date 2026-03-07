@@ -9,11 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:user_app/l10n/app_localizations.dart';
 import 'package:user_app/models/language.dart';
 
-import 'package:provider/provider.dart';
-import 'package:user_app/providers/locale_provider.dart';
-import 'package:user_app/providers/menu_provider.dart';
-import 'package:user_app/providers/local_stats_provider.dart';
-import 'package:user_app/providers/global_stats_provider.dart';
+import 'package:user_app/providers/providers_import.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user_app/global/global.dart';
@@ -33,10 +29,9 @@ import 'package:user_app/screens/analytics_screen.dart';
 import 'package:user_app/screens/settings_screen.dart';
 import 'package:user_app/screens/how_it_works_screen.dart';
 import 'package:user_app/screens/pricing_screen.dart';
+import 'package:user_app/screens/promotion_screen.dart';
 
-import 'package:user_app/screens/admin/dashboard_shell.dart';
-import 'package:user_app/screens/admin/overview_screen.dart';
-import 'package:user_app/screens/admin/requests_screen.dart';
+import 'package:user_app/screens/admin/admin_import.dart';
 
 import 'package:user_app/services/location_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -71,7 +66,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: localeProvider),
-        ChangeNotifierProvider(create: (_) => LocalStatsProvider(currentUid ?? '')),
+        ChangeNotifierProvider(
+            create: (_) => LocalStatsProvider(currentUid ?? '')),
         ChangeNotifierProvider(create: (_) => GlobalStatsProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider(currentUid ?? '')),
       ],
@@ -80,7 +76,7 @@ void main() async {
   );
 }
 
-// ── Navigator keys ───────────────────────────────────────────────────────────
+// -- Navigator keys -----------------------------------------------------------
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _userShellKey =
@@ -88,17 +84,16 @@ final GlobalKey<NavigatorState> _userShellKey =
 final GlobalKey<NavigatorState> _adminShellKey =
     GlobalKey<NavigatorState>(debugLabel: 'adminShell');
 
-// ── Admin role check ──────────────────────────────────────────────────────────
-Future<String?> _adminRedirect(BuildContext context, GoRouterState state) async {
+// -- Admin role check ---------------------------------------------------------
+Future<String?> _adminRedirect(
+    BuildContext context, GoRouterState state) async {
   final uid = FirebaseAuth.instance.currentUser?.uid;
 
   // Not signed in at all
   if (uid == null) return '/auth/login';
 
-  final doc = await FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .get();
+  final doc =
+      await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
   final role = doc.data()?['role']?.toString() ?? '';
 
@@ -109,13 +104,12 @@ Future<String?> _adminRedirect(BuildContext context, GoRouterState state) async 
   return null;
 }
 
-// ── Router ────────────────────────────────────────────────────────────────────
+// -- Router -------------------------------------------------------------------
 final GoRouter _router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   routes: <RouteBase>[
-
-    // ── Public ───────────────────────────────────────────────────────────────
+    // -- Public ---------------------------------------------------------------
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/',
@@ -145,7 +139,7 @@ final GoRouter _router = GoRouter(
       builder: (_, __) => const PricingScreen(),
     ),
 
-    // ── Restaurant dashboard ──────────────────────────────────────────────────
+    // -- Restaurant dashboard -------------------------------------------------
     ShellRoute(
       navigatorKey: _userShellKey,
       builder: (context, state, child) => DashboardShell(child: child),
@@ -163,6 +157,10 @@ final GoRouter _router = GoRouter(
           builder: (_, __) => const MenusScreen(),
         ),
         GoRoute(
+          path: '/dashboard/promotions',
+          builder: (_, __) => const PromotionsScreen(),
+        ),
+        GoRoute(
           path: '/dashboard/analytics',
           builder: (_, __) => const AnalyticsScreen(),
         ),
@@ -173,7 +171,7 @@ final GoRouter _router = GoRouter(
       ],
     ),
 
-    // ── Admin panel ───────────────────────────────────────────────────────────
+    // -- Admin panel ----------------------------------------------------------
     ShellRoute(
       navigatorKey: _adminShellKey,
       redirect: _adminRedirect,
@@ -187,12 +185,16 @@ final GoRouter _router = GoRouter(
           path: '/admin/join-requests',
           builder: (_, __) => const RequestsScreen(),
         ),
+        GoRoute(
+          path: '/admin/users',
+          builder: (_, __) => const UserManagementScreen(),
+        ),
       ],
     ),
   ],
 );
 
-// ── App ───────────────────────────────────────────────────────────────────────
+// -- App ----------------------------------------------------------------------
 class AdminApp extends StatelessWidget {
   const AdminApp({super.key});
 
@@ -228,7 +230,7 @@ class AdminApp extends StatelessWidget {
   }
 }
 
-// ── Google Maps script injection ──────────────────────────────────────────────
+// -- Google Maps script injection ---------------------------------------------
 void injectGoogleMapsScript(String apiKey) {
   const scriptId = 'google-maps-sdk';
 

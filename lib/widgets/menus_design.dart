@@ -149,7 +149,7 @@ class MenusDesignWidget extends StatelessWidget {
   }
 }
 
-// ── Edit sheet ────────────────────────────────────────────────────────────────
+// -- Edit sheet --------------------------------------------------------------------
 
 class _EditMenuSheet extends StatefulWidget {
   final Menus menu;
@@ -171,8 +171,7 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
   @override
   void initState() {
     super.initState();
-    _titleController =
-        TextEditingController(text: widget.menu.title ?? '');
+    _titleController = TextEditingController(text: widget.menu.title ?? '');
     _descriptionController =
         TextEditingController(text: widget.menu.description ?? '');
   }
@@ -238,8 +237,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
       if (bannerChanged && oldUrl != null && oldUrl.isNotEmpty) {
         final String? errorMsg = await deleteOldFile(oldUrl);
         if (errorMsg != null && mounted) {
-          unifiedSnackBar(context,
-              'Banner updated, but cleanup of old file failed.',
+          unifiedSnackBar(
+              context, 'Banner updated, but cleanup of old file failed.',
               error: true);
         }
       }
@@ -268,8 +267,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete',
-                style: TextStyle(color: Colors.redAccent)),
+            child:
+                const Text('Delete', style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -286,8 +285,7 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
     setState(() => _isLoading = true);
 
     try {
-      if (widget.menu.bannerUrl != null &&
-          widget.menu.bannerUrl!.isNotEmpty) {
+      if (widget.menu.bannerUrl != null && widget.menu.bannerUrl!.isNotEmpty) {
         await deleteOldFile(widget.menu.bannerUrl!);
       }
 
@@ -333,8 +331,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Edit Menu',
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w700)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                   Row(
                     children: [
                       ElevatedButton(
@@ -355,8 +353,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                       const SizedBox(width: 16),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.close_rounded,
-                            color: brandColors.muted),
+                        icon:
+                            Icon(Icons.close_rounded, color: brandColors.muted),
                       ),
                     ],
                   ),
@@ -395,8 +393,7 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
               const SizedBox(height: 8),
               Center(
                 child: Text('Tap to change image',
-                    style:
-                        TextStyle(fontSize: 11, color: brandColors.muted)),
+                    style: TextStyle(fontSize: 11, color: brandColors.muted)),
               ),
               const SizedBox(height: 20),
 
@@ -406,9 +403,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                     label: 'Menu Title',
                     colorScheme: colorScheme,
                     brandColors: brandColors),
-                validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Title is required'
-                    : null,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Title is required' : null,
               ),
               const SizedBox(height: 16),
 

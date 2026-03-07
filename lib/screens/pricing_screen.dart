@@ -62,7 +62,7 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // ── Hero ──────────────────────────────────────────────────────────────────
+  // -- Hero ----------------------------------------------------------------------
 
   Widget _buildHero(
       BuildContext context, BrandColors brand, bool isWide, double h) {
@@ -104,10 +104,7 @@ class _PricingScreenState extends State<PricingScreen> {
             child: Text(
               'Freequick charges a small commission on completed orders only. If you don\'t earn, you don\'t pay.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 16,
-                  color: brand.muted,
-                  height: 1.6),
+              style: TextStyle(fontSize: 16, color: brand.muted, height: 1.6),
             ),
           ),
         ],
@@ -115,7 +112,7 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // ── Commission explainer ──────────────────────────────────────────────────
+  // -- Commission explainer -------------------------------------------------------------------
 
   Widget _buildCommissionExplainer(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
@@ -196,7 +193,7 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // ── Calculator ────────────────────────────────────────────────────────────
+  // -- Calculator -----------------------------------------------------------------------------
 
   Widget _buildCalculator(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
@@ -238,8 +235,7 @@ class _PricingScreenState extends State<PricingScreen> {
                     divisions: 195,
                     displayValue:
                         '$_ordersPerDay orders/day · $monthlyOrders/month',
-                    onChanged: (v) =>
-                        setState(() => _ordersPerDay = v.round()),
+                    onChanged: (v) => setState(() => _ordersPerDay = v.round()),
                     brand: brand,
                     color: brand.navy!,
                   ),
@@ -250,8 +246,7 @@ class _PricingScreenState extends State<PricingScreen> {
                     min: 15,
                     max: 200,
                     divisions: 37,
-                    displayValue:
-                        '${_avgOrderValue.toStringAsFixed(0)} PLN',
+                    displayValue: '${_avgOrderValue.toStringAsFixed(0)} PLN',
                     onChanged: (v) => setState(() => _avgOrderValue = v),
                     brand: brand,
                     color: const Color(0xFF8B5CF6),
@@ -290,8 +285,7 @@ class _PricingScreenState extends State<PricingScreen> {
                         const Spacer(),
                         Text(
                           '$monthlyOrders orders/month',
-                          style: TextStyle(
-                              fontSize: 11, color: tier.tierColor),
+                          style: TextStyle(fontSize: 11, color: tier.tierColor),
                         ),
                       ],
                     ),
@@ -306,8 +300,7 @@ class _PricingScreenState extends State<PricingScreen> {
                       Expanded(
                           child: _CalcResult(
                         label: 'Daily revenue',
-                        value:
-                            '${dailyRevenue.toStringAsFixed(0)} PLN',
+                        value: '${dailyRevenue.toStringAsFixed(0)} PLN',
                         sub: 'before commission',
                         color: brand.muted!,
                         brand: brand,
@@ -316,8 +309,7 @@ class _PricingScreenState extends State<PricingScreen> {
                       Expanded(
                           child: _CalcResult(
                         label: 'Freequick fee ($pctLabel)',
-                        value:
-                            '− ${dailyFee.toStringAsFixed(0)} PLN',
+                        value: '− ${dailyFee.toStringAsFixed(0)} PLN',
                         sub: 'per day',
                         color: const Color(0xFFEF4444),
                         brand: brand,
@@ -326,10 +318,8 @@ class _PricingScreenState extends State<PricingScreen> {
                       Expanded(
                           child: _CalcResult(
                         label: 'You keep',
-                        value:
-                            '${dailyNet.toStringAsFixed(0)} PLN/day',
-                        sub:
-                            '≈ ${monthlyNet.toStringAsFixed(0)} PLN/month',
+                        value: '${dailyNet.toStringAsFixed(0)} PLN/day',
+                        sub: '≈ ${monthlyNet.toStringAsFixed(0)} PLN/month',
                         color: brand.accentGreen!,
                         brand: brand,
                         scheme: scheme,
@@ -352,7 +342,7 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // ── Tiers ─────────────────────────────────────────────────────────────────
+  // -- Tiers ---------------------------------------------------------------------
 
   Widget _buildTiers(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
@@ -408,12 +398,16 @@ class _PricingScreenState extends State<PricingScreen> {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 680),
             child: Column(
-              children: tiers.asMap().entries.map((e) => _TierRow(
-                    data: e.value,
-                    isLast: e.key == tiers.length - 1,
-                    brand: brand,
-                    scheme: scheme,
-                  )).toList(),
+              children: tiers
+                  .asMap()
+                  .entries
+                  .map((e) => _TierRow(
+                        data: e.value,
+                        isLast: e.key == tiers.length - 1,
+                        brand: brand,
+                        scheme: scheme,
+                      ))
+                  .toList(),
             ),
           ),
         ],
@@ -421,7 +415,7 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // ── FAQ ───────────────────────────────────────────────────────────────────
+  // -- FAQ -----------------------------------------------------------------------
 
   Widget _buildFaq(BuildContext context, BrandColors brand, ColorScheme scheme,
       bool isWide, double h) {
@@ -452,8 +446,7 @@ class _PricingScreenState extends State<PricingScreen> {
             constraints: const BoxConstraints(maxWidth: 680),
             child: Column(
               children: faqs
-                  .map((f) =>
-                      _FaqTile(faq: f, brand: brand, scheme: scheme))
+                  .map((f) => _FaqTile(faq: f, brand: brand, scheme: scheme))
                   .toList(),
             ),
           ),
@@ -463,7 +456,7 @@ class _PricingScreenState extends State<PricingScreen> {
   }
 }
 
-// ── Commission step card ──────────────────────────────────────────────────────
+// -- Commission step card -----------------------------------------------------------------------
 
 class _CommissionStepCard extends StatelessWidget {
   final _CommissionStepData data;
@@ -512,15 +505,14 @@ class _CommissionStepCard extends StatelessWidget {
                   const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
           Text(data.description,
-              style:
-                  TextStyle(fontSize: 12, color: brand.muted, height: 1.5)),
+              style: TextStyle(fontSize: 12, color: brand.muted, height: 1.5)),
         ],
       ),
     );
   }
 }
 
-// ── Slider row ────────────────────────────────────────────────────────────────
+// -- Slider row --------------------------------------------------------------------
 
 class _SliderRow extends StatelessWidget {
   final String label, displayValue;
@@ -550,20 +542,17 @@ class _SliderRow extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label,
-                style: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w600)),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(displayValue,
                   style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: color)),
+                      fontSize: 12, fontWeight: FontWeight.w700, color: color)),
             ),
           ],
         ),
@@ -588,7 +577,7 @@ class _SliderRow extends StatelessWidget {
   }
 }
 
-// ── Calc result ───────────────────────────────────────────────────────────────
+// -- Calc result -------------------------------------------------------------------
 
 class _CalcResult extends StatelessWidget {
   final String label, value, sub;
@@ -634,7 +623,7 @@ class _CalcResult extends StatelessWidget {
   }
 }
 
-// ── Tier row ──────────────────────────────────────────────────────────────────
+// -- Tier row ----------------------------------------------------------------------
 
 class _TierRow extends StatelessWidget {
   final _TierData data;
@@ -713,7 +702,7 @@ class _TierRow extends StatelessWidget {
   }
 }
 
-// ── FAQ tile ──────────────────────────────────────────────────────────────────
+// -- FAQ tile ----------------------------------------------------------------------
 
 class _FaqTile extends StatefulWidget {
   final _Faq faq;
@@ -746,8 +735,7 @@ class _FaqTileState extends State<_FaqTile> {
         borderRadius: BorderRadius.circular(10),
         onTap: () => setState(() => _open = !_open),
         child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             children: [
               Row(
@@ -768,9 +756,7 @@ class _FaqTileState extends State<_FaqTile> {
                 const SizedBox(height: 12),
                 Text(widget.faq.answer,
                     style: TextStyle(
-                        fontSize: 13,
-                        color: widget.brand.muted,
-                        height: 1.6)),
+                        fontSize: 13, color: widget.brand.muted, height: 1.6)),
               ],
             ],
           ),
@@ -780,7 +766,7 @@ class _FaqTileState extends State<_FaqTile> {
   }
 }
 
-// ── Data models ───────────────────────────────────────────────────────────────
+// -- Data models -------------------------------------------------------------------
 
 class _CommissionStepData {
   final String number, title, description;

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:user_app/extensions/responsive_ext.dart';
@@ -66,8 +67,7 @@ class ItemsScreen extends StatelessWidget {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return SliverToBoxAdapter(
-                      child: Center(child: circularProgress(),
-                      ),
+                      child: Center(child: circularProgress()),
                     );
                   }
 
@@ -75,8 +75,8 @@ class ItemsScreen extends StatelessWidget {
                     return SliverToBoxAdapter(
                       child: Center(
                         child: Text(
-                          "Error: ${snapshot.error}", 
-                          style: TextStyle(color: brandColors.muted)
+                          "Error: ${snapshot.error}",
+                          style: TextStyle(color: brandColors.muted),
                         ),
                       ),
                     );
@@ -88,11 +88,16 @@ class ItemsScreen extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.fastfood_rounded, size: 64, color: brandColors.muted),
+                            Icon(Icons.fastfood_rounded,
+                                size: 64, color: brandColors.muted),
                             const SizedBox(height: 16),
-                            const Text('No items yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                            const Text('No items yet',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600)),
                             const SizedBox(height: 8),
-                            Text('Tap + to add your first item', style: TextStyle(fontSize: 14, color: brandColors.muted)),
+                            Text('Tap + to add your first item',
+                                style: TextStyle(
+                                    fontSize: 14, color: brandColors.muted)),
                           ],
                         ),
                       ),
@@ -108,7 +113,8 @@ class ItemsScreen extends StatelessWidget {
                       childCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
                         var doc = snapshot.data!.docs[index];
-                        Items iModel = Items.fromJson(doc.data()! as Map<String, dynamic>);
+                        Items iModel =
+                            Items.fromJson(doc.data()! as Map<String, dynamic>);
                         iModel.itemID = doc.id;
                         iModel.menuID = model!.menuID;
                         iModel.restaurantID = model!.restaurantID;
@@ -127,7 +133,9 @@ class ItemsScreen extends StatelessWidget {
               onPressed: () => _openAddItemSheet(context),
               backgroundColor: brandColors.navy,
               icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: const Text('Add Item', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              label: const Text('Add Item',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -135,6 +143,8 @@ class ItemsScreen extends StatelessWidget {
     );
   }
 }
+
+// -- Add item sheet ------------------------------------------------------------
 
 class _AddItemSheet extends StatefulWidget {
   final Menus menu;
@@ -150,32 +160,63 @@ class _AddItemSheetState extends State<_AddItemSheet> {
   final TextEditingController _infoController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _discountController = TextEditingController();
   final TextEditingController _tagController = TextEditingController();
 
   final List<String> _tags = [];
+  bool _hasDiscount = false;
+  String? _tagError;
   Uint8List? _imageBytes;
   String? _imageFileName;
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Rebuild when price/discount change so the live preview updates
+    _priceController.addListener(() => setState(() {}));
+    _discountController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _infoController.dispose();
+    _descriptionController.dispose();
+    _priceController.dispose();
+    _discountController.dispose();
+    _tagController.dispose();
+    super.dispose();
+  }
+
   void _addTag() {
     final tag = _tagController.text.trim();
-    if (tag.isNotEmpty && !_tags.contains(tag)) {
-      setState(() {
+    String? validationResult;
+
+    if (tag.isEmpty) {
+      validationResult = 'Please enter a tag';
+    } else if (!RegExp(r'^[A-Z]').hasMatch(tag)) {
+      validationResult = 'First letter must be capitalized';
+    } else if (!RegExp(r'^[a-zA-Z]+$').hasMatch(tag)) {
+      validationResult = 'Only letters are allowed';
+    } else if (_tags.contains(tag)) {
+      validationResult = 'Tag already exists';
+    }
+
+    setState(() {
+      _tagError = validationResult;
+      if (validationResult == null) {
         _tags.add(tag);
         _tagController.clear();
-      });
-    }
+      }
+    });
   }
 
-  void _removeTag(String tag) {
-    setState(() => _tags.remove(tag));
-  }
+  void _removeTag(String tag) => setState(() => _tags.remove(tag));
 
   Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: true,
-    );
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.image, withData: true);
     if (result != null && result.files.first.bytes != null) {
       setState(() {
         _imageBytes = result.files.first.bytes;
@@ -186,22 +227,20 @@ class _AddItemSheetState extends State<_AddItemSheet> {
 
   Future<String> _fetchRestaurantStatus() async {
     try {
-      final String restaurantID = widget.menu.restaurantID!;
-
       final resDoc = await FirebaseFirestore.instance
           .collection('restaurants')
-          .doc(restaurantID)
+          .doc(widget.menu.restaurantID!)
           .get();
 
       if (!resDoc.exists) {
-        Fluttertoast.showToast(msg: "Restaurant record not found.");
+        Fluttertoast.showToast(msg: 'Restaurant record not found.');
         return 'Pending';
       }
 
       return resDoc.data()?['status']?.toString() ?? 'Pending';
     } catch (e) {
-      Fluttertoast.showToast(msg: "Error fetching restaurant status: $e");
-      return 'pending'; 
+      Fluttertoast.showToast(msg: 'Error fetching restaurant status: $e');
+      return 'Pending';
     }
   }
 
@@ -216,11 +255,10 @@ class _AddItemSheetState extends State<_AddItemSheet> {
 
     try {
       final String currentRestaurantStatus = await _fetchRestaurantStatus();
-
       final String restaurantID = widget.menu.restaurantID!;
       final String menuID = widget.menu.menuID!;
-      final String fileName = '${DateTime.now().millisecondsSinceEpoch}_$_imageFileName';
-      
+      final String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_$_imageFileName';
 
       final ref = FirebaseStorage.instance
           .ref()
@@ -234,6 +272,11 @@ class _AddItemSheetState extends State<_AddItemSheet> {
       await ref.putData(_imageBytes!);
       final String imageUrl = await ref.getDownloadURL();
 
+      final double price = double.tryParse(_priceController.text.trim()) ?? 0.0;
+      final double discount = _hasDiscount
+          ? (double.tryParse(_discountController.text.trim()) ?? 0.0)
+          : 0.0;
+
       final docRef = await FirebaseFirestore.instance
           .collection('restaurants')
           .doc(restaurantID)
@@ -244,14 +287,14 @@ class _AddItemSheetState extends State<_AddItemSheet> {
         'title': _titleController.text.trim(),
         'shortInfo': _infoController.text.trim(),
         'description': _descriptionController.text.trim(),
-        'price': double.tryParse(_priceController.text.trim()) ?? 0.0,
+        'price': price,
+        'discount': discount,
         'imageUrl': imageUrl,
         'restaurantID': restaurantID,
         'menuID': menuID,
         'createdAt': Timestamp.now(),
         'status': 'Available',
-        'restaurantStatus': currentRestaurantStatus, 
-        'discount': 0.0,
+        'restaurantStatus': currentRestaurantStatus,
         'likes': 0,
         'tags': _tags,
       });
@@ -259,23 +302,38 @@ class _AddItemSheetState extends State<_AddItemSheet> {
       await docRef.update({'itemID': docRef.id});
 
       if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: const Row(children: [
+              Icon(Icons.check_circle_outline_rounded,
+                  color: Colors.white, size: 20),
+              SizedBox(width: 12),
+              Text('Item added successfully',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500)),
+            ]),
+            backgroundColor: const Color(0xFF1E293B),
+            behavior: SnackBarBehavior.floating,
+            elevation: 6,
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            duration: const Duration(seconds: 2),
+            dismissDirection: DismissDirection.horizontal,
+          ),
+        );
     } catch (e) {
       if (!mounted) return;
       unifiedSnackBar(context, e.toString(), error: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _infoController.dispose();
-    _descriptionController.dispose();
-    _priceController.dispose();
-    _tagController.dispose();
-    super.dispose();
   }
 
   @override
@@ -297,10 +355,13 @@ class _AddItemSheetState extends State<_AddItemSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Add Item', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                  const Text('Add Item',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(Icons.close_rounded, color: brandColors.muted),
@@ -309,6 +370,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
               ),
               const SizedBox(height: 20),
 
+              // Image picker
               GestureDetector(
                 onTap: _pickImage,
                 child: Container(
@@ -318,7 +380,9 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                     color: brandColors.navy?.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: _imageBytes != null ? brandColors.navy! : colorScheme.outline,
+                      color: _imageBytes != null
+                          ? brandColors.navy!
+                          : colorScheme.outline,
                       width: _imageBytes != null ? 2 : 1,
                     ),
                   ),
@@ -330,77 +394,98 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_photo_alternate_outlined, size: 40, color: brandColors.muted),
+                            Icon(Icons.add_photo_alternate_outlined,
+                                size: 40, color: brandColors.muted),
                             const SizedBox(height: 8),
-                            Text('Upload Item Image', style: TextStyle(fontSize: 13, color: brandColors.muted, fontWeight: FontWeight.w500)),
+                            Text('Upload Item Image',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    color: brandColors.muted,
+                                    fontWeight: FontWeight.w500)),
                             const SizedBox(height: 4),
-                            Text('Click to browse', style: TextStyle(fontSize: 11, color: brandColors.muted)),
+                            Text('Click to browse',
+                                style: TextStyle(
+                                    fontSize: 11, color: brandColors.muted)),
                           ],
                         ),
                 ),
               ),
-
               const SizedBox(height: 20),
 
+              // Title
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(
                   labelText: 'Item Title',
                   hintText: 'e.g. Pierogi Ruskie',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Title is required' : null,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Title is required' : null,
               ),
-
               const SizedBox(height: 16),
 
+              // Short info
               TextFormField(
                 controller: _infoController,
                 decoration: InputDecoration(
                   labelText: 'Short Info',
                   hintText: 'e.g. Crispy and Tasty',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Info is required' : null,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? 'Info is required' : null,
               ),
-
               const SizedBox(height: 16),
 
+              // Description
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: InputDecoration(
                   labelText: 'Description',
                   hintText: 'Describe the item...',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                validator: (v) => v == null || v.trim().isEmpty ? 'Description is required' : null,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? 'Description is required'
+                    : null,
               ),
-
               const SizedBox(height: 16),
 
+              // Price
               TextFormField(
                 controller: _priceController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   labelText: 'Price (PLN)',
                   hintText: 'e.g. 24.99',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   prefixText: 'PLN ',
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Price is required';
-                  if (double.tryParse(v.trim()) == null) return 'Enter a valid number';
+                  if (double.tryParse(v.trim()) == null)
+                    return 'Enter a valid number';
                   return null;
                 },
               ),
-
               const SizedBox(height: 16),
 
+              // Tags
               Row(
                 children: [
                   Expanded(
@@ -409,9 +494,20 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                       decoration: InputDecoration(
                         labelText: 'Tags',
                         hintText: 'e.g. Vegan',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        errorText: _tagError,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+                      ],
+                      onChanged: (_) {
+                        if (_tagError != null) {
+                          setState(() => _tagError = null);
+                        }
+                      },
                       onFieldSubmitted: (_) => _addTag(),
                     ),
                   ),
@@ -421,31 +517,158 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                     style: IconButton.styleFrom(
                       backgroundColor: brandColors.navy,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
                     icon: const Icon(Icons.add_rounded),
                   ),
                 ],
               ),
-
               if (_tags.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: _tags.map((tag) => Chip(
-                    label: Text(tag, style: const TextStyle(fontSize: 12)),
-                    deleteIcon: const Icon(Icons.close_rounded, size: 14),
-                    onDeleted: () => _removeTag(tag),
-                    backgroundColor: brandColors.navy?.withValues(alpha: 0.1),
-                    side: BorderSide(color: brandColors.navy?.withValues(alpha: 0.3) ?? Colors.transparent),
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                  )).toList(),
+                  children: _tags
+                      .map((tag) => Chip(
+                            label:
+                                Text(tag, style: const TextStyle(fontSize: 12)),
+                            deleteIcon:
+                                const Icon(Icons.close_rounded, size: 14),
+                            onDeleted: () => _removeTag(tag),
+                            backgroundColor:
+                                brandColors.navy?.withValues(alpha: 0.1),
+                            side: BorderSide(
+                                color:
+                                    brandColors.navy?.withValues(alpha: 0.3) ??
+                                        Colors.transparent),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                          ))
+                      .toList(),
                 ),
               ],
+              const SizedBox(height: 16),
+
+              // -- Discount toggle ------------------------------------------
+              Container(
+                decoration: BoxDecoration(
+                  color: _hasDiscount
+                      ? brandColors.accentGreen?.withValues(alpha: 0.08)
+                      : colorScheme.surfaceBright,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _hasDiscount
+                        ? brandColors.accentGreen?.withValues(alpha: 0.4) ??
+                            colorScheme.outline
+                        : colorScheme.outline,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => setState(() => _hasDiscount = !_hasDiscount),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        child: Row(
+                          children: [
+                            Icon(Icons.local_offer_rounded,
+                                size: 18,
+                                color: _hasDiscount
+                                    ? brandColors.accentGreen
+                                    : brandColors.muted),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Apply Discount',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: _hasDiscount
+                                    ? brandColors.accentGreen
+                                    : brandColors.muted,
+                              ),
+                            ),
+                            const Spacer(),
+                            Checkbox(
+                              value: _hasDiscount,
+                              onChanged: (v) =>
+                                  setState(() => _hasDiscount = v ?? false),
+                              activeColor: brandColors.accentGreen,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_hasDiscount) ...[
+                      Divider(
+                          height: 1,
+                          color:
+                              brandColors.accentGreen?.withValues(alpha: 0.2)),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                        child: TextFormField(
+                          controller: _discountController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          decoration: InputDecoration(
+                            labelText: 'Discount %',
+                            suffixText: '%',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                          ),
+                          validator: (v) {
+                            if (!_hasDiscount) return null;
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Enter a discount percentage';
+                            }
+                            final val = double.tryParse(v.trim());
+                            if (val == null || val <= 0 || val > 100) {
+                              return 'Enter a value between 1 and 100';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      // Live discounted price preview
+                      if (_priceController.text.isNotEmpty &&
+                          _discountController.text.isNotEmpty &&
+                          double.tryParse(_priceController.text) != null &&
+                          double.tryParse(_discountController.text) != null)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: Row(
+                            children: [
+                              Text(
+                                'PLN ${(double.parse(_priceController.text) * (1 - double.parse(_discountController.text) / 100)).toStringAsFixed(2)}',
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: brandColors.accentGreen),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'PLN ${double.parse(_priceController.text).toStringAsFixed(2)}',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: brandColors.muted,
+                                    decoration: TextDecoration.lineThrough),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ],
+                ),
+              ),
 
               const SizedBox(height: 24),
 
+              // Submit button
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -454,12 +677,19 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: brandColors.navy,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                     elevation: 0,
                   ),
                   child: _isLoading
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Add Item', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : const Text('Add Item',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 15)),
                 ),
               ),
             ],

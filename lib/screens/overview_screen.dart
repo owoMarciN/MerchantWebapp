@@ -31,15 +31,20 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Future<void> _loadData() async {
     try {
       final results = await Future.wait([
-        FirebaseFirestore.instance.collection("restaurants").doc(_restaurantID).get(),
+        FirebaseFirestore.instance
+            .collection("restaurants")
+            .doc(_restaurantID)
+            .get(),
         FirebaseFirestore.instance.collection("users").doc(_restaurantID).get(),
         _checkHasMenusAndItems(),
       ]);
 
       if (!mounted) return;
       setState(() {
-        _restaurantData = (results[0] as DocumentSnapshot).data() as Map<String, dynamic>?;
-        _userData = (results[1] as DocumentSnapshot).data() as Map<String, dynamic>?;
+        _restaurantData =
+            (results[0] as DocumentSnapshot).data() as Map<String, dynamic>?;
+        _userData =
+            (results[1] as DocumentSnapshot).data() as Map<String, dynamic>?;
         _hasMenus = results[2] as bool;
         _isLoading = false;
       });
@@ -78,11 +83,16 @@ class _OverviewScreenState extends State<OverviewScreen> {
       return Center(child: circularProgress());
     }
 
-    final bool hasLogo = (_restaurantData?["logoUrl"] ?? "").toString().isNotEmpty;
-    final bool hasBanner = (_restaurantData?["bannerUrl"] ?? "").toString().isNotEmpty;
-    final bool hasAddress = (_restaurantData?["address"] ?? "").toString().isNotEmpty;
-    final bool hasProfilePhoto = (_userData?["photoUrl"] ?? "").toString().isNotEmpty;
-    final bool hasIban = (_restaurantData?["iban"] ?? "").toString().trim().isNotEmpty;
+    final bool hasLogo =
+        (_restaurantData?["logoUrl"] ?? "").toString().isNotEmpty;
+    final bool hasBanner =
+        (_restaurantData?["bannerUrl"] ?? "").toString().isNotEmpty;
+    final bool hasAddress =
+        (_restaurantData?["address"] ?? "").toString().isNotEmpty;
+    final bool hasProfilePhoto =
+        (_userData?["photoUrl"] ?? "").toString().isNotEmpty;
+    final bool hasIban =
+        (_restaurantData?["iban"] ?? "").toString().trim().isNotEmpty;
 
     final List<_SetupTask> tasks = [
       _SetupTask(
@@ -116,7 +126,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
       _SetupTask(
         icon: Icons.restaurant_menu_rounded,
         title: 'Create a Menu & Add Items',
-        description: 'Organise your offerings into menus with dishes and prices.',
+        description:
+            'Organise your offerings into menus with dishes and prices.',
         done: _hasMenus,
         route: '/dashboard/menus',
       ),
@@ -148,17 +159,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
             style: TextStyle(fontSize: 14, color: brandColors.muted),
           ),
           const SizedBox(height: 28),
-
           if (!allDone) ...[
-            _buildSetupCard(context, tasks, completedCount, progress, brandColors, colorScheme),
+            _buildSetupCard(context, tasks, completedCount, progress,
+                brandColors, colorScheme),
             const SizedBox(height: 32),
           ],
-
           _sectionLabel('AT A GLANCE', brandColors),
           const SizedBox(height: 14),
           _buildStatGrid(brandColors, colorScheme),
           const SizedBox(height: 32),
-
           _sectionLabel('RECENT ORDERS', brandColors),
           const SizedBox(height: 14),
           _buildOrdersTable(brandColors, colorScheme),
@@ -193,7 +202,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   color: brandColors.navy?.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.rocket_launch_rounded, size: 20, color: brandColors.navy),
+                child: Icon(Icons.rocket_launch_rounded,
+                    size: 20, color: brandColors.navy),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -201,17 +211,21 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Get your restaurant ready',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
                     Text('$completedCount of ${tasks.length} steps completed',
-                        style: TextStyle(fontSize: 12, color: brandColors.muted)),
+                        style:
+                            TextStyle(fontSize: 12, color: brandColors.muted)),
                   ],
                 ),
               ),
               Text(
                 '${(progress * 100).toInt()}%',
                 style: TextStyle(
-                    fontSize: 14, fontWeight: FontWeight.w700, color: brandColors.navy),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: brandColors.navy),
               ),
             ],
           ),
@@ -226,8 +240,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          ...tasks.asMap().entries.map((entry) => _buildTaskRow(
-              context, entry.value, entry.key, tasks.length, brandColors, colorScheme)),
+          ...tasks.asMap().entries.map((entry) => _buildTaskRow(context,
+              entry.value, entry.key, tasks.length, brandColors, colorScheme)),
         ],
       ),
     );
@@ -245,7 +259,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
       children: [
         InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: task.done ? null : () => Router.neglect(context, () => context.go(task.route)),
+          onTap: task.done
+              ? null
+              : () => Router.neglect(context, () => context.go(task.route)),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
@@ -268,7 +284,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   child: Icon(
                     task.done ? Icons.check_rounded : task.icon,
                     size: 18,
-                    color: task.done ? brandColors.accentGreen : brandColors.navy,
+                    color:
+                        task.done ? brandColors.accentGreen : brandColors.navy,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -282,23 +299,28 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: task.done ? brandColors.muted : null,
-                          decoration: task.done ? TextDecoration.lineThrough : null,
+                          decoration:
+                              task.done ? TextDecoration.lineThrough : null,
                           decorationColor: brandColors.muted,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(task.description,
                           style: TextStyle(
-                              fontSize: 12, color: brandColors.muted, height: 1.4)),
+                              fontSize: 12,
+                              color: brandColors.muted,
+                              height: 1.4)),
                     ],
                   ),
                 ),
                 const SizedBox(width: 8),
                 task.done
                     ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: brandColors.accentGreen?.withValues(alpha: 0.1),
+                          color:
+                              brandColors.accentGreen?.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text('Done',
@@ -308,7 +330,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                 color: brandColors.accentGreen)),
                       )
                     : Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: brandColors.navy?.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8),
@@ -348,18 +371,36 @@ class _OverviewScreenState extends State<OverviewScreen> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: cols, crossAxisSpacing: 14,
-          mainAxisSpacing: 14, mainAxisExtent: 96,
+          crossAxisCount: cols,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          mainAxisExtent: 96,
         ),
         children: [
-          _StatCard(label: 'Total Orders', value: '${stats.totalOrders}',
-              icon: Icons.shopping_bag_rounded, color: brandColors.navy!, colorScheme: colorScheme),
-          _StatCard(label: 'Pending', value: '${stats.pendingOrders}',
-              icon: Icons.pending_actions_rounded, color: const Color(0xFFD97706), colorScheme: colorScheme),
-          _StatCard(label: 'Completed', value: '${stats.completedOrders}',
-              icon: Icons.check_circle_rounded, color: brandColors.accentGreen!, colorScheme: colorScheme),
-          _StatCard(label: 'Total Revenue', value: '${stats.totalRevenue.toStringAsFixed(2)} PLN',
-              icon: Icons.payments_rounded, color: const Color(0xFF8B5CF6), colorScheme: colorScheme),
+          _StatCard(
+              label: 'Total Orders',
+              value: '${stats.totalOrders}',
+              icon: Icons.shopping_bag_rounded,
+              color: brandColors.navy!,
+              colorScheme: colorScheme),
+          _StatCard(
+              label: 'Pending',
+              value: '${stats.pendingOrders}',
+              icon: Icons.pending_actions_rounded,
+              color: const Color(0xFFD97706),
+              colorScheme: colorScheme),
+          _StatCard(
+              label: 'Completed',
+              value: '${stats.completedOrders}',
+              icon: Icons.check_circle_rounded,
+              color: brandColors.accentGreen!,
+              colorScheme: colorScheme),
+          _StatCard(
+              label: 'Total Revenue',
+              value: '${stats.totalRevenue.toStringAsFixed(2)} PLN',
+              icon: Icons.payments_rounded,
+              color: const Color(0xFF8B5CF6),
+              colorScheme: colorScheme),
         ],
       );
     });
@@ -372,11 +413,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
     if (recentDocs.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(color: colorScheme.surface,
+        decoration: BoxDecoration(
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: colorScheme.outline)),
-        child: Center(child: Text('No orders yet',
-            style: TextStyle(fontSize: 13, color: brandColors.muted))),
+        child: Center(
+            child: Text('No orders yet',
+                style: TextStyle(fontSize: 13, color: brandColors.muted))),
       );
     }
 
@@ -413,16 +456,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
             final double total =
                 double.tryParse(d["totalAmount"]?.toString() ?? "0") ?? 0;
             final Timestamp? ts = d["orderTime"] as Timestamp?;
-            final String timeLabel = ts != null
-                ? _formatTime(ts.toDate())
-                : "—";
+            final String timeLabel =
+                ts != null ? _formatTime(ts.toDate()) : "—";
             final String shortId =
                 '#${doc.id.substring(0, doc.id.length.clamp(0, 8))}';
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: Row(
                     children: [
                       Expanded(
@@ -438,8 +480,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             const SizedBox(height: 2),
                             Text(timeLabel,
                                 style: TextStyle(
-                                    fontSize: 10,
-                                    color: brandColors.muted)),
+                                    fontSize: 10, color: brandColors.muted)),
                           ],
                         ),
                       ),
@@ -447,31 +488,25 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           flex: 3,
                           child: Text(customer,
                               style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
+                                  fontSize: 13, fontWeight: FontWeight.w500),
                               overflow: TextOverflow.ellipsis)),
                       Expanded(
                           flex: 2,
-                          child: Text(
-                              '$items item${items == 1 ? '' : 's'}',
+                          child: Text('$items item${items == 1 ? '' : 's'}',
                               style: TextStyle(
-                                  fontSize: 13,
-                                  color: brandColors.muted))),
+                                  fontSize: 13, color: brandColors.muted))),
                       Expanded(
                           flex: 3,
                           child: _StatusChip(
-                              status: status,
-                              brandColors: brandColors)),
+                              status: status, brandColors: brandColors)),
                       Expanded(
                           flex: 2,
                           child: Align(
                               alignment: Alignment.centerRight,
-                              child: Text(
-                                  '${total.toStringAsFixed(2)} PLN',
+                              child: Text('${total.toStringAsFixed(2)} PLN',
                                   style: const TextStyle(
                                       fontSize: 13,
-                                      fontWeight:
-                                          FontWeight.w600)))),
+                                      fontWeight: FontWeight.w600)))),
                     ],
                   ),
                 ),
@@ -494,7 +529,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 }
 
-// ─── Supporting widgets ───────────────────────────────────────────────────────
+// --- Supporting widgets ------------------------------------------------------------------------
 
 class _SetupTask {
   final IconData icon;
@@ -571,11 +606,26 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = switch (status) {
-      'normal' => (const Color(0xFFFEF3C7).withValues(alpha: 0.5), const Color(0xFFD97706)),
-      'processing' => (brandColors.navy!.withValues(alpha: 0.15), brandColors.navy!),
-      'ready' => (brandColors.accentGreen!.withValues(alpha: 0.15), brandColors.accentGreen!),
-      'delivered' => (brandColors.muted!.withValues(alpha: 0.1), brandColors.muted!),
-      'cancelled' => (const Color(0xFFEF4444).withValues(alpha: 0.1), const Color(0xFFEF4444)),
+      'normal' => (
+          const Color(0xFFFEF3C7).withValues(alpha: 0.5),
+          const Color(0xFFD97706)
+        ),
+      'processing' => (
+          brandColors.navy!.withValues(alpha: 0.15),
+          brandColors.navy!
+        ),
+      'ready' => (
+          brandColors.accentGreen!.withValues(alpha: 0.15),
+          brandColors.accentGreen!
+        ),
+      'delivered' => (
+          brandColors.muted!.withValues(alpha: 0.1),
+          brandColors.muted!
+        ),
+      'cancelled' => (
+          const Color(0xFFEF4444).withValues(alpha: 0.1),
+          const Color(0xFFEF4444)
+        ),
       _ => (brandColors.muted!.withValues(alpha: 0.1), brandColors.muted!),
     };
     return UnconstrainedBox(

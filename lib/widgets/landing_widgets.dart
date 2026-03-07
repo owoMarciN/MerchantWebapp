@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
 
-// ── CTA Block ─────────────────────────────────────────────────────────────────
+// -- CTA Block ---------------------------------------------------------------------
 // Usage:
 //   LandingCta(
 //     title: 'Ready to grow?',
@@ -88,7 +88,7 @@ class LandingCta extends StatelessWidget {
   }
 }
 
-// ── Nav ───────────────────────────────────────────────────────────────────────
+// -- Nav ---------------------------------------------------------------------------
 
 class LandingNav extends StatelessWidget {
   final String activeRoute;
@@ -142,7 +142,7 @@ class LandingNav extends StatelessWidget {
   }
 }
 
-// ── Footer ────────────────────────────────────────────────────────────────────
+// -- Footer ------------------------------------------------------------------------
 
 class LandingFooter extends StatelessWidget {
   const LandingFooter({super.key});
@@ -168,7 +168,7 @@ class LandingFooter extends StatelessWidget {
   }
 }
 
-// ── Logo ──────────────────────────────────────────────────────────────────────
+// -- Logo --------------------------------------------------------------------------
 
 class LandingLogo extends StatelessWidget {
   const LandingLogo({super.key});
@@ -199,7 +199,7 @@ class LandingLogo extends StatelessWidget {
   }
 }
 
-// ── Nav link ──────────────────────────────────────────────────────────────────
+// -- Nav link ----------------------------------------------------------------------
 
 class LandingNavLink extends StatelessWidget {
   final String label;
@@ -225,7 +225,7 @@ class LandingNavLink extends StatelessWidget {
   }
 }
 
-// ── Primary button ────────────────────────────────────────────────────────────
+// -- Primary button -----------------------------------------------------------------------------
 
 class LandingPrimaryButton extends StatelessWidget {
   final String label;
@@ -260,7 +260,7 @@ class LandingPrimaryButton extends StatelessWidget {
   }
 }
 
-// ── Outline button ────────────────────────────────────────────────────────────
+// -- Outline button -----------------------------------------------------------------------------
 
 class LandingOutlineButton extends StatelessWidget {
   final String label;
@@ -296,7 +296,7 @@ class LandingOutlineButton extends StatelessWidget {
   }
 }
 
-// ── Section label ─────────────────────────────────────────────────────────────
+// -- Section label ------------------------------------------------------------------------------
 
 class LandingSectionLabel extends StatelessWidget {
   final String text;

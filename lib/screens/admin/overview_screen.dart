@@ -28,20 +28,16 @@ class AdminOverviewScreen extends StatelessWidget {
           _sectionLabel('REVENUE (LAST 30 DAYS)', brand),
           const SizedBox(height: 14),
           _RevenueChart(
-              data: stats.revenueForRange(30),
-              brand: brand,
-              scheme: scheme),
+              data: stats.revenueForRange(30), brand: brand, scheme: scheme),
           const SizedBox(height: 32),
           Row(
             children: [
-              Expanded(
-                  child: _sectionLabel('PENDING JOIN REQUESTS', brand)),
+              Expanded(child: _sectionLabel('PENDING JOIN REQUESTS', brand)),
               TextButton.icon(
-                onPressed: () =>
-                    Router.neglect(context, () => context.go('/admin/join-requests')),
+                onPressed: () => Router.neglect(
+                    context, () => context.go('/admin/join-requests')),
                 icon: const Icon(Icons.arrow_forward_rounded, size: 14),
-                label: const Text('View all',
-                    style: TextStyle(fontSize: 12)),
+                label: const Text('View all', style: TextStyle(fontSize: 12)),
               ),
             ],
           ),
@@ -67,7 +63,7 @@ class AdminOverviewScreen extends StatelessWidget {
     );
   }
 
-  // ── Stat grid ─────────────────────────────────────────────────────────────
+  // -- Stat grid --------------------------------------------------------------
 
   Widget _buildStatGrid(BuildContext context, BrandColors brand,
       ColorScheme scheme, GlobalStatsProvider stats) {
@@ -137,7 +133,7 @@ class AdminOverviewScreen extends StatelessWidget {
       );
 }
 
-// ── Stat card ─────────────────────────────────────────────────────────────────
+// -- Stat card ----------------------------------------------------------------
 
 class _StatCard extends StatelessWidget {
   final String label, value, sub;
@@ -188,19 +184,17 @@ class _StatCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Text(label,
-              style: TextStyle(fontSize: 11, color: brand.muted)),
+          Text(label, style: TextStyle(fontSize: 11, color: brand.muted)),
           Text(sub,
               style: TextStyle(
-                  fontSize: 10,
-                  color: brand.muted?.withValues(alpha: 0.6))),
+                  fontSize: 10, color: brand.muted?.withValues(alpha: 0.6))),
         ],
       ),
     );
   }
 }
 
-// ── Revenue chart ─────────────────────────────────────────────────────────────
+// -- Revenue chart ------------------------------------------------------------
 
 class _RevenueChart extends StatelessWidget {
   final Map<String, double> data;
@@ -288,7 +282,7 @@ class _RevenueChart extends StatelessWidget {
   }
 }
 
-// ── Pending requests list ─────────────────────────────────────────────────────
+// -- Pending requests list ----------------------------------------------------
 // Shows up to 3 most recent pending requests inline on the overview.
 // Full list is on the JoinRequestsScreen.
 
@@ -296,8 +290,7 @@ class _PendingRequestsList extends StatelessWidget {
   final BrandColors brand;
   final ColorScheme scheme;
 
-  const _PendingRequestsList(
-      {required this.brand, required this.scheme});
+  const _PendingRequestsList({required this.brand, required this.scheme});
 
   @override
   Widget build(BuildContext context) {
@@ -336,9 +329,7 @@ class _PendingRequestsList extends StatelessWidget {
             final String name = d['name']?.toString() ?? 'Unknown';
             final String nip = d['nip']?.toString() ?? '—';
             final Timestamp? ts = d['createdAt'] as Timestamp?;
-            final String date = ts != null
-                ? _formatDate(ts.toDate())
-                : '—';
+            final String date = ts != null ? _formatDate(ts.toDate()) : '—';
 
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
@@ -368,19 +359,16 @@ class _PendingRequestsList extends StatelessWidget {
                       children: [
                         Text(name,
                             style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600)),
+                                fontSize: 13, fontWeight: FontWeight.w600)),
                         Text('NIP: $nip · Submitted $date',
-                            style: TextStyle(
-                                fontSize: 11, color: brand.muted)),
+                            style: TextStyle(fontSize: 11, color: brand.muted)),
                       ],
                     ),
                   ),
                   TextButton(
-                    onPressed: () => Router.neglect(context,
-                        () => context.go('/admin/join-requests')),
-                    child: const Text('Review',
-                        style: TextStyle(fontSize: 12)),
+                    onPressed: () => Router.neglect(
+                        context, () => context.go('/admin/join-requests')),
+                    child: const Text('Review', style: TextStyle(fontSize: 12)),
                   ),
                 ],
               ),
@@ -395,7 +383,7 @@ class _PendingRequestsList extends StatelessWidget {
       '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 }
 
-// ── Status breakdown ──────────────────────────────────────────────────────────
+// -- Status breakdown ---------------------------------------------------------
 
 class _StatusBreakdown extends StatelessWidget {
   final Map<String, int> counts;
@@ -457,23 +445,20 @@ class _StatusBreakdown extends StatelessWidget {
                       width: 10,
                       height: 10,
                       decoration: BoxDecoration(
-                          color: s.$3,
-                          borderRadius: BorderRadius.circular(3)),
+                          color: s.$3, borderRadius: BorderRadius.circular(3)),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(s.$2,
                           style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500)),
+                              fontSize: 13, fontWeight: FontWeight.w500)),
                     ),
                     Text('$count',
                         style: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w700)),
                     const SizedBox(width: 8),
                     Text('(${(pct * 100).toInt()}%)',
-                        style: TextStyle(
-                            fontSize: 12, color: brand.muted)),
+                        style: TextStyle(fontSize: 12, color: brand.muted)),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -495,7 +480,7 @@ class _StatusBreakdown extends StatelessWidget {
   }
 }
 
-// ── Top restaurants ───────────────────────────────────────────────────────────
+// -- Top restaurants ----------------------------------------------------------
 
 class _TopRestaurants extends StatelessWidget {
   final List<MapEntry<String, int>> entries;
@@ -569,8 +554,7 @@ class _TopRestaurants extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Fetch restaurant name from Firestore
-                      _RestaurantName(
-                          restaurantId: restaurantId, brand: brand),
+                      _RestaurantName(restaurantId: restaurantId, brand: brand),
                       const SizedBox(height: 6),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(100),
@@ -587,8 +571,7 @@ class _TopRestaurants extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text('$count orders',
-                    style:
-                        TextStyle(fontSize: 12, color: brand.muted)),
+                    style: TextStyle(fontSize: 12, color: brand.muted)),
               ],
             ),
           );
@@ -603,8 +586,7 @@ class _RestaurantName extends StatelessWidget {
   final String restaurantId;
   final BrandColors brand;
 
-  const _RestaurantName(
-      {required this.restaurantId, required this.brand});
+  const _RestaurantName({required this.restaurantId, required this.brand});
 
   @override
   Widget build(BuildContext context) {
@@ -615,11 +597,9 @@ class _RestaurantName extends StatelessWidget {
           .get(),
       builder: (context, snap) {
         final data = snap.data?.data() as Map<String, dynamic>?;
-        final String name =
-            data?['name']?.toString() ?? restaurantId;
+        final String name = data?['name']?.toString() ?? restaurantId;
         return Text(name,
-            style: const TextStyle(
-                fontSize: 13, fontWeight: FontWeight.w600),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             overflow: TextOverflow.ellipsis);
       },
     );

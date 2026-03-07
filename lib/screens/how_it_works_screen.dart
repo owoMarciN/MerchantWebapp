@@ -36,7 +36,7 @@ class HowItWorksScreen extends StatelessWidget {
     );
   }
 
-  // ── Hero ──────────────────────────────────────────────────────────────────
+  // -- Hero ----------------------------------------------------------------------
 
   Widget _buildHero(BuildContext context, BrandColors brand, ColorScheme scheme,
       bool isWide, double h) {
@@ -51,8 +51,8 @@ class HowItWorksScreen extends StatelessWidget {
               color: brand.navy?.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(100),
               border: Border.all(
-                  color: brand.navy?.withValues(alpha: 0.3) ??
-                      Colors.transparent),
+                  color:
+                      brand.navy?.withValues(alpha: 0.3) ?? Colors.transparent),
             ),
             child: Text('Simple. Fast. Transparent.',
                 style: TextStyle(
@@ -86,10 +86,10 @@ class HowItWorksScreen extends StatelessWidget {
     );
   }
 
-  // ── Steps ─────────────────────────────────────────────────────────────────
+  // -- Steps ---------------------------------------------------------------------
 
-  Widget _buildSteps(BuildContext context, BrandColors brand, ColorScheme scheme,
-      bool isWide, double h) {
+  Widget _buildSteps(BuildContext context, BrandColors brand,
+      ColorScheme scheme, bool isWide, double h) {
     final steps = [
       _Step(
         number: '01',
@@ -151,27 +151,39 @@ class HowItWorksScreen extends StatelessWidget {
     );
   }
 
-  // ── Feature grid ──────────────────────────────────────────────────────────
+  // -- Feature grid ---------------------------------------------------------------------------
 
   Widget _buildFeatureGrid(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
     final items = [
-      _GridItem(Icons.bolt_rounded, 'Real-time orders',
+      _GridItem(
+          Icons.bolt_rounded,
+          'Real-time orders',
           'Every order appears on your dashboard instantly. No refresh needed.',
           brand.navy!),
-      _GridItem(Icons.analytics_rounded, 'Sales analytics',
+      _GridItem(
+          Icons.analytics_rounded,
+          'Sales analytics',
           'See revenue, popular items, and order trends across 7 or 30 days.',
           const Color(0xFF8B5CF6)),
-      _GridItem(Icons.image_rounded, 'Custom branding',
+      _GridItem(
+          Icons.image_rounded,
+          'Custom branding',
           'Your logo, banner, and colours — your restaurant, your identity.',
           brand.accentGreen!),
-      _GridItem(Icons.lock_rounded, 'Secure payments',
+      _GridItem(
+          Icons.lock_rounded,
+          'Secure payments',
           'All payments processed securely. You never handle card data.',
           const Color(0xFFD97706)),
-      _GridItem(Icons.devices_rounded, 'Works everywhere',
+      _GridItem(
+          Icons.devices_rounded,
+          'Works everywhere',
           'Dashboard runs on desktop, tablet, and mobile. Manage from anywhere.',
           const Color(0xFFEF4444)),
-      _GridItem(Icons.support_agent_rounded, 'Dedicated support',
+      _GridItem(
+          Icons.support_agent_rounded,
+          'Dedicated support',
           'Real people available to help you get set up and stay running.',
           const Color(0xFF0EA5E9)),
     ];
@@ -209,7 +221,7 @@ class HowItWorksScreen extends StatelessWidget {
   }
 }
 
-// ── Step row ──────────────────────────────────────────────────────────────────
+// -- Step row ----------------------------------------------------------------------
 
 class _StepRow extends StatelessWidget {
   final _Step step;
@@ -292,9 +304,7 @@ class _StepRow extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(step.description,
                             style: TextStyle(
-                                fontSize: 14,
-                                color: brand.muted,
-                                height: 1.6)),
+                                fontSize: 14, color: brand.muted, height: 1.6)),
                       ],
                     ),
                   ),
@@ -319,7 +329,7 @@ class _StepRow extends StatelessWidget {
   }
 }
 
-// ── Grid card ─────────────────────────────────────────────────────────────────
+// -- Grid card ---------------------------------------------------------------------
 
 class _GridCard extends StatelessWidget {
   final _GridItem item;
@@ -361,7 +371,7 @@ class _GridCard extends StatelessWidget {
   }
 }
 
-// ── Data models ───────────────────────────────────────────────────────────────
+// -- Data models -------------------------------------------------------------------
 
 class _Step {
   final String number, title, description;

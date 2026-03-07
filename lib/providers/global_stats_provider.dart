@@ -22,18 +22,18 @@ class GlobalStatsProvider extends ChangeNotifier {
     _subscribeRestaurants();
   }
 
-  // ── Loading ────────────────────────────────────────────────────────────────
+  // -- Loading ----------------------------------------------------------------
 
   bool get isLoading => _ordersLoading || _restaurantsLoading;
   bool _ordersLoading = true;
   bool _restaurantsLoading = true;
 
-  // ── Orders ─────────────────────────────────────────────────────────────────
+  // -- Orders -----------------------------------------------------------------
 
   int totalOrders = 0;
-  int pendingOrders = 0;     // status == "normal"
+  int pendingOrders = 0; // status == "normal"
   int processingOrders = 0;
-  int completedOrders = 0;   // status == "delivered"
+  int completedOrders = 0; // status == "delivered"
   int cancelledOrders = 0;
   double totalRevenue = 0;
   double avgOrderValue = 0;
@@ -62,22 +62,22 @@ class GlobalStatsProvider extends ChangeNotifier {
   // Status frequency
   Map<String, int> statusCounts = {};
 
-  // ── Restaurants ────────────────────────────────────────────────────────────
+  // -- Restaurants ------------------------------------------------------------
 
-  int totalRestaurants = 0;   // all restaurants including pending/rejected
-  int liveRestaurants = 0;    // only approved + active (shown on landing page)
+  int totalRestaurants = 0; // all restaurants including pending/rejected
+  int liveRestaurants = 0; // only approved + active (shown on landing page)
   int totalMenus = 0;
   int totalItems = 0;
 
   // Restaurants with at least one order
   int activeRestaurants = 0;
 
-  // ── Internal ───────────────────────────────────────────────────────────────
+  // -- Internal ---------------------------------------------------------------
 
   StreamSubscription<QuerySnapshot>? _ordersSub;
   StreamSubscription<QuerySnapshot>? _restaurantsSub;
 
-  // ── Orders stream ──────────────────────────────────────────────────────────
+  // -- Orders stream ----------------------------------------------------------
 
   void _subscribeOrders() {
     _ordersSub = FirebaseFirestore.instance
@@ -180,7 +180,7 @@ class GlobalStatsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Restaurants stream ─────────────────────────────────────────────────────
+  // -- Restaurants stream -----------------------------------------------------
 
   void _subscribeRestaurants() {
     _restaurantsSub = FirebaseFirestore.instance
@@ -243,7 +243,7 @@ class GlobalStatsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+  // -- Helpers ----------------------------------------------------------------
 
   /// Top N restaurants by order count.
   List<MapEntry<String, int>> topRestaurantsByOrders({int limit = 5}) {

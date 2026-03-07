@@ -153,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       "photoUrl": "",
       "createdAt": Timestamp.now(),
       "role": "restaurant",
-      "status": "pending",
+      "status": "approved",
     });
   }
 
