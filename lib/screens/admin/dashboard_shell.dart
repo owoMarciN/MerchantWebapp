@@ -17,7 +17,14 @@ class AdminDashboardShell extends StatelessWidget {
         icon: Icons.storefront_rounded,
         label: 'Join Requests',
         path: '/admin/join-requests'),
-    _NavItem(icon: Icons.people_rounded, label: 'Users', path: '/admin/users'),
+    _NavItem(
+      icon: Icons.people_rounded, 
+      label: 'Users', 
+      path: '/admin/users'),
+    _NavItem(
+      icon: Icons.notifications_rounded,    
+      label: 'Notifications',  
+      path: '/admin/notifications'),
   ];
 
   int _selectedIndex(BuildContext context) {

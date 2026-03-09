@@ -899,7 +899,7 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                         Switch(
                           value: _isActive,
                           onChanged: (v) => setState(() => _isActive = v),
-                          activeColor: brandColors.accentGreen,
+                          activeThumbColor: brandColors.accentGreen,
                         ),
                       ],
                     ),

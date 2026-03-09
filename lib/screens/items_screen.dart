@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -478,8 +477,9 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Price is required';
-                  if (double.tryParse(v.trim()) == null)
+                  if (double.tryParse(v.trim()) == null) {
                     return 'Enter a valid number';
+                  }
                   return null;
                 },
               ),

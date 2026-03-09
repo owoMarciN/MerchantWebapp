@@ -189,6 +189,10 @@ final GoRouter _router = GoRouter(
           path: '/admin/users',
           builder: (_, __) => const UserManagementScreen(),
         ),
+        GoRoute(
+          path: '/admin/notifications',
+          builder: (_, __) => const AdminNotificationsScreen(),
+        ),
       ],
     ),
   ],

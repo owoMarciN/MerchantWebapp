@@ -6,6 +6,7 @@ import 'package:user_app/extensions/brand_color_ext.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:user_app/global/global.dart';
+import 'package:user_app/widgets/notification_bell.dart';
 
 class DashboardShell extends StatefulWidget {
   final Widget child;
@@ -153,6 +154,7 @@ class _DashboardShellState extends State<DashboardShell> {
                       child: Column(
                         children: [
                           _buildTopBar(
+                            restaurantID ?? '',
                             context,
                             isWide,
                             brandColors,
@@ -399,6 +401,7 @@ class _DashboardShellState extends State<DashboardShell> {
   // -- Top bar -------------------------------------------------------------------
 
   Widget _buildTopBar(
+    String restaurantID,
     BuildContext context,
     bool isWide,
     BrandColors brandColors,
@@ -432,14 +435,10 @@ class _DashboardShellState extends State<DashboardShell> {
 
           const Spacer(),
 
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              border: Border.all(color: colorScheme.outline),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(Icons.notifications_none, color: brandColors.muted),
+          NotificationBell(
+            uid: restaurantID,
+            brandColors: brandColors,
+            colorScheme: colorScheme
           ),
           const SizedBox(width: 16),
 
@@ -591,35 +590,6 @@ class _DashboardShellState extends State<DashboardShell> {
 }
 
 // -- Shared widgets -----------------------------------------------------------------------------
-
-class _TopBarButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  const _TopBarButton(
-      {required this.icon, required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration:
-          BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: Colors.white),
-          const SizedBox(width: 6),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white)),
-        ],
-      ),
-    );
-  }
-}
 
 class _NavItem {
   final IconData icon;
@@ -1017,3 +987,4 @@ class _GateConfig {
     required this.message,
   });
 }
+
