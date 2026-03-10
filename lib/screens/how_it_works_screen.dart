@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/extensions/responsive_ext.dart';
 import 'package:user_app/widgets/landing_widgets.dart';
 
@@ -22,11 +23,11 @@ class HowItWorksScreen extends StatelessWidget {
             _buildSteps(context, brand, scheme, isWide, h),
             _buildFeatureGrid(context, brand, scheme, isWide, h),
             LandingCta(
-              title: 'Ready to get started?',
-              subtitle: 'Join restaurants already on Freequick.',
-              primaryLabel: 'Register Your Restaurant',
+              title: context.l10n.hiw_cta_title,
+              subtitle: context.l10n.hiw_cta_subtitle,
+              primaryLabel: context.l10n.hiw_cta_primary,
               primaryRoute: '/auth/register',
-              secondaryLabel: 'See Pricing',
+              secondaryLabel: context.l10n.hiw_cta_secondary,
               secondaryRoute: '/pricing',
             ),
             const LandingFooter(),
@@ -36,7 +37,7 @@ class HowItWorksScreen extends StatelessWidget {
     );
   }
 
-  // -- Hero ----------------------------------------------------------------------
+  // -- Hero ------------------------------------------------------------------
 
   Widget _buildHero(BuildContext context, BrandColors brand, ColorScheme scheme,
       bool isWide, double h) {
@@ -54,7 +55,7 @@ class HowItWorksScreen extends StatelessWidget {
                   color:
                       brand.navy?.withValues(alpha: 0.3) ?? Colors.transparent),
             ),
-            child: Text('Simple. Fast. Transparent.',
+            child: Text(context.l10n.hiw_hero_badge,
                 style: TextStyle(
                     fontSize: 12,
                     color: brand.navy,
@@ -64,7 +65,7 @@ class HowItWorksScreen extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 680),
             child: Text(
-              'From sign-up to\nfirst order in minutes.',
+              context.l10n.hiw_hero_title,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: isWide ? 58 : 34,
@@ -76,7 +77,7 @@ class HowItWorksScreen extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: Text(
-              'Freequick is built for restaurant owners who want to focus on cooking — not managing technology.',
+              context.l10n.hiw_hero_subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: brand.muted, height: 1.6),
             ),
@@ -86,48 +87,43 @@ class HowItWorksScreen extends StatelessWidget {
     );
   }
 
-  // -- Steps ---------------------------------------------------------------------
+  // -- Steps -----------------------------------------------------------------
 
   Widget _buildSteps(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
     final steps = [
       _Step(
         number: '01',
-        title: 'Create your account',
-        description:
-            'Register with your restaurant details. Takes under 2 minutes. No credit card required.',
+        title: context.l10n.hiw_step1_title,
+        description: context.l10n.hiw_step1_desc,
         icon: Icons.person_add_rounded,
         color: brand.navy!,
       ),
       _Step(
         number: '02',
-        title: 'Set up your profile',
-        description:
-            'Upload your logo, banner, and set your address. Your storefront goes live immediately.',
+        title: context.l10n.hiw_step2_title,
+        description: context.l10n.hiw_step2_desc,
         icon: Icons.storefront_rounded,
         color: const Color(0xFF8B5CF6),
       ),
       _Step(
         number: '03',
-        title: 'Build your menu',
-        description:
-            'Add menus and items with photos, prices, and descriptions. Organise by category.',
+        title: context.l10n.hiw_step3_title,
+        description: context.l10n.hiw_step3_desc,
         icon: Icons.restaurant_menu_rounded,
         color: brand.accentGreen!,
       ),
       _Step(
         number: '04',
-        title: 'Receive orders',
-        description:
-            'Customers find you, place orders, and pay online. You see every order in real-time on your dashboard.',
+        title: context.l10n.hiw_step4_title,
+        description: context.l10n.hiw_step4_desc,
         icon: Icons.receipt_long_rounded,
         color: const Color(0xFFD97706),
       ),
       _Step(
         number: '05',
-        title: 'Get paid',
-        description:
-            'Revenue is settled to your registered bank account. You only pay a small commission per completed order.',
+        title: context.l10n.hiw_step5_title,
+        description: context.l10n.hiw_step5_desc,
         icon: Icons.account_balance_rounded,
         color: const Color(0xFFEF4444),
       ),
@@ -137,7 +133,7 @@ class HowItWorksScreen extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: h, vertical: isWide ? 80 : 48),
       child: Column(
         children: [
-          LandingSectionLabel('THE PROCESS'),
+          LandingSectionLabel(context.l10n.hiw_section_process),
           const SizedBox(height: 56),
           ...steps.asMap().entries.map((entry) => _StepRow(
                 step: entry.value,
@@ -151,41 +147,17 @@ class HowItWorksScreen extends StatelessWidget {
     );
   }
 
-  // -- Feature grid ---------------------------------------------------------------------------
+  // -- Feature grid ----------------------------------------------------------
 
   Widget _buildFeatureGrid(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
     final items = [
-      _GridItem(
-          Icons.bolt_rounded,
-          'Real-time orders',
-          'Every order appears on your dashboard instantly. No refresh needed.',
-          brand.navy!),
-      _GridItem(
-          Icons.analytics_rounded,
-          'Sales analytics',
-          'See revenue, popular items, and order trends across 7 or 30 days.',
-          const Color(0xFF8B5CF6)),
-      _GridItem(
-          Icons.image_rounded,
-          'Custom branding',
-          'Your logo, banner, and colours — your restaurant, your identity.',
-          brand.accentGreen!),
-      _GridItem(
-          Icons.lock_rounded,
-          'Secure payments',
-          'All payments processed securely. You never handle card data.',
-          const Color(0xFFD97706)),
-      _GridItem(
-          Icons.devices_rounded,
-          'Works everywhere',
-          'Dashboard runs on desktop, tablet, and mobile. Manage from anywhere.',
-          const Color(0xFFEF4444)),
-      _GridItem(
-          Icons.support_agent_rounded,
-          'Dedicated support',
-          'Real people available to help you get set up and stay running.',
-          const Color(0xFF0EA5E9)),
+      _GridItem(Icons.bolt_rounded,          context.l10n.hiw_feature1_title, context.l10n.hiw_feature1_desc, brand.navy!),
+      _GridItem(Icons.analytics_rounded,     context.l10n.hiw_feature2_title, context.l10n.hiw_feature2_desc, const Color(0xFF8B5CF6)),
+      _GridItem(Icons.image_rounded,         context.l10n.hiw_feature3_title, context.l10n.hiw_feature3_desc, brand.accentGreen!),
+      _GridItem(Icons.lock_rounded,          context.l10n.hiw_feature4_title, context.l10n.hiw_feature4_desc, const Color(0xFFD97706)),
+      _GridItem(Icons.devices_rounded,       context.l10n.hiw_feature5_title, context.l10n.hiw_feature5_desc, const Color(0xFFEF4444)),
+      _GridItem(Icons.support_agent_rounded, context.l10n.hiw_feature6_title, context.l10n.hiw_feature6_desc, const Color(0xFF0EA5E9)),
     ];
 
     return Container(
@@ -193,9 +165,9 @@ class HowItWorksScreen extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: h, vertical: isWide ? 80 : 48),
       child: Column(
         children: [
-          LandingSectionLabel('WHAT YOU GET'),
+          LandingSectionLabel(context.l10n.hiw_section_features),
           const SizedBox(height: 16),
-          Text('Everything a restaurant needs.',
+          Text(context.l10n.hiw_features_title,
               style: TextStyle(
                   fontSize: isWide ? 36 : 24, fontWeight: FontWeight.w700)),
           const SizedBox(height: 48),
@@ -221,7 +193,7 @@ class HowItWorksScreen extends StatelessWidget {
   }
 }
 
-// -- Step row ----------------------------------------------------------------------
+// -- Step row -----------------------------------------------------------------
 
 class _StepRow extends StatelessWidget {
   final _Step step;
@@ -329,7 +301,7 @@ class _StepRow extends StatelessWidget {
   }
 }
 
-// -- Grid card ---------------------------------------------------------------------
+// -- Grid card ----------------------------------------------------------------
 
 class _GridCard extends StatelessWidget {
   final _GridItem item;
@@ -371,7 +343,7 @@ class _GridCard extends StatelessWidget {
   }
 }
 
-// -- Data models -------------------------------------------------------------------
+// -- Data models --------------------------------------------------------------
 
 class _Step {
   final String number, title, description;

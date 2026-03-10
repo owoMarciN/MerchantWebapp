@@ -1,40 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
 import 'package:user_app/global/global.dart';
-import 'package:user_app/extensions/responsive_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
+import 'package:user_app/widgets/language_button.dart';
 
 class AdminDashboardShell extends StatelessWidget {
   final Widget child;
   const AdminDashboardShell({super.key, required this.child});
 
-  static const List<_NavItem> _navItems = [
+  List<_NavItem> _navItems(BuildContext context) => [
     _NavItem(
         icon: Icons.grid_view_rounded,
-        label: 'Overview',
+        label: context.l10n.admin_overview,
         path: '/admin/overview'),
     _NavItem(
         icon: Icons.storefront_rounded,
-        label: 'Join Requests',
+        label: context.l10n.admin_join_requests,
         path: '/admin/join-requests'),
     _NavItem(
-      icon: Icons.people_rounded, 
-      label: 'Users', 
-      path: '/admin/users'),
+        icon: Icons.people_rounded,
+        label: context.l10n.admin_users,
+        path: '/admin/users'),
     _NavItem(
-      icon: Icons.notifications_rounded,    
-      label: 'Notifications',  
-      path: '/admin/notifications'),
+        icon: Icons.notifications_rounded,
+        label: context.l10n.admin_notifications,
+        path: '/admin/notifications'),
   ];
 
-  int _selectedIndex(BuildContext context) {
+  int _selectedIndex(BuildContext context, List<_NavItem> navItems) {
     final location = GoRouterState.of(context).uri.toString();
-    final index = _navItems.indexWhere((e) => e.path == location);
+    final index = navItems.indexWhere((e) => e.path == location);
     return index == -1 ? 0 : index;
   }
 
-  void _onNavTap(BuildContext context, int index) {
-    Router.neglect(context, () => context.go(_navItems[index].path));
+  void _onNavTap(BuildContext context, List<_NavItem> navItems, int index) {
+    Router.neglect(context, () => context.go(navItems[index].path));
   }
 
   @override
@@ -42,7 +42,8 @@ class AdminDashboardShell extends StatelessWidget {
     final brand = Theme.of(context).extension<BrandColors>()!;
     final scheme = Theme.of(context).colorScheme;
     final isWide = context.isWide;
-    final int selected = _selectedIndex(context);
+    final navItems = _navItems(context);
+    final int selected = _selectedIndex(context, navItems);
 
     return PopScope(
       canPop: false,
@@ -59,11 +60,11 @@ class AdminDashboardShell extends StatelessWidget {
           children: [
             if (isWide)
               _AdminSidebar(
-                navItems: _navItems,
+                navItems: navItems,
                 selected: selected,
                 brand: brand,
                 scheme: scheme,
-                onTap: (i) => _onNavTap(context, i),
+                onTap: (i) => _onNavTap(context, navItems, i),
               ),
             Expanded(
               child: Column(
@@ -72,7 +73,7 @@ class AdminDashboardShell extends StatelessWidget {
                     isWide: isWide,
                     brand: brand,
                     scheme: scheme,
-                    label: _navItems[selected].label,
+                    label: navItems[selected].label,
                   ),
                   Expanded(child: child),
                 ],
@@ -83,11 +84,11 @@ class AdminDashboardShell extends StatelessWidget {
         bottomNavigationBar: isWide
             ? null
             : _AdminBottomNav(
-                navItems: _navItems,
+                navItems: navItems,
                 selected: selected,
                 brand: brand,
                 scheme: scheme,
-                onTap: (i) => _onNavTap(context, i),
+                onTap: (i) => _onNavTap(context, navItems, i),
               ),
       ),
     );
@@ -95,6 +96,7 @@ class AdminDashboardShell extends StatelessWidget {
 }
 
 // -- Sidebar ------------------------------------------------------------------
+
 class _AdminSidebar extends StatelessWidget {
   final List<_NavItem> navItems;
   final int selected;
@@ -142,7 +144,7 @@ class _AdminSidebar extends StatelessWidget {
                       const Text('Freequick',
                           style: TextStyle(
                               fontSize: 13, fontWeight: FontWeight.w700)),
-                      Text('Admin Panel',
+                      Text(context.l10n.admin_panel,
                           style: TextStyle(fontSize: 10, color: brand.muted)),
                     ],
                   ),
@@ -185,13 +187,14 @@ class _AdminSidebar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        getUserPref<String>("accountName") ?? 'Admin',
+                        getUserPref<String>('accountName') ??
+                            context.l10n.admin,
                         style: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w600),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      Text('Administrator',
+                      Text(context.l10n.administrator,
                           style: TextStyle(fontSize: 12, color: brand.muted)),
                     ],
                   ),
@@ -207,6 +210,7 @@ class _AdminSidebar extends StatelessWidget {
 }
 
 // -- Nav tile -----------------------------------------------------------------
+
 class _NavTile extends StatelessWidget {
   final _NavItem item;
   final bool isSelected;
@@ -260,6 +264,7 @@ class _NavTile extends StatelessWidget {
 }
 
 // -- Top bar ------------------------------------------------------------------
+
 class _AdminTopBar extends StatelessWidget {
   final bool isWide;
   final BrandColors brand;
@@ -295,30 +300,36 @@ class _AdminTopBar extends StatelessWidget {
                   color: Colors.white, size: 16),
             ),
             const SizedBox(width: 8),
-            const Text('Admin',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+            Text(context.l10n.admin,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w700, fontSize: 14)),
           ],
           if (isWide)
             Text(label,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w600)),
           const Spacer(),
+
+          LanguageButton(brandColors: brand, colorScheme: scheme),
+          const SizedBox(width: 16,),
 
           // Admin badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: const Color(0xFFEF4444).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                   color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.shield_rounded, size: 16, color: Color(0xFFEF4444)),
-                SizedBox(width: 4),
-                Text('Admin',
-                    style: TextStyle(
+                const Icon(Icons.shield_rounded,
+                    size: 16, color: Color(0xFFEF4444)),
+                const SizedBox(width: 4),
+                Text(context.l10n.admin,
+                    style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFFEF4444))),
@@ -333,7 +344,7 @@ class _AdminTopBar extends StatelessWidget {
             color: const Color(0xFF1E293B),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: BorderSide(                        // ← border
+              side: BorderSide(
                 color: const Color(0xFFEF4444).withValues(alpha: 0.25),
                 width: 1.2,
               ),
@@ -346,13 +357,18 @@ class _AdminTopBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      getUserPref<String>("accountName") ?? 'Admin',
-                      style: const TextStyle(color: Colors.white,
-                          fontSize: 13, fontWeight: FontWeight.w700),
+                      getUserPref<String>('accountName') ??
+                          context.l10n.admin,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700),
                     ),
                     Text(
-                      getUserPref<String>("accountEmail") ?? '',
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      getUserPref<String>('accountEmail') ??
+                          'business@email.com',
+                      style: const TextStyle(
+                          fontSize: 11, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -364,11 +380,12 @@ class _AdminTopBar extends StatelessWidget {
                   if (!context.mounted) return;
                   Router.neglect(context, () => context.go('/auth/login'));
                 },
-                child: const Row(children: [
-                  Icon(Icons.logout_rounded, size: 16, color: Colors.redAccent),
-                  SizedBox(width: 12),
-                  Text('Sign out',
-                      style: TextStyle(
+                child: Row(children: [
+                  const Icon(Icons.logout_rounded,
+                      size: 16, color: Colors.redAccent),
+                  const SizedBox(width: 12),
+                  Text(context.l10n.sign_out,
+                      style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Colors.redAccent)),
@@ -395,6 +412,7 @@ class _AdminTopBar extends StatelessWidget {
 }
 
 // -- Bottom nav ---------------------------------------------------------------
+
 class _AdminBottomNav extends StatelessWidget {
   final List<_NavItem> navItems;
   final int selected;
@@ -430,9 +448,11 @@ class _AdminBottomNav extends StatelessWidget {
 }
 
 // -- Data model ---------------------------------------------------------------
+
 class _NavItem {
   final IconData icon;
   final String label;
   final String path;
-  const _NavItem({required this.icon, required this.label, required this.path});
+  const _NavItem(
+      {required this.icon, required this.label, required this.path});
 }

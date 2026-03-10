@@ -134,7 +134,7 @@ class _MapScreenState extends State<MapDialog> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: context.t.searchAddress,
+                        hintText: context.l10n.searchAddress,
                         prefixIcon: const Icon(Icons.search),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.all(15),

@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/widgets/error_dialog.dart';
 import 'package:user_app/widgets/loading_dialog.dart';
 import 'package:user_app/widgets/custom_text_field.dart';
-import 'package:user_app/extensions/context_translate_ext.dart';
 import 'package:user_app/widgets/custom_password_field.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
       showDialog(
         context: context,
         builder: (_) =>
-            ErrorDialog(message: context.t.errorEnterEmailOrPassword),
+            ErrorDialog(message: context.l10n.errorEnterEmailOrPassword),
       );
     }
   }
@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => LoadingDialog(message: context.t.checkingCredentials),
+      builder: (_) => LoadingDialog(message: context.l10n.checkingCredentials),
     );
 
     try {
@@ -55,8 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pop(context);
       showDialog(
         context: context,
-        builder: (_) =>
-            ErrorDialog(message: error.message ?? context.t.errorLoginFailed),
+        builder: (_) => ErrorDialog(
+            message: error.message ?? context.l10n.errorLoginFailed),
       );
     }
   }
@@ -70,7 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
           .get();
 
       if (!userSnap.exists) {
-        return _failWith("No user record found.");
+        if (!mounted) return;
+        return _failWith(context.l10n.error_no_user_record_found);
       }
 
       final userData = userSnap.data()!;
@@ -88,7 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (role != "restaurant") {
-        return _failWith("This app is for restaurant accounts only.");
+        if (!mounted) return;
+        return _failWith(context.l10n.permission_restaurant_accounts_only);
       }
 
       // -- 2. Check restaurant record exists ---------------------------------
@@ -98,7 +100,8 @@ class _LoginScreenState extends State<LoginScreen> {
           .get();
 
       if (!restaurantSnap.exists) {
-        return _failWith("No restaurant record found. Please contact support.");
+        if (!mounted) return;
+        return _failWith(context.l10n.error_no_restaurant_record_found);
       }
 
       final restaurantData = restaurantSnap.data()!;
@@ -124,9 +127,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.pop(context);
       context.go('/splash');
+
     } catch (e) {
+
       if (firebaseAuth.currentUser != null) await firebaseAuth.signOut();
       if (!mounted) return;
+
       Navigator.pop(context);
       showDialog(
         context: context,
@@ -141,6 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _failWith(String message) async {
     await firebaseAuth.signOut();
     if (!mounted) return;
+    
     Navigator.pop(context);
     showDialog(
       context: context,
@@ -157,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isWeb = MediaQuery.of(context).size.width > 800;
+    final bool isWeb = context.isWide;
 
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
@@ -178,12 +185,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     CustomTextField(
                       data: Icons.email,
                       controller: _emailController,
-                      hintText: context.t.hintEmail,
+                      hintText: context.l10n.hintEmail,
                       isObsecure: false,
                     ),
                     CustomPasswordField(
                       controller: _passwordController,
-                      label: context.t.hintPassword,
+                      label: context.l10n.hintPassword,
                       isRequired: true,
                       isConfirmation: true,
                     ),
@@ -199,8 +206,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
-                          "Login",
+                        child: Text(
+                          context.l10n.login,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

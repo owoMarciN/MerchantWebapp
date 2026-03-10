@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
 // -----------------------------------------------------------------------------
 // ADMIN USER MANAGEMENT SCREEN
@@ -26,12 +26,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   // null = all roles
   String? _roleFilter;
 
-  static const List<({String label, String? value})> _roleOptions = [
-    (label: 'All', value: null),
-    (label: 'Restaurant', value: 'restaurant'),
-    (label: 'Admin', value: 'admin'),
-    (label: 'Customer', value: 'customer'),
-  ];
+  List<({String label, String? value})> _roleOptions(BuildContext context) => [
+        (label: context.l10n.users_filter_all, value: null),
+        (label: context.l10n.users_filter_restaurant, value: 'restaurant'),
+        (label: context.l10n.users_filter_admin, value: 'admin'),
+        (label: context.l10n.users_filter_customer, value: 'customer'),
+      ];
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     controller: _searchController,
                     style: const TextStyle(fontSize: 13),
                     decoration: InputDecoration(
-                      hintText: 'Search by name or email…',
+                      hintText: context.l10n.users_search_hint,
                       hintStyle: TextStyle(fontSize: 13, color: brand.muted),
                       prefixIcon: Icon(Icons.search_rounded,
                           size: 18, color: brand.muted),
@@ -106,7 +106,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: _roleOptions.map((opt) {
+                  children: _roleOptions(context).map((opt) {
                     final selected = _roleFilter == opt.value;
                     return Padding(
                       padding: const EdgeInsets.only(right: 6),
@@ -238,8 +238,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       const SizedBox(height: 12),
                       Text(
                         _search.isNotEmpty || _roleFilter != null
-                            ? 'No users match your filter'
-                            : 'No users yet',
+                            ? context.l10n.users_empty_filtered
+                            : context.l10n.users_empty_all,
                         style: TextStyle(fontSize: 14, color: brand.muted),
                       ),
                     ],
@@ -308,7 +308,7 @@ class _UserCard extends StatelessWidget {
     final Timestamp? ts = data['createdAt'] as Timestamp?;
     final String joined = ts != null ? _formatDate(ts.toDate()) : '—';
 
-    final _RoleStyle rs = _roleStyle(role);
+    final _RoleStyle rs = _roleStyle(role, context);
 
     return GestureDetector(
       onTap: () => _openDetail(context),
@@ -385,8 +385,8 @@ class _UserCard extends StatelessWidget {
                             border:
                                 Border.all(color: _red.withValues(alpha: 0.3)),
                           ),
-                          child: const Text('Banned',
-                              style: TextStyle(
+                          child: Text(context.l10n.users_banned_badge,
+                              style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                   color: _red)),
@@ -419,7 +419,7 @@ class _UserCard extends StatelessWidget {
                                 color: rs.color)),
                       ),
                       const SizedBox(width: 8),
-                      Text('Joined $joined',
+                      Text(context.l10n.users_joined(joined),
                           style: TextStyle(fontSize: 11, color: brand.muted)),
                     ],
                   ),
@@ -466,10 +466,12 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
 
   Future<void> _toggleBan() async {
     final bool currentlyBanned = widget.data['banned'] == true;
-    final String action = currentlyBanned ? 'Unban' : 'Ban';
+    final String action = currentlyBanned
+        ? context.l10n.users_action_unban
+        : context.l10n.users_action_ban;
     final String detail = currentlyBanned
-        ? 'This will restore the user\'s access.'
-        : 'This will prevent the user from accessing the platform.';
+        ? context.l10n.users_unban_body
+        : context.l10n.users_ban_body;
 
     final bool? confirmed = await showDialog<bool>(
       context: context,
@@ -481,7 +483,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(context.l10n.users_confirm_cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
@@ -511,8 +513,9 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       Navigator.pop(context);
       messenger
         ..clearSnackBars()
-        ..showSnackBar(
-            _successSnack(currentlyBanned ? 'User unbanned.' : 'User banned.'));
+        ..showSnackBar(_successSnack(currentlyBanned
+            ? context.l10n.users_snack_unbanned
+            : context.l10n.users_snack_banned));
     } catch (e) {
       if (!mounted) return;
       messenger
@@ -528,17 +531,16 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Delete User?',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-        content: const Text(
-          'This will permanently delete the user\'s Firestore document. '
-          'Their Auth account will remain unless deleted separately from Firebase Console.',
-          style: TextStyle(fontSize: 13),
+        title: Text(context.l10n.users_delete_title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+        content: Text(
+          context.l10n.users_delete_body,
+          style: const TextStyle(fontSize: 13),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(context.l10n.users_confirm_cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
@@ -548,7 +550,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Delete'),
+            child: Text(context.l10n.users_action_delete),
           ),
         ],
       ),
@@ -568,7 +570,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       Navigator.pop(context);
       messenger
         ..clearSnackBars()
-        ..showSnackBar(_successSnack('User deleted.'));
+        ..showSnackBar(_successSnack(context.l10n.users_snack_deleted));
     } catch (e) {
       if (!mounted) return;
       messenger
@@ -592,7 +594,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
         : null;
     final Timestamp? ts = data['createdAt'] as Timestamp?;
     final String joined = ts != null ? _formatDate(ts.toDate()) : '—';
-    final _RoleStyle rs = _roleStyle(role);
+    final _RoleStyle rs = _roleStyle(role, context);
 
     return Container(
       decoration: BoxDecoration(
@@ -609,9 +611,9 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             // Header row
             Row(
               children: [
-                const Text('User Details',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                Text(context.l10n.users_detail_title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w700)),
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
@@ -680,8 +682,8 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                                 border: Border.all(
                                     color: _red.withValues(alpha: 0.3)),
                               ),
-                              child: const Text('Banned',
-                                  style: TextStyle(
+                              child: Text(context.l10n.users_banned_badge,
+                                  style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
                                       color: _red)),
@@ -701,13 +703,22 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
 
             // Detail grid
             _DetailRow(
-                label: 'User ID',
+                label: context.l10n.users_detail_id,
                 value: widget.uid,
                 copyable: true,
                 brand: widget.brand),
-            _DetailRow(label: 'Phone', value: phone, brand: widget.brand),
-            _DetailRow(label: 'Joined', value: joined, brand: widget.brand),
-            _DetailRow(label: 'Role', value: role, brand: widget.brand),
+            _DetailRow(
+                label: context.l10n.users_detail_phone,
+                value: phone,
+                brand: widget.brand),
+            _DetailRow(
+                label: context.l10n.users_detail_joined,
+                value: joined,
+                brand: widget.brand),
+            _DetailRow(
+                label: context.l10n.users_detail_role,
+                value: role,
+                brand: widget.brand),
 
             const SizedBox(height: 24),
 
@@ -730,7 +741,9 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                         banned ? Icons.lock_open_rounded : Icons.block_rounded,
                         size: 16,
                       ),
-                      label: Text(banned ? 'Unban' : 'Ban'),
+                      label: Text(banned
+                          ? context.l10n.users_action_unban
+                          : context.l10n.users_action_ban),
                       style: OutlinedButton.styleFrom(
                         foregroundColor:
                             banned ? const Color(0xFF10B981) : _red,
@@ -749,7 +762,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     child: ElevatedButton.icon(
                       onPressed: _deleteUser,
                       icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                      label: const Text('Delete'),
+                      label: Text(context.l10n.users_action_delete),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _red,
                         foregroundColor: Colors.white,
@@ -851,7 +864,7 @@ class _DetailRow extends StatelessWidget {
                 Clipboard.setData(ClipboardData(text: value));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Copied to clipboard'),
+                    content: Text(context.l10n.users_copied),
                     duration: const Duration(seconds: 1),
                     behavior: SnackBarBehavior.floating,
                     margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -876,14 +889,16 @@ class _RoleStyle {
   const _RoleStyle(this.label, this.color);
 }
 
-_RoleStyle _roleStyle(String role) {
+_RoleStyle _roleStyle(String role, BuildContext context) {
   switch (role) {
     case 'admin':
-      return const _RoleStyle('Admin', Color(0xFFEF4444));
-    case 'restaurant_admin':
-      return const _RoleStyle('Restaurant', Color(0xFF8B5CF6));
+      return _RoleStyle(context.l10n.users_role_admin, const Color(0xFFEF4444));
+    case 'restaurant':
+      return _RoleStyle(
+          context.l10n.users_role_restaurant, const Color(0xFF8B5CF6));
     case 'customer':
-      return const _RoleStyle('Customer', Color(0xFF3B82F6));
+      return _RoleStyle(
+          context.l10n.users_role_customer, const Color(0xFF3B82F6));
     default:
       return _RoleStyle(role, const Color(0xFF6B7280));
   }

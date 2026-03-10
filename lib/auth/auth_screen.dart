@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/auth/login.dart';
 import 'package:user_app/auth/register.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:go_router/go_router.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -14,7 +14,7 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   bool get showLogin => widget.initialShowLogin;
-  
+
   void toggleView() {
     final newPath = showLogin ? '/auth/register' : '/auth/login';
     Router.neglect(context, () => context.go(newPath));
@@ -22,7 +22,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isLargeScreen = MediaQuery.of(context).size.width > 900;
+    bool isLargeScreen = context.isUltraWide;
 
     final brandColors = Theme.of(context).extension<BrandColors>()!;
 
@@ -42,8 +42,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   children: [
                     const FlutterLogo(size: 40),
                     const SizedBox(height: 40),
-                    const Text(
-                      "Build the best search\nexperience for your users.",
+                    Text(
+                      context.l10n.build_user_experience,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 32,
@@ -53,14 +53,13 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      "Join thousands of teams scaling their applications with our dashboard.",
+                      context.l10n.join_thousands,
                       style: TextStyle(color: Colors.blue[100], fontSize: 18),
                     ),
                   ],
                 ),
               ),
             ),
-
           Expanded(
             flex: 1,
             child: Center(
@@ -72,7 +71,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        showLogin ? "Sign in to Dashboard" : "Create your account",
+                        showLogin
+                            ? context.l10n.sign_in_to_dashboard
+                            : context.l10n.create_your_account,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
@@ -83,45 +84,47 @@ class _AuthScreenState extends State<AuthScreen> {
                       Row(
                         children: [
                           Text(
-                            showLogin ? "New to the platform?" : "Already have an account?",
+                            showLogin
+                                ? context.l10n.new_to_the_platform
+                                : context.l10n.already_have_an_account,
                             style: TextStyle(color: Colors.black),
                           ),
                           const SizedBox(width: 5),
                           TextButton(
                             onPressed: toggleView,
                             child: Text(
-                              showLogin ? "Sign up" : "Log in",
-                              style: const TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+                              showLogin
+                                  ? context.l10n.sign_up
+                                  : context.l10n.log_in,
+                              style: const TextStyle(
+                                  color: Colors.blueAccent,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
                       ),
-    
                       showLogin ? const LoginScreen() : const RegisterScreen(),
-                    
-                      const Row(
+                      Row(
                         children: [
                           Expanded(child: Divider()),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Text("OR", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                            child: Text(context.l10n.or,
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 12)),
                           ),
                           Expanded(child: Divider()),
                         ],
                       ),
-
                       const SizedBox(height: 10),
-
                       _SocialButton(
-                        icon: Icons.g_mobiledata, 
-                        label: "${showLogin ? 'Sign in' : 'Sign up'} with Google"
-                      ),
-
+                          icon: Icons.g_mobiledata,
+                          label:
+                            "${showLogin ? context.l10n.sign_in : context.l10n.sign_up} ${context.l10n.with_google}"),
                       const SizedBox(height: 25),
-
-                      const Center(
+                      Center(
                         child: Text(
-                          "By continuing, you agree to the Terms of Service.",
+                          context.l10n.terms_of_service,
                           style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ),
@@ -145,8 +148,7 @@ class _SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child:
-      OutlinedButton(
+      child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(240, 50),
           maximumSize: const Size(350, 50),
@@ -159,7 +161,9 @@ class _SocialButton extends StatelessWidget {
           children: [
             Icon(icon, color: Colors.black),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600)),
+            Text(label,
+                style: const TextStyle(
+                    color: Colors.black87, fontWeight: FontWeight.w600)),
           ],
         ),
       ),

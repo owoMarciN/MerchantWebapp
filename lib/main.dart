@@ -183,7 +183,7 @@ final GoRouter _router = GoRouter(
         ),
         GoRoute(
           path: '/admin/join-requests',
-          builder: (_, __) => const RequestsScreen(),
+          builder: (_, __) => const JoinRequestsScreen(),
         ),
         GoRoute(
           path: '/admin/users',

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
-class RequestsScreen extends StatefulWidget {
-  const RequestsScreen({super.key});
+class JoinRequestsScreen extends StatefulWidget {
+  const JoinRequestsScreen({super.key});
 
   @override
-  State<RequestsScreen> createState() => _RequestsScreenState();
+  State<JoinRequestsScreen> createState() => _JoinRequestsScreenState();
 }
 
-class _RequestsScreenState extends State<RequestsScreen>
+class _JoinRequestsScreenState extends State<JoinRequestsScreen>
     with SingleTickerProviderStateMixin {
   // Tab 0 = Restaurant registrations, Tab 1 = Go Live requests
   late final TabController _tabController;
-  final String _filter = 'pending';
+  final String? _filter = 'pending';
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _RequestsScreenState extends State<RequestsScreen>
 
     return Column(
       children: [
-        // -- Tab bar ----------------------------------------------------------
+        // -- Tab bar ---------------------------------------------------------
         Container(
           color: scheme.surface,
           child: TabBar(
@@ -45,9 +45,9 @@ class _RequestsScreenState extends State<RequestsScreen>
             indicatorWeight: 2,
             labelStyle:
                 const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-            tabs: const [
-              Tab(text: 'Registrations'),
-              Tab(text: 'Go Live Requests'),
+            tabs: [
+              Tab(text: context.l10n.requests_tab_registrations),
+              Tab(text: context.l10n.requests_tab_go_live),
             ],
           ),
         ),
@@ -67,7 +67,7 @@ class _RequestsScreenState extends State<RequestsScreen>
   }
 }
 
-// -- Registrations tab --------------------------------------------------------
+// -- Registrations tab ---------------------------------------------------------
 
 class _RegistrationsTab extends StatefulWidget {
   final BrandColors brand;
@@ -92,7 +92,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
 
     return Column(
       children: [
-        // -- Filter bar -------------------------------------------------------
+        // -- Filter bar ------------------------------------------------------
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           decoration: BoxDecoration(
@@ -107,7 +107,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                   child: Row(
                     children: [
                       _FilterChip(
-                        label: 'Pending',
+                        label: context.l10n.requests_filter_pending,
                         icon: Icons.hourglass_top_rounded,
                         color: const Color(0xFFD97706),
                         selected: _filter == 'pending',
@@ -117,7 +117,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                       ),
                       const SizedBox(width: 8),
                       _FilterChip(
-                        label: 'Approved',
+                        label: context.l10n.requests_filter_approved,
                         icon: Icons.check_circle_rounded,
                         color: const Color(0xFF10B981),
                         selected: _filter == 'approved',
@@ -127,7 +127,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                       ),
                       const SizedBox(width: 8),
                       _FilterChip(
-                        label: 'Active',
+                        label: context.l10n.requests_filter_active,
                         icon: Icons.bolt_rounded,
                         color: const Color(0xFF8B5CF6),
                         selected: _filter == 'active',
@@ -137,7 +137,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                       ),
                       const SizedBox(width: 8),
                       _FilterChip(
-                        label: 'Rejected',
+                        label: context.l10n.requests_filter_rejected,
                         icon: Icons.cancel_rounded,
                         color: const Color(0xFFEF4444),
                         selected: _filter == 'rejected',
@@ -147,7 +147,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                       ),
                       const SizedBox(width: 8),
                       _FilterChip(
-                        label: 'Suspended',
+                        label: context.l10n.requests_filter_suspended,
                         icon: Icons.block_rounded,
                         color: Colors.grey,
                         selected: _filter == 'suspended',
@@ -157,7 +157,7 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                       ),
                       const SizedBox(width: 8),
                       _FilterChip(
-                        label: 'All',
+                        label: context.l10n.requests_filter_all,
                         icon: Icons.list_rounded,
                         color: brand.navy!,
                         selected: _filter == null,
@@ -202,8 +202,8 @@ class _RegistrationsTabState extends State<_RegistrationsTab> {
                       const SizedBox(height: 12),
                       Text(
                         _filter != null
-                            ? 'No ${_filter!} requests'
-                            : 'No restaurants yet',
+                            ? context.l10n.requests_empty_filtered(_filter!)
+                            : context.l10n.requests_empty_all,
                         style: TextStyle(fontSize: 14, color: brand.muted),
                       ),
                     ],
@@ -270,7 +270,7 @@ class _GoLiveRequestsTab extends StatelessWidget {
               children: [
                 Icon(Icons.rocket_launch_rounded, size: 40, color: brand.muted),
                 const SizedBox(height: 12),
-                Text('No Go Live requests yet',
+                Text(context.l10n.requests_go_live_empty,
                     style: TextStyle(fontSize: 14, color: brand.muted)),
               ],
             ),
@@ -281,7 +281,8 @@ class _GoLiveRequestsTab extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           children: [
             if (pending.isNotEmpty) ...[
-              _sectionLabel('PENDING REVIEW', brand),
+              _sectionLabel(
+                  context.l10n.requests_go_live_section_pending, brand),
               const SizedBox(height: 12),
               ...pending.map((doc) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -294,7 +295,8 @@ class _GoLiveRequestsTab extends StatelessWidget {
               const SizedBox(height: 24),
             ],
             if (reviewed.isNotEmpty) ...[
-              _sectionLabel('REVIEWED', brand),
+              _sectionLabel(
+                  context.l10n.requests_go_live_section_reviewed, brand),
               const SizedBox(height: 12),
               ...reviewed.map((doc) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -321,7 +323,7 @@ class _GoLiveRequestsTab extends StatelessWidget {
       );
 }
 
-// -- Go Live card -------------------------------------------------------------
+// -- Go Live card --------------------------------------------------------------
 
 class _GoLiveCard extends StatefulWidget {
   final QueryDocumentSnapshot doc;
@@ -389,8 +391,8 @@ class _GoLiveCardState extends State<_GoLiveCard> {
           {'status': 'approved', 'reviewedAt': FieldValue.serverTimestamp()});
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(context.l10n.requests_error_failed(e.toString()))));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -409,8 +411,8 @@ class _GoLiveCardState extends State<_GoLiveCard> {
       // Restaurant stays at "approved" — owner sees "Declined · Reapply"
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(context.l10n.requests_error_failed(e.toString()))));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -440,7 +442,7 @@ class _GoLiveCardState extends State<_GoLiveCard> {
       ),
       child: Column(
         children: [
-          // -- Header ---------------------------------------------------------
+          // -- Header -------------------------------------------------------
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
             child: Row(
@@ -463,7 +465,9 @@ class _GoLiveCardState extends State<_GoLiveCard> {
                       Text(name,
                           style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w700)),
-                      Text('Requested $timeAgo · $date',
+                      Text(
+                          context.l10n
+                              .requests_go_live_requested(timeAgo, date),
                           style: TextStyle(
                               fontSize: 11, color: widget.brand.muted)),
                     ],
@@ -505,7 +509,7 @@ class _GoLiveCardState extends State<_GoLiveCard> {
           const SizedBox(height: 14),
           Divider(height: 1, color: widget.scheme.outline),
 
-          // -- Actions --------------------------------------------------------
+          // -- Actions -------------------------------------------------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: _loading
@@ -521,14 +525,14 @@ class _GoLiveCardState extends State<_GoLiveCard> {
                     ? Row(
                         children: [
                           _ActionButton(
-                            label: 'Activate',
+                            label: context.l10n.requests_action_activate,
                             icon: Icons.bolt_rounded,
                             color: const Color(0xFF8B5CF6),
                             onTap: _activate,
                           ),
                           const SizedBox(width: 8),
                           _ActionButton(
-                            label: 'Decline',
+                            label: context.l10n.requests_action_decline,
                             icon: Icons.close_rounded,
                             color: const Color(0xFFEF4444),
                             outline: true,
@@ -538,8 +542,14 @@ class _GoLiveCardState extends State<_GoLiveCard> {
                       )
                     : Text(
                         status == 'approved'
-                            ? 'Activated on ${_formatDate((d['reviewedAt'] as Timestamp?)?.toDate() ?? DateTime.now())}'
-                            : 'Declined on ${_formatDate((d['reviewedAt'] as Timestamp?)?.toDate() ?? DateTime.now())}',
+                            ? context.l10n.requests_go_live_activated_on(
+                                _formatDate((d['reviewedAt'] as Timestamp?)
+                                        ?.toDate() ??
+                                    DateTime.now()))
+                            : context.l10n.requests_go_live_declined_on(
+                                _formatDate(
+                                    (d['reviewedAt'] as Timestamp?)?.toDate() ??
+                                        DateTime.now())),
                         style:
                             TextStyle(fontSize: 12, color: widget.brand.muted),
                       ),
@@ -563,11 +573,11 @@ class _GoLiveCardState extends State<_GoLiveCard> {
   String _badgeLabel(String status) {
     switch (status) {
       case 'approved':
-        return 'Activated';
+        return context.l10n.requests_badge_activated;
       case 'declined':
-        return 'Declined';
+        return context.l10n.requests_badge_declined;
       default:
-        return 'Pending Review';
+        return context.l10n.requests_badge_pending_review;
     }
   }
 
@@ -582,7 +592,7 @@ class _GoLiveCardState extends State<_GoLiveCard> {
   }
 }
 
-// -- Setup checklist ----------------------------------------------------------
+// -- Setup checklist -----------------------------------------------------------
 // Fetches the restaurant doc and checks what the owner has completed.
 
 class _SetupChecklist extends StatelessWidget {
@@ -625,17 +635,17 @@ class _SetupChecklist extends StatelessWidget {
         final menusSnap = snap.data![2] as QuerySnapshot;
 
         final checks = [
-          _Check('Logo uploaded',
+          _Check(context.l10n.requests_check_logo,
               (restaurantData['logoUrl'] ?? '').toString().isNotEmpty),
-          _Check('Banner uploaded',
+          _Check(context.l10n.requests_check_banner,
               (restaurantData['bannerUrl'] ?? '').toString().isNotEmpty),
-          _Check('Address set',
+          _Check(context.l10n.requests_check_address,
               (restaurantData['address'] ?? '').toString().isNotEmpty),
-          _Check('IBAN set',
+          _Check(context.l10n.requests_check_iban,
               (restaurantData['iban'] ?? '').toString().trim().isNotEmpty),
-          _Check('Profile photo',
+          _Check(context.l10n.requests_check_photo,
               (userData['photoUrl'] ?? '').toString().isNotEmpty),
-          _Check('At least one menu', menusSnap.docs.isNotEmpty),
+          _Check(context.l10n.requests_check_menu, menusSnap.docs.isNotEmpty),
         ];
 
         final int completed = checks.where((c) => c.done).length;
@@ -645,7 +655,9 @@ class _SetupChecklist extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('Setup: $completed/${checks.length} complete',
+                Text(
+                    context.l10n
+                        .requests_setup_progress(completed, checks.length),
                     style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -706,7 +718,7 @@ class _Check {
   const _Check(this.label, this.done);
 }
 
-// -- Request card -------------------------------------------------------------
+// -- Request card --------------------------------------------------------------
 
 class _RequestCard extends StatelessWidget {
   final String docId;
@@ -731,7 +743,7 @@ class _RequestCard extends StatelessWidget {
     final Timestamp? ts = data['createdAt'] as Timestamp?;
     final String date = ts != null ? _formatDate(ts.toDate()) : '—';
 
-    final _StatusStyle style = _statusStyle(status);
+    final _StatusStyle style = _statusStyle(context, status);
 
     return Container(
       decoration: BoxDecoration(
@@ -763,7 +775,7 @@ class _RequestCard extends StatelessWidget {
                       Text(name,
                           style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w700)),
-                      Text('Submitted $date',
+                      Text(context.l10n.requests_submitted(date),
                           style: TextStyle(fontSize: 11, color: brand.muted)),
                     ],
                   ),
@@ -825,36 +837,38 @@ class _RequestCard extends StatelessWidget {
   String _formatDate(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 
-  _StatusStyle _statusStyle(String status) {
+  _StatusStyle _statusStyle(BuildContext context, String status) {
     switch (status) {
       case 'approved':
         return _StatusStyle(
             icon: Icons.check_circle_rounded,
             color: const Color(0xFF10B981),
-            label: 'Approved');
+            label: context.l10n.requests_status_approved);
       case 'active':
         return _StatusStyle(
             icon: Icons.bolt_rounded,
             color: const Color(0xFF8B5CF6),
-            label: 'Active');
+            label: context.l10n.requests_status_active);
       case 'rejected':
         return _StatusStyle(
             icon: Icons.cancel_rounded,
             color: const Color(0xFFEF4444),
-            label: 'Rejected');
+            label: context.l10n.requests_status_rejected);
       case 'suspended':
         return _StatusStyle(
-            icon: Icons.block_rounded, color: Colors.grey, label: 'Suspended');
+            icon: Icons.block_rounded,
+            color: Colors.grey,
+            label: context.l10n.requests_status_suspended);
       default:
         return _StatusStyle(
             icon: Icons.hourglass_top_rounded,
             color: const Color(0xFFD97706),
-            label: 'Pending');
+            label: context.l10n.requests_status_pending);
     }
   }
 }
 
-// -- Action row ---------------------------------------------------------------
+// -- Action row ----------------------------------------------------------------
 
 class _ActionRow extends StatefulWidget {
   final String docId;
@@ -918,7 +932,8 @@ class _ActionRowState extends State<_ActionRow> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed: $e')),
+        SnackBar(
+            content: Text(context.l10n.requests_error_failed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -938,7 +953,7 @@ class _ActionRowState extends State<_ActionRow> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.requests_confirm_cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -980,13 +995,13 @@ class _ActionRowState extends State<_ActionRow> {
     final buttons = <Widget>[
       if (widget.status == 'pending' || widget.status == 'rejected')
         _ActionButton(
-          label: 'Approve',
+          label: context.l10n.requests_action_approve,
           icon: Icons.check_rounded,
           color: const Color(0xFF10B981),
           onTap: () => _confirmAndUpdate(
             'approved',
-            'Approve',
-            'This will approve the restaurant and give the owner access to their dashboard.',
+            context.l10n.requests_confirm_approve_title,
+            context.l10n.requests_confirm_approve_body,
             const Color(0xFF10B981),
           ),
         ),
@@ -994,39 +1009,39 @@ class _ActionRowState extends State<_ActionRow> {
           widget.status == 'approved' ||
           widget.status == 'suspended')
         _ActionButton(
-          label: 'Reject',
+          label: context.l10n.requests_action_reject,
           icon: Icons.close_rounded,
           color: const Color(0xFFEF4444),
           outline: true,
           onTap: () => _confirmAndUpdate(
             'rejected',
-            'Reject',
-            'This will reject the restaurant. The owner will see a rejection message when they log in.',
+            context.l10n.requests_confirm_reject_title,
+            context.l10n.requests_confirm_reject_body,
             const Color(0xFFEF4444),
           ),
         ),
       if (widget.status == 'active' || widget.status == 'approved')
         _ActionButton(
-          label: 'Suspend',
+          label: context.l10n.requests_action_suspend,
           icon: Icons.block_rounded,
           color: Colors.grey,
           outline: true,
           onTap: () => _confirmAndUpdate(
             'suspended',
-            'Suspend',
-            'This will suspend the restaurant. The owner will be locked out of their dashboard immediately.',
+            context.l10n.requests_confirm_suspend_title,
+            context.l10n.requests_confirm_suspend_body,
             Colors.grey,
           ),
         ),
       if (widget.status == 'suspended')
         _ActionButton(
-          label: 'Reinstate',
+          label: context.l10n.requests_action_reinstate,
           icon: Icons.undo_rounded,
           color: const Color(0xFF10B981),
           onTap: () => _confirmAndUpdate(
             'active',
-            'Reinstate',
-            'This will reinstate the restaurant to active status.',
+            context.l10n.requests_confirm_reinstate_title,
+            context.l10n.requests_confirm_reinstate_body,
             const Color(0xFF10B981),
           ),
         ),
@@ -1042,12 +1057,12 @@ class _ActionRowState extends State<_ActionRow> {
 
         // Copy restaurant ID
         IconButton(
-          tooltip: 'Copy restaurant ID',
+          tooltip: context.l10n.requests_action_copy_id,
           icon: Icon(Icons.copy_rounded, size: 16, color: widget.brand.muted),
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Copied: ${widget.docId}'),
+                content: Text(context.l10n.requests_copied(widget.docId)),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -1058,7 +1073,7 @@ class _ActionRowState extends State<_ActionRow> {
   }
 }
 
-// -- Filter chip --------------------------------------------------------------
+// -- Filter chip ---------------------------------------------------------------
 
 class _FilterChip extends StatelessWidget {
   final String label;
@@ -1112,7 +1127,7 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-// -- Action button ------------------------------------------------------------
+// -- Action button -------------------------------------------------------------
 
 class _ActionButton extends StatelessWidget {
   final String label;
@@ -1162,7 +1177,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// -- Detail item --------------------------------------------------------------
+// -- Detail item ---------------------------------------------------------------
 
 class _DetailItem extends StatelessWidget {
   final String label, value;
@@ -1185,7 +1200,7 @@ class _DetailItem extends StatelessWidget {
   }
 }
 
-// -- Data models --------------------------------------------------------------
+// -- Data models ---------------------------------------------------------------
 
 class _StatusStyle {
   final IconData icon;

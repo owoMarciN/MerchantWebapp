@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/widgets/progress_bar.dart';
 import 'package:go_router/go_router.dart';
@@ -97,44 +98,43 @@ class _OverviewScreenState extends State<OverviewScreen> {
     final List<_SetupTask> tasks = [
       _SetupTask(
         icon: Icons.add_a_photo_rounded,
-        title: 'Upload Restaurant Logo',
-        description: 'Customers will see your logo across the app.',
+        title: context.l10n.overview_task_logo_title,
+        description: context.l10n.overview_task_logo_desc,
         done: hasLogo,
         route: '/dashboard/settings',
       ),
       _SetupTask(
         icon: Icons.panorama_rounded,
-        title: 'Add a Banner Image',
-        description: 'A banner makes your storefront visually appealing.',
+        title: context.l10n.overview_task_banner_title,
+        description: context.l10n.overview_task_banner_desc,
         done: hasBanner,
         route: '/dashboard/settings',
       ),
       _SetupTask(
         icon: Icons.location_on_rounded,
-        title: 'Set Restaurant Address',
-        description: 'Let customers know where to find you.',
+        title: context.l10n.overview_task_address_title,
+        description: context.l10n.overview_task_address_desc,
         done: hasAddress,
         route: '/dashboard/settings',
       ),
       _SetupTask(
         icon: Icons.person_rounded,
-        title: 'Add a Profile Photo',
-        description: 'Put a face to your restaurant owner account.',
+        title: context.l10n.overview_task_photo_title,
+        description: context.l10n.overview_task_photo_desc,
         done: hasProfilePhoto,
         route: '/dashboard/settings',
       ),
       _SetupTask(
         icon: Icons.restaurant_menu_rounded,
-        title: 'Create a Menu & Add Items',
-        description:
-            'Organise your offerings into menus with dishes and prices.',
+        title: context.l10n.overview_task_menu_title,
+        description: context.l10n.overview_task_menu_desc,
         done: _hasMenus,
         route: '/dashboard/menus',
       ),
       _SetupTask(
         icon: Icons.account_balance_rounded,
-        title: 'Add Bank Account (IBAN)',
-        description: 'Required to receive payouts from customer orders.',
+        title: context.l10n.overview_task_iban_title,
+        description: context.l10n.overview_task_iban_desc,
         done: hasIban,
         route: '/dashboard/settings',
       ),
@@ -150,12 +150,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welcome back, ${getUserPref<String>("accountName") ?? "Chef"} 👋',
+            context.l10n.overview_welcome(
+                getUserPref<String>("accountName") ?? context.l10n.overview_chef_fallback),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
           Text(
-            "Here's what's happening with your restaurant today.",
+            context.l10n.overview_subtitle,
             style: TextStyle(fontSize: 14, color: brandColors.muted),
           ),
           const SizedBox(height: 28),
@@ -164,11 +165,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 brandColors, colorScheme),
             const SizedBox(height: 32),
           ],
-          _sectionLabel('AT A GLANCE', brandColors),
+          _sectionLabel(context.l10n.overview_section_glance, brandColors),
           const SizedBox(height: 14),
           _buildStatGrid(brandColors, colorScheme),
           const SizedBox(height: 32),
-          _sectionLabel('RECENT ORDERS', brandColors),
+          _sectionLabel(context.l10n.overview_section_orders, brandColors),
           const SizedBox(height: 14),
           _buildOrdersTable(brandColors, colorScheme),
         ],
@@ -210,11 +211,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Get your restaurant ready',
-                        style: TextStyle(
+                    Text(context.l10n.overview_setup_title,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
-                    Text('$completedCount of ${tasks.length} steps completed',
+                    Text(
+                        context.l10n.overview_setup_progress(
+                            completedCount, tasks.length),
                         style:
                             TextStyle(fontSize: 12, color: brandColors.muted)),
                   ],
@@ -323,7 +326,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               brandColors.accentGreen?.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('Done',
+                        child: Text(context.l10n.overview_task_done,
                             style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -336,7 +339,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           color: brandColors.navy?.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('Set up',
+                        child: Text(context.l10n.overview_task_setup,
                             style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -378,25 +381,25 @@ class _OverviewScreenState extends State<OverviewScreen> {
         ),
         children: [
           _StatCard(
-              label: 'Total Orders',
+              label: context.l10n.overview_stat_total_orders,
               value: '${stats.totalOrders}',
               icon: Icons.shopping_bag_rounded,
               color: brandColors.navy!,
               colorScheme: colorScheme),
           _StatCard(
-              label: 'Pending',
+              label: context.l10n.overview_stat_pending,
               value: '${stats.pendingOrders}',
               icon: Icons.pending_actions_rounded,
               color: const Color(0xFFD97706),
               colorScheme: colorScheme),
           _StatCard(
-              label: 'Completed',
+              label: context.l10n.overview_stat_completed,
               value: '${stats.completedOrders}',
               icon: Icons.check_circle_rounded,
               color: brandColors.accentGreen!,
               colorScheme: colorScheme),
           _StatCard(
-              label: 'Total Revenue',
+              label: context.l10n.overview_stat_revenue,
               value: '${stats.totalRevenue.toStringAsFixed(2)} PLN',
               icon: Icons.payments_rounded,
               color: const Color(0xFF8B5CF6),
@@ -418,7 +421,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: colorScheme.outline)),
         child: Center(
-            child: Text('No orders yet',
+            child: Text(context.l10n.overview_no_orders,
                 style: TextStyle(fontSize: 13, color: brandColors.muted))),
       );
     }
@@ -434,16 +437,16 @@ class _OverviewScreenState extends State<OverviewScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             child: Row(
-              children: const [
-                Expanded(flex: 3, child: _TableHeader('ORDER ID')),
-                Expanded(flex: 3, child: _TableHeader('CUSTOMER')),
-                Expanded(flex: 2, child: _TableHeader('ITEMS')),
-                Expanded(flex: 3, child: _TableHeader('STATUS')),
+              children: [
+                Expanded(flex: 3, child: _TableHeader(context.l10n.overview_table_order_id)),
+                Expanded(flex: 3, child: _TableHeader(context.l10n.overview_table_customer)),
+                Expanded(flex: 2, child: _TableHeader(context.l10n.overview_table_items)),
+                Expanded(flex: 3, child: _TableHeader(context.l10n.overview_table_status)),
                 Expanded(
                     flex: 2,
                     child: Align(
                         alignment: Alignment.centerRight,
-                        child: _TableHeader('TOTAL'))),
+                        child: _TableHeader(context.l10n.overview_table_total))),
               ],
             ),
           ),
@@ -457,7 +460,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 double.tryParse(d["totalAmount"]?.toString() ?? "0") ?? 0;
             final Timestamp? ts = d["orderTime"] as Timestamp?;
             final String timeLabel =
-                ts != null ? _formatTime(ts.toDate()) : "—";
+                ts != null ? _formatTime(context, ts.toDate()) : "—";
             final String shortId =
                 '#${doc.id.substring(0, doc.id.length.clamp(0, 8))}';
             return Column(
@@ -492,7 +495,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               overflow: TextOverflow.ellipsis)),
                       Expanded(
                           flex: 2,
-                          child: Text('$items item${items == 1 ? '' : 's'}',
+                          child: Text(
+                              items == 1
+                                  ? context.l10n.overview_items_count(items)
+                                  : context.l10n.overview_items_count_plural(items),
                               style: TextStyle(
                                   fontSize: 13, color: brandColors.muted))),
                       Expanded(
@@ -519,17 +525,17 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  String _formatTime(DateTime dt) {
+  String _formatTime(BuildContext context, DateTime dt) {
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inMinutes < 1) return context.l10n.overview_time_just_now;
+    if (diff.inMinutes < 60) return context.l10n.overview_time_minutes(diff.inMinutes);
+    if (diff.inHours < 24) return context.l10n.overview_time_hours(diff.inHours);
     return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}';
   }
 }
 
-// --- Supporting widgets ------------------------------------------------------------------------
+// --- Supporting widgets ------------------------------------------------------
 
 class _SetupTask {
   final IconData icon;

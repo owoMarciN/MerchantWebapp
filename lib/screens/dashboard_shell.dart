@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:user_app/extensions/responsive_ext.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:user_app/global/global.dart';
+import 'package:user_app/widgets/language_button.dart';
 import 'package:user_app/widgets/notification_bell.dart';
 
 class DashboardShell extends StatefulWidget {
@@ -17,39 +18,23 @@ class DashboardShell extends StatefulWidget {
 }
 
 class _DashboardShellState extends State<DashboardShell> {
-  static const List<_NavItem> _navItems = [
-    _NavItem(
-        icon: Icons.grid_view_rounded, label: 'Overview', path: '/dashboard'),
-    _NavItem(
-        icon: Icons.receipt_long_rounded,
-        label: 'Orders',
-        path: '/dashboard/orders'),
-    _NavItem(
-        icon: Icons.restaurant_menu_rounded,
-        label: 'Menus',
-        path: '/dashboard/menus'),
-    _NavItem(
-        icon: Icons.campaign_rounded,
-        label: 'Promotions',
-        path: '/dashboard/promotions'),
-    _NavItem(
-        icon: Icons.bar_chart_rounded,
-        label: 'Analytics',
-        path: '/dashboard/analytics'),
-    _NavItem(
-        icon: Icons.settings_rounded,
-        label: 'Settings',
-        path: '/dashboard/settings'),
+  List<_NavItem> _navItems(BuildContext context) => [
+    _NavItem(icon: Icons.grid_view_rounded,       label: context.l10n.shell_nav_overview,    path: '/dashboard'),
+    _NavItem(icon: Icons.receipt_long_rounded,    label: context.l10n.shell_nav_orders,      path: '/dashboard/orders'),
+    _NavItem(icon: Icons.restaurant_menu_rounded, label: context.l10n.shell_nav_menus,       path: '/dashboard/menus'),
+    _NavItem(icon: Icons.campaign_rounded,        label: context.l10n.shell_nav_promotions,  path: '/dashboard/promotions'),
+    _NavItem(icon: Icons.bar_chart_rounded,       label: context.l10n.shell_nav_analytics,   path: '/dashboard/analytics'),
+    _NavItem(icon: Icons.settings_rounded,        label: context.l10n.shell_nav_settings,    path: '/dashboard/settings'),
   ];
 
   int _selectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    final index = _navItems.indexWhere((e) => e.path == location);
+    final index = _navItems(context).indexWhere((e) => e.path == location);
     return index == -1 ? 0 : index;
   }
 
   void _onNavTap(BuildContext context, int index) {
-    Router.neglect(context, () => context.go(_navItems[index].path));
+    Router.neglect(context, () => context.go(_navItems(context)[index].path));
   }
 
   @override
@@ -75,32 +60,24 @@ class _DashboardShellState extends State<DashboardShell> {
             .doc(restaurantID)
             .snapshots(),
         builder: (context, snap) {
-          // -- First load only ------------------------------------------------
-          // Use snap.hasData so subsequent stream events never flash a spinner.
-          // ConnectionState.waiting on re-emits would destroy the shell layout.
           if (!snap.hasData) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
 
-          // -- Missing document -----------------------------------------------
           final data = snap.data!.data() as Map<String, dynamic>?;
           if (data == null) {
             return Scaffold(
               body: Center(
                 child: Text(
-                  'Restaurant not found. Please contact support.',
+                  context.l10n.shell_restaurant_not_found,
                   style: TextStyle(color: brandColors.muted),
                 ),
               ),
             );
           }
 
-          // -- Status gate ----------------------------------------------------
-          // Shown only when status is genuinely blocked.
-          // snap.hasData means this evaluates against real Firestore data,
-          // never against a transient loading state.
           final String status = data['status']?.toString() ?? 'pending';
           if (status != 'approved' && status != 'active') {
             return Scaffold(
@@ -108,7 +85,6 @@ class _DashboardShellState extends State<DashboardShell> {
             );
           }
 
-          // -- Dashboard ------------------------------------------------------
           return StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('users')
@@ -200,7 +176,6 @@ class _DashboardShellState extends State<DashboardShell> {
         children: [
           const SizedBox(height: 28),
 
-          // Logo + name — tapping returns to landing page
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: GestureDetector(
@@ -247,7 +222,6 @@ class _DashboardShellState extends State<DashboardShell> {
 
           const SizedBox(height: 20),
 
-          // Finish setup banner
           if (!setupComplete) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -273,7 +247,7 @@ class _DashboardShellState extends State<DashboardShell> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Finish setup',
+                          context.l10n.shell_finish_setup,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -297,7 +271,6 @@ class _DashboardShellState extends State<DashboardShell> {
             const SizedBox(height: 8),
           ],
 
-          // Go Live / Go Offline button
           if (setupComplete) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -310,16 +283,14 @@ class _DashboardShellState extends State<DashboardShell> {
             const SizedBox(height: 8),
           ],
 
-          // Nav items
           ...List.generate(
-            _navItems.length,
+            _navItems(context).length,
             (i) => _buildNavTile(context, i, selected, brandColors),
           ),
 
           const Spacer(),
           Divider(color: colorScheme.outline, indent: 20, endIndent: 20),
 
-          // Account row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(
@@ -338,7 +309,7 @@ class _DashboardShellState extends State<DashboardShell> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    getUserPref<String>('accountName') ?? 'My Account',
+                    getUserPref<String>('accountName') ?? context.l10n.shell_my_account,
                     style: TextStyle(fontSize: 13, color: brandColors.muted),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -359,7 +330,7 @@ class _DashboardShellState extends State<DashboardShell> {
     int selected,
     BrandColors brandColors,
   ) {
-    final item = _navItems[index];
+    final item = _navItems(context)[index];
     final bool isSelected = selected == index;
 
     return Padding(
@@ -398,7 +369,7 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 
-  // -- Top bar -------------------------------------------------------------------
+  // -- Top bar ----------------------------------------------------------------
 
   Widget _buildTopBar(
     String restaurantID,
@@ -418,7 +389,6 @@ class _DashboardShellState extends State<DashboardShell> {
       ),
       child: Row(
         children: [
-          // Left side
           if (!isWide) ...[
             Icon(Icons.restaurant_rounded, color: brandColors.navy, size: 22),
             const SizedBox(width: 8),
@@ -429,16 +399,19 @@ class _DashboardShellState extends State<DashboardShell> {
           ],
           if (isWide)
             Text(
-              _navItems[selected].label,
+              _navItems(context)[selected].label,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
 
           const Spacer(),
 
+          LanguageButton(brandColors: brandColors, colorScheme: colorScheme),
+          const SizedBox(width: 16,),
+
           NotificationBell(
             uid: restaurantID,
             brandColors: brandColors,
-            colorScheme: colorScheme
+            colorScheme: colorScheme,
           ),
           const SizedBox(width: 16),
 
@@ -448,7 +421,6 @@ class _DashboardShellState extends State<DashboardShell> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                // ← border
                 color: brandColors.accentGreen!,
                 width: 1.2,
               ),
@@ -497,35 +469,35 @@ class _DashboardShellState extends State<DashboardShell> {
               const PopupMenuDivider(),
               PopupMenuItem(
                 onTap: () {},
-                child: const Row(children: [
-                  Icon(Icons.headset_mic_outlined, size: 16),
-                  SizedBox(width: 12),
-                  Text('Talk to Support', style: TextStyle(fontSize: 13)),
+                child: Row(children: [
+                  const Icon(Icons.headset_mic_outlined, size: 16),
+                  const SizedBox(width: 12),
+                  Text(context.l10n.shell_menu_support, style: const TextStyle(fontSize: 13)),
                 ]),
               ),
               PopupMenuItem(
                 onTap: () {},
-                child: const Row(children: [
-                  Icon(Icons.storefront_outlined, size: 16),
-                  SizedBox(width: 12),
-                  Text('Talk to Sales', style: TextStyle(fontSize: 13)),
+                child: Row(children: [
+                  const Icon(Icons.storefront_outlined, size: 16),
+                  const SizedBox(width: 12),
+                  Text(context.l10n.shell_menu_sales, style: const TextStyle(fontSize: 13)),
                 ]),
               ),
               PopupMenuItem(
                 onTap: () {},
-                child: const Row(children: [
-                  Icon(Icons.cookie_outlined, size: 16),
-                  SizedBox(width: 12),
-                  Text('Cookie Preferences', style: TextStyle(fontSize: 13)),
+                child: Row(children: [
+                  const Icon(Icons.cookie_outlined, size: 16),
+                  const SizedBox(width: 12),
+                  Text(context.l10n.shell_menu_cookies, style: const TextStyle(fontSize: 13)),
                 ]),
               ),
               PopupMenuItem(
                 onTap: () => Router.neglect(
                     context, () => context.go('/dashboard/settings')),
-                child: const Row(children: [
-                  Icon(Icons.settings_outlined, size: 16),
-                  SizedBox(width: 12),
-                  Text('Settings', style: TextStyle(fontSize: 13)),
+                child: Row(children: [
+                  const Icon(Icons.settings_outlined, size: 16),
+                  const SizedBox(width: 12),
+                  Text(context.l10n.shell_menu_settings, style: const TextStyle(fontSize: 13)),
                 ]),
               ),
               const PopupMenuDivider(),
@@ -535,12 +507,12 @@ class _DashboardShellState extends State<DashboardShell> {
                   if (!context.mounted) return;
                   Router.neglect(context, () => context.go('/auth/login'));
                 },
-                child: const Row(children: [
-                  Icon(Icons.logout_rounded, size: 16, color: Colors.redAccent),
-                  SizedBox(width: 12),
+                child: Row(children: [
+                  const Icon(Icons.logout_rounded, size: 16, color: Colors.redAccent),
+                  const SizedBox(width: 12),
                   Text(
-                    'Log out',
-                    style: TextStyle(
+                    context.l10n.shell_menu_logout,
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: Colors.redAccent,
@@ -566,7 +538,8 @@ class _DashboardShellState extends State<DashboardShell> {
     );
   }
 
-  // -- Bottom nav -----------------------------------------------------------------------------
+  // -- Bottom nav -------------------------------------------------------------
+
   Widget _buildBottomNav(
     BuildContext context,
     int selected,
@@ -578,7 +551,7 @@ class _DashboardShellState extends State<DashboardShell> {
       onDestinationSelected: (i) => _onNavTap(context, i),
       backgroundColor: colorScheme.surface,
       indicatorColor: brandColors.navy?.withValues(alpha: 0.1),
-      destinations: _navItems
+      destinations: _navItems(context)
           .map((e) => NavigationDestination(
                 icon: Icon(e.icon, color: brandColors.muted),
                 selectedIcon: Icon(e.icon, color: brandColors.navy),
@@ -589,7 +562,7 @@ class _DashboardShellState extends State<DashboardShell> {
   }
 }
 
-// -- Shared widgets -----------------------------------------------------------------------------
+// -- Shared widgets -----------------------------------------------------------
 
 class _NavItem {
   final IconData icon;
@@ -598,7 +571,7 @@ class _NavItem {
   const _NavItem({required this.icon, required this.label, required this.path});
 }
 
-// -- Go Live button -----------------------------------------------------------------------------
+// -- Go Live button -----------------------------------------------------------
 
 class _GoLiveButton extends StatefulWidget {
   final String status;
@@ -630,8 +603,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
           existing.data()?['status']?.toString() == 'pending') {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('You already have a pending Go Live request.')),
+          SnackBar(content: Text(context.l10n.shell_already_pending)),
         );
         return;
       }
@@ -645,14 +617,12 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text("Go Live request submitted. We'll review it shortly.")),
+        SnackBar(content: Text(context.l10n.shell_go_live_submitted)),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.shell_error(e.toString()))));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -663,16 +633,16 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Go Offline?',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-        content: const Text(
-          'Your restaurant will be hidden from customers. You can go live again at any time.',
-          style: TextStyle(fontSize: 13),
+        title: Text(context.l10n.shell_go_offline_title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+        content: Text(
+          context.l10n.shell_go_offline_body,
+          style: const TextStyle(fontSize: 13),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(context.l10n.shell_confirm_cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
@@ -682,7 +652,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Go Offline'),
+            child: Text(context.l10n.shell_go_offline_confirm),
           ),
         ],
       ),
@@ -699,7 +669,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+          .showSnackBar(SnackBar(content: Text(context.l10n.shell_error(e.toString()))));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -751,7 +721,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Live · Go Offline',
+                  context.l10n.shell_live_go_offline,
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -797,7 +767,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Go Live pending review',
+                      context.l10n.shell_go_live_pending,
                       style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -832,7 +802,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Declined · Reapply',
+                        context.l10n.shell_go_live_declined,
                         style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -867,7 +837,7 @@ class _GoLiveButtonState extends State<_GoLiveButton> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Request Go Live',
+                      context.l10n.shell_request_go_live,
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -900,23 +870,20 @@ class _StatusGate extends StatelessWidget {
       'pending': _GateConfig(
         icon: Icons.hourglass_top_rounded,
         color: const Color(0xFFD97706),
-        title: 'Your account is under review',
-        message:
-            "We're reviewing your registration details. This usually takes 1-2 business days. We'll notify you by email once approved.",
+        title: context.l10n.gate_pending_title,
+        message: context.l10n.gate_pending_message,
       ),
       'rejected': _GateConfig(
         icon: Icons.cancel_rounded,
         color: const Color(0xFFEF4444),
-        title: 'Application not approved',
-        message:
-            'Unfortunately your registration was not approved. Please contact support for more information.',
+        title: context.l10n.gate_rejected_title,
+        message: context.l10n.gate_rejected_message,
       ),
       'suspended': _GateConfig(
         icon: Icons.block_rounded,
         color: const Color(0xFFEF4444),
-        title: 'Account suspended',
-        message:
-            'Your account has been suspended. Please contact support to resolve this.',
+        title: context.l10n.gate_suspended_title,
+        message: context.l10n.gate_suspended_message,
       ),
     };
 
@@ -924,8 +891,8 @@ class _StatusGate extends StatelessWidget {
         _GateConfig(
           icon: Icons.info_outline_rounded,
           color: brandColors.muted ?? Colors.grey,
-          title: 'Access unavailable',
-          message: 'Please contact support.',
+          title: context.l10n.gate_default_title,
+          message: context.l10n.gate_default_message,
         );
 
     return Center(
@@ -966,7 +933,7 @@ class _StatusGate extends StatelessWidget {
                   Router.neglect(context, () => context.go('/auth/login'));
                 },
                 icon: const Icon(Icons.logout_rounded, size: 16),
-                label: const Text('Sign out'),
+                label: Text(context.l10n.gate_sign_out),
               ),
             ],
           ),
@@ -987,4 +954,3 @@ class _GateConfig {
     required this.message,
   });
 }
-

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/extensions/responsive_ext.dart';
 import 'package:user_app/widgets/landing_widgets.dart';
 
@@ -14,21 +15,32 @@ class _PricingScreenState extends State<PricingScreen> {
   int _ordersPerDay = 20;
   double _avgOrderValue = 45.0;
 
-  // Returns commission rate, tier name and color based on monthly order count
   ({double rate, String tierName, Color tierColor}) _getTier(
-      int monthlyOrders, BrandColors brand) {
+      int monthlyOrders, BrandColors brand, BuildContext context) {
     if (monthlyOrders <= 100) {
-      return (rate: 0.10, tierName: 'Starter', tierColor: brand.muted!);
+      return (
+        rate: 0.10,
+        tierName: context.l10n.pricing_tier_name_starter,
+        tierColor: brand.muted!
+      );
     } else if (monthlyOrders <= 500) {
-      return (rate: 0.08, tierName: 'Growing', tierColor: brand.navy!);
+      return (
+        rate: 0.08,
+        tierName: context.l10n.pricing_tier_name_growing,
+        tierColor: brand.navy!
+      );
     } else if (monthlyOrders <= 1500) {
       return (
         rate: 0.06,
-        tierName: 'Established',
+        tierName: context.l10n.pricing_tier_name_established,
         tierColor: const Color(0xFF8B5CF6),
       );
     } else {
-      return (rate: 0.04, tierName: 'Partner', tierColor: brand.accentGreen!);
+      return (
+        rate: 0.04,
+        tierName: context.l10n.pricing_tier_name_partner,
+        tierColor: brand.accentGreen!
+      );
     }
   }
 
@@ -50,9 +62,9 @@ class _PricingScreenState extends State<PricingScreen> {
             _buildTiers(context, brand, scheme, isWide, h),
             _buildFaq(context, brand, scheme, isWide, h),
             LandingCta(
-              title: 'Start for free today.',
-              subtitle: 'No fees until your first order.',
-              primaryLabel: 'Register Your Restaurant',
+              title: context.l10n.pricing_cta_title,
+              subtitle: context.l10n.pricing_cta_subtitle,
+              primaryLabel: context.l10n.pricing_cta_primary,
               primaryRoute: '/auth/register',
             ),
             const LandingFooter(),
@@ -62,7 +74,7 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // -- Hero ----------------------------------------------------------------------
+  // -- Hero ------------------------------------------------------------------
 
   Widget _buildHero(
       BuildContext context, BrandColors brand, bool isWide, double h) {
@@ -80,7 +92,7 @@ class _PricingScreenState extends State<PricingScreen> {
                   color: brand.accentGreen?.withValues(alpha: 0.3) ??
                       Colors.transparent),
             ),
-            child: Text('No monthly fees. Ever.',
+            child: Text(context.l10n.pricing_hero_badge,
                 style: TextStyle(
                     fontSize: 12,
                     color: brand.accentGreen,
@@ -90,7 +102,7 @@ class _PricingScreenState extends State<PricingScreen> {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
             child: Text(
-              'Pay only when\nyou earn.',
+              context.l10n.pricing_hero_title,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: isWide ? 58 : 34,
@@ -102,7 +114,7 @@ class _PricingScreenState extends State<PricingScreen> {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
             child: Text(
-              'Freequick charges a small commission on completed orders only. If you don\'t earn, you don\'t pay.',
+              context.l10n.pricing_hero_subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: brand.muted, height: 1.6),
             ),
@@ -112,32 +124,29 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // -- Commission explainer -------------------------------------------------------------------
+  // -- Commission explainer --------------------------------------------------
 
   Widget _buildCommissionExplainer(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
     final steps = [
       _CommissionStepData(
         number: '1',
-        title: 'Customer places an order',
-        description:
-            'They browse your menu, add items, and pay through the app.',
+        title: context.l10n.pricing_step1_title,
+        description: context.l10n.pricing_step1_desc,
         icon: Icons.shopping_bag_rounded,
         color: brand.navy!,
       ),
       _CommissionStepData(
         number: '2',
-        title: 'You prepare and deliver',
-        description:
-            'You confirm the order, prepare it, and mark it as delivered.',
+        title: context.l10n.pricing_step2_title,
+        description: context.l10n.pricing_step2_desc,
         icon: Icons.restaurant_rounded,
         color: const Color(0xFF8B5CF6),
       ),
       _CommissionStepData(
         number: '3',
-        title: 'We take a small cut',
-        description:
-            'A commission is deducted from the order value. The rest goes to you.',
+        title: context.l10n.pricing_step3_title,
+        description: context.l10n.pricing_step3_desc,
         icon: Icons.payments_rounded,
         color: brand.accentGreen!,
       ),
@@ -148,7 +157,7 @@ class _PricingScreenState extends State<PricingScreen> {
       padding: EdgeInsets.symmetric(horizontal: h, vertical: isWide ? 72 : 48),
       child: Column(
         children: [
-          LandingSectionLabel('HOW THE FEE WORKS'),
+          LandingSectionLabel(context.l10n.pricing_section_fee),
           const SizedBox(height: 48),
           LayoutBuilder(builder: (context, constraints) {
             final isThreeCol = constraints.maxWidth > 700;
@@ -193,12 +202,12 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // -- Calculator -----------------------------------------------------------------------------
+  // -- Calculator ------------------------------------------------------------
 
   Widget _buildCalculator(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
     final int monthlyOrders = _ordersPerDay * 30;
-    final tier = _getTier(monthlyOrders, brand);
+    final tier = _getTier(monthlyOrders, brand, context);
 
     final double dailyRevenue = _ordersPerDay * _avgOrderValue;
     final double dailyFee = dailyRevenue * tier.rate;
@@ -210,9 +219,9 @@ class _PricingScreenState extends State<PricingScreen> {
       padding: EdgeInsets.symmetric(horizontal: h, vertical: isWide ? 72 : 48),
       child: Column(
         children: [
-          LandingSectionLabel('ESTIMATE YOUR EARNINGS'),
+          LandingSectionLabel(context.l10n.pricing_section_calculator),
           const SizedBox(height: 16),
-          Text('See what you keep.',
+          Text(context.l10n.pricing_calculator_title,
               style: TextStyle(
                   fontSize: isWide ? 32 : 22, fontWeight: FontWeight.w700)),
           const SizedBox(height: 48),
@@ -228,25 +237,26 @@ class _PricingScreenState extends State<PricingScreen> {
               child: Column(
                 children: [
                   _SliderRow(
-                    label: 'Orders per day',
+                    label: context.l10n.pricing_slider_orders_label,
                     value: _ordersPerDay.toDouble(),
                     min: 5,
                     max: 200,
                     divisions: 195,
-                    displayValue:
-                        '$_ordersPerDay orders/day · $monthlyOrders/month',
+                    displayValue: context.l10n.pricing_slider_orders_value(
+                        _ordersPerDay, monthlyOrders),
                     onChanged: (v) => setState(() => _ordersPerDay = v.round()),
                     brand: brand,
                     color: brand.navy!,
                   ),
                   const SizedBox(height: 28),
                   _SliderRow(
-                    label: 'Average order value',
+                    label: context.l10n.pricing_slider_avg_label,
                     value: _avgOrderValue,
                     min: 15,
                     max: 200,
                     divisions: 37,
-                    displayValue: '${_avgOrderValue.toStringAsFixed(0)} PLN',
+                    displayValue: context.l10n.pricing_slider_avg_value(
+                        _avgOrderValue.toStringAsFixed(0)),
                     onChanged: (v) => setState(() => _avgOrderValue = v),
                     brand: brand,
                     color: const Color(0xFF8B5CF6),
@@ -276,7 +286,8 @@ class _PricingScreenState extends State<PricingScreen> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          '${tier.tierName} tier — $pctLabel commission',
+                          context.l10n.pricing_tier_badge(
+                              tier.tierName, pctLabel),
                           style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -284,8 +295,9 @@ class _PricingScreenState extends State<PricingScreen> {
                         ),
                         const Spacer(),
                         Text(
-                          '$monthlyOrders orders/month',
-                          style: TextStyle(fontSize: 11, color: tier.tierColor),
+                          context.l10n.pricing_tier_monthly(monthlyOrders),
+                          style:
+                              TextStyle(fontSize: 11, color: tier.tierColor),
                         ),
                       ],
                     ),
@@ -299,27 +311,28 @@ class _PricingScreenState extends State<PricingScreen> {
                     children: [
                       Expanded(
                           child: _CalcResult(
-                        label: 'Daily revenue',
+                        label: context.l10n.pricing_calc_revenue_label,
                         value: '${dailyRevenue.toStringAsFixed(0)} PLN',
-                        sub: 'before commission',
+                        sub: context.l10n.pricing_calc_revenue_sub,
                         color: brand.muted!,
                         brand: brand,
                         scheme: scheme,
                       )),
                       Expanded(
                           child: _CalcResult(
-                        label: 'Freequick fee ($pctLabel)',
+                        label: context.l10n.pricing_calc_fee_label(pctLabel),
                         value: '− ${dailyFee.toStringAsFixed(0)} PLN',
-                        sub: 'per day',
+                        sub: context.l10n.pricing_calc_fee_sub,
                         color: const Color(0xFFEF4444),
                         brand: brand,
                         scheme: scheme,
                       )),
                       Expanded(
                           child: _CalcResult(
-                        label: 'You keep',
+                        label: context.l10n.pricing_calc_keep_label,
                         value: '${dailyNet.toStringAsFixed(0)} PLN/day',
-                        sub: '≈ ${monthlyNet.toStringAsFixed(0)} PLN/month',
+                        sub:
+                            '≈ ${monthlyNet.toStringAsFixed(0)} PLN/month',
                         color: brand.accentGreen!,
                         brand: brand,
                         scheme: scheme,
@@ -329,7 +342,7 @@ class _PricingScreenState extends State<PricingScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Commission is only charged on completed, delivered orders.',
+                    context.l10n.pricing_calc_disclaimer,
                     style: TextStyle(fontSize: 11, color: brand.muted),
                     textAlign: TextAlign.center,
                   ),
@@ -342,38 +355,38 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // -- Tiers ---------------------------------------------------------------------
+  // -- Tiers -----------------------------------------------------------------
 
   Widget _buildTiers(BuildContext context, BrandColors brand,
       ColorScheme scheme, bool isWide, double h) {
     final brand = Theme.of(context).extension<BrandColors>()!;
     final tiers = [
       _TierData(
-        label: 'Starter',
-        range: '0 – 100 orders/month',
+        label: context.l10n.pricing_tier_starter_label,
+        range: context.l10n.pricing_tier_starter_range,
         rate: '10%',
-        description: 'Get started with no upfront cost.',
+        description: context.l10n.pricing_tier_starter_desc,
         color: brand.muted!,
       ),
       _TierData(
-        label: 'Growing',
-        range: '101 – 500 orders/month',
+        label: context.l10n.pricing_tier_growing_label,
+        range: context.l10n.pricing_tier_growing_range,
         rate: '8%',
-        description: 'Lower rate as you build your customer base.',
+        description: context.l10n.pricing_tier_growing_desc,
         color: brand.navy!,
       ),
       _TierData(
-        label: 'Established',
-        range: '501 – 1 500 orders/month',
+        label: context.l10n.pricing_tier_established_label,
+        range: context.l10n.pricing_tier_established_range,
         rate: '6%',
-        description: 'Rewarding consistent high-volume restaurants.',
+        description: context.l10n.pricing_tier_established_desc,
         color: const Color(0xFF8B5CF6),
       ),
       _TierData(
-        label: 'Partner',
-        range: '1 500+ orders/month',
+        label: context.l10n.pricing_tier_partner_label,
+        range: context.l10n.pricing_tier_partner_range,
         rate: '4%',
-        description: 'Our best rate for our highest-volume partners.',
+        description: context.l10n.pricing_tier_partner_desc,
         color: brand.accentGreen!,
       ),
     ];
@@ -383,14 +396,14 @@ class _PricingScreenState extends State<PricingScreen> {
       padding: EdgeInsets.symmetric(horizontal: h, vertical: isWide ? 72 : 48),
       child: Column(
         children: [
-          LandingSectionLabel('COMMISSION TIERS'),
+          LandingSectionLabel(context.l10n.pricing_section_tiers),
           const SizedBox(height: 16),
-          Text('More orders, lower rate.',
+          Text(context.l10n.pricing_tiers_title,
               style: TextStyle(
                   fontSize: isWide ? 32 : 22, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           Text(
-            'As your restaurant grows, your commission rate goes down automatically.',
+            context.l10n.pricing_tiers_subtitle,
             style: TextStyle(fontSize: 14, color: brand.muted),
             textAlign: TextAlign.center,
           ),
@@ -415,30 +428,25 @@ class _PricingScreenState extends State<PricingScreen> {
     );
   }
 
-  // -- FAQ -----------------------------------------------------------------------
+  // -- FAQ -------------------------------------------------------------------
 
   Widget _buildFaq(BuildContext context, BrandColors brand, ColorScheme scheme,
       bool isWide, double h) {
     final faqs = [
-      _Faq('Are there any setup or monthly fees?',
-          'No. Freequick charges zero setup fees and zero monthly fees. You only pay commission on completed orders.'),
-      _Faq('When does the commission get deducted?',
-          'Commission is calculated at the time an order is marked as delivered. It is deducted from your payout balance automatically.'),
-      _Faq('How often do I get paid?',
-          'Payouts are processed weekly to your registered IBAN bank account. You can track your balance in real-time on the dashboard.'),
-      _Faq('What happens if an order is cancelled?',
-          'Cancelled orders are not charged commission. You only pay for successful, completed deliveries.'),
-      _Faq('Can I change my bank account details later?',
-          'Yes. You can update your IBAN at any time in the Settings section of your dashboard.'),
+      _Faq(context.l10n.pricing_faq1_q, context.l10n.pricing_faq1_a),
+      _Faq(context.l10n.pricing_faq2_q, context.l10n.pricing_faq2_a),
+      _Faq(context.l10n.pricing_faq3_q, context.l10n.pricing_faq3_a),
+      _Faq(context.l10n.pricing_faq4_q, context.l10n.pricing_faq4_a),
+      _Faq(context.l10n.pricing_faq5_q, context.l10n.pricing_faq5_a),
     ];
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: h, vertical: isWide ? 72 : 48),
       child: Column(
         children: [
-          LandingSectionLabel('FREQUENTLY ASKED'),
+          LandingSectionLabel(context.l10n.pricing_section_faq),
           const SizedBox(height: 16),
-          Text('Common questions.',
+          Text(context.l10n.pricing_faq_title,
               style: TextStyle(
                   fontSize: isWide ? 32 : 22, fontWeight: FontWeight.w700)),
           const SizedBox(height: 48),
@@ -456,7 +464,7 @@ class _PricingScreenState extends State<PricingScreen> {
   }
 }
 
-// -- Commission step card -----------------------------------------------------------------------
+// -- Commission step card -----------------------------------------------------
 
 class _CommissionStepCard extends StatelessWidget {
   final _CommissionStepData data;
@@ -512,7 +520,7 @@ class _CommissionStepCard extends StatelessWidget {
   }
 }
 
-// -- Slider row --------------------------------------------------------------------
+// -- Slider row ---------------------------------------------------------------
 
 class _SliderRow extends StatelessWidget {
   final String label, displayValue;
@@ -577,7 +585,7 @@ class _SliderRow extends StatelessWidget {
   }
 }
 
-// -- Calc result -------------------------------------------------------------------
+// -- Calc result --------------------------------------------------------------
 
 class _CalcResult extends StatelessWidget {
   final String label, value, sub;
@@ -623,7 +631,7 @@ class _CalcResult extends StatelessWidget {
   }
 }
 
-// -- Tier row ----------------------------------------------------------------------
+// -- Tier row -----------------------------------------------------------------
 
 class _TierRow extends StatelessWidget {
   final _TierData data;
@@ -702,7 +710,7 @@ class _TierRow extends StatelessWidget {
   }
 }
 
-// -- FAQ tile ----------------------------------------------------------------------
+// -- FAQ tile -----------------------------------------------------------------
 
 class _FaqTile extends StatefulWidget {
   final _Faq faq;
@@ -766,7 +774,7 @@ class _FaqTileState extends State<_FaqTile> {
   }
 }
 
-// -- Data models -------------------------------------------------------------------
+// -- Data models --------------------------------------------------------------
 
 class _CommissionStepData {
   final String number, title, description;

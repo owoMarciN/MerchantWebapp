@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
-import 'package:user_app/extensions/responsive_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/providers/global_stats_provider.dart';
 
 class AdminOverviewScreen extends StatelessWidget {
@@ -21,30 +20,33 @@ class AdminOverviewScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionLabel('PLATFORM AT A GLANCE', brand),
+          _sectionLabel(context.l10n.admin_overview_platform_glance, brand),
           const SizedBox(height: 14),
           _buildStatGrid(context, brand, scheme, stats),
           const SizedBox(height: 32),
-          _sectionLabel('REVENUE (LAST 30 DAYS)', brand),
+          _sectionLabel(context.l10n.admin_overview_revenue_30d, brand),
           const SizedBox(height: 14),
           _RevenueChart(
               data: stats.revenueForRange(30), brand: brand, scheme: scheme),
           const SizedBox(height: 32),
           Row(
             children: [
-              Expanded(child: _sectionLabel('PENDING JOIN REQUESTS', brand)),
+              Expanded(
+                  child: _sectionLabel(
+                      context.l10n.admin_overview_pending_requests, brand)),
               TextButton.icon(
                 onPressed: () => Router.neglect(
                     context, () => context.go('/admin/join-requests')),
-                icon: const Icon(Icons.arrow_forward_rounded, size: 14),
-                label: const Text('View all', style: TextStyle(fontSize: 12)),
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                label: Text(context.l10n.admin_overview_view_all,
+                    style: const TextStyle(fontSize: 14)),
               ),
             ],
           ),
           const SizedBox(height: 14),
           _PendingRequestsList(brand: brand, scheme: scheme),
           const SizedBox(height: 32),
-          _sectionLabel('ORDER STATUS BREAKDOWN', brand),
+          _sectionLabel(context.l10n.admin_overview_order_status, brand),
           const SizedBox(height: 14),
           _StatusBreakdown(
               counts: stats.statusCounts,
@@ -52,7 +54,7 @@ class AdminOverviewScreen extends StatelessWidget {
               brand: brand,
               scheme: scheme),
           const SizedBox(height: 32),
-          _sectionLabel('TOP RESTAURANTS BY ORDERS', brand),
+          _sectionLabel(context.l10n.admin_overview_top_restaurants, brand),
           const SizedBox(height: 14),
           _TopRestaurants(
               entries: stats.topRestaurantsByOrders(limit: 5),
@@ -63,7 +65,7 @@ class AdminOverviewScreen extends StatelessWidget {
     );
   }
 
-  // -- Stat grid --------------------------------------------------------------
+  // -- Stat grid -------------------------------------------------------------
 
   Widget _buildStatGrid(BuildContext context, BrandColors brand,
       ColorScheme scheme, GlobalStatsProvider stats) {
@@ -72,37 +74,44 @@ class AdminOverviewScreen extends StatelessWidget {
 
     final cards = [
       _StatCard(
-        label: 'Total Restaurants',
-        value: stats.isLoading ? '—' : '${stats.totalRestaurants}',
-        sub: '${stats.activeRestaurants} with orders',
+        label: context.l10n.admin_overview_stat_restaurants,
+        value: stats.isLoading
+            ? context.l10n.admin_overview_loading
+            : '${stats.totalRestaurants}',
+        sub: context.l10n
+            .admin_overview_stat_restaurants_sub(stats.activeRestaurants),
         icon: Icons.storefront_rounded,
         color: brand.navy!,
         scheme: scheme,
       ),
       _StatCard(
-        label: 'Total Orders',
-        value: stats.isLoading ? '—' : '${stats.totalOrders}',
-        sub: '${stats.todayOrders} today',
+        label: context.l10n.admin_overview_stat_orders,
+        value: stats.isLoading
+            ? context.l10n.admin_overview_loading
+            : '${stats.totalOrders}',
+        sub: context.l10n.admin_overview_stat_orders_sub(stats.todayOrders),
         icon: Icons.receipt_long_rounded,
         color: brand.accentGreen!,
         scheme: scheme,
       ),
       _StatCard(
-        label: 'Total Revenue',
+        label: context.l10n.admin_overview_stat_revenue,
         value: stats.isLoading
-            ? '—'
+            ? context.l10n.admin_overview_loading
             : '${stats.totalRevenue.toStringAsFixed(0)} PLN',
-        sub: '${stats.last7dRevenue.toStringAsFixed(0)} PLN last 7d',
+        sub: context.l10n.admin_overview_stat_revenue_sub(
+            stats.last7dRevenue.toStringAsFixed(0)),
         icon: Icons.payments_rounded,
         color: const Color(0xFF8B5CF6),
         scheme: scheme,
       ),
       _StatCard(
-        label: 'Avg Order Value',
+        label: context.l10n.admin_overview_stat_avg,
         value: stats.isLoading
-            ? '—'
+            ? context.l10n.admin_overview_loading
             : '${stats.avgOrderValue.toStringAsFixed(2)} PLN',
-        sub: '${stats.totalMenus} menus · ${stats.totalItems} items',
+        sub: context.l10n
+            .admin_overview_stat_avg_sub(stats.totalMenus, stats.totalItems),
         icon: Icons.trending_up_rounded,
         color: const Color(0xFFD97706),
         scheme: scheme,
@@ -133,7 +142,7 @@ class AdminOverviewScreen extends StatelessWidget {
       );
 }
 
-// -- Stat card ----------------------------------------------------------------
+// -- Stat card -----------------------------------------------------------------
 
 class _StatCard extends StatelessWidget {
   final String label, value, sub;
@@ -194,7 +203,7 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-// -- Revenue chart ------------------------------------------------------------
+// -- Revenue chart -------------------------------------------------------------
 
 class _RevenueChart extends StatelessWidget {
   final Map<String, double> data;
@@ -273,7 +282,7 @@ class _RevenueChart extends StatelessWidget {
           ),
           if (maxValue == 0) ...[
             const SizedBox(height: 8),
-            Text('No revenue data yet',
+            Text(context.l10n.admin_overview_revenue_no_data,
                 style: TextStyle(fontSize: 12, color: brand.muted)),
           ],
         ],
@@ -282,7 +291,7 @@ class _RevenueChart extends StatelessWidget {
   }
 }
 
-// -- Pending requests list ----------------------------------------------------
+// -- Pending requests list -----------------------------------------------------
 // Shows up to 3 most recent pending requests inline on the overview.
 // Full list is on the JoinRequestsScreen.
 
@@ -317,7 +326,7 @@ class _PendingRequestsList extends StatelessWidget {
               border: Border.all(color: scheme.outline),
             ),
             child: Center(
-              child: Text('No pending requests',
+              child: Text(context.l10n.admin_overview_no_pending,
                   style: TextStyle(fontSize: 13, color: brand.muted)),
             ),
           );
@@ -360,7 +369,7 @@ class _PendingRequestsList extends StatelessWidget {
                         Text(name,
                             style: const TextStyle(
                                 fontSize: 13, fontWeight: FontWeight.w600)),
-                        Text('NIP: $nip · Submitted $date',
+                        Text(context.l10n.admin_overview_pending_nip(nip, date),
                             style: TextStyle(fontSize: 11, color: brand.muted)),
                       ],
                     ),
@@ -368,7 +377,8 @@ class _PendingRequestsList extends StatelessWidget {
                   TextButton(
                     onPressed: () => Router.neglect(
                         context, () => context.go('/admin/join-requests')),
-                    child: const Text('Review', style: TextStyle(fontSize: 12)),
+                    child: Text(context.l10n.admin_overview_review,
+                        style: const TextStyle(fontSize: 14)),
                   ),
                 ],
               ),
@@ -383,7 +393,7 @@ class _PendingRequestsList extends StatelessWidget {
       '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 }
 
-// -- Status breakdown ---------------------------------------------------------
+// -- Status breakdown ----------------------------------------------------------
 
 class _StatusBreakdown extends StatelessWidget {
   final Map<String, int> counts;
@@ -409,17 +419,29 @@ class _StatusBreakdown extends StatelessWidget {
           border: Border.all(color: scheme.outline),
         ),
         child: Center(
-          child: Text('No orders yet',
+          child: Text(context.l10n.admin_overview_no_orders,
               style: TextStyle(fontSize: 13, color: brand.muted)),
         ),
       );
     }
 
     final statuses = [
-      ('normal', 'Pending', brand.navy!),
-      ('processing', 'Processing', const Color(0xFF8B5CF6)),
-      ('delivered', 'Delivered', brand.accentGreen!),
-      ('cancelled', 'Cancelled', const Color(0xFFEF4444)),
+      ('normal', context.l10n.admin_overview_status_pending, brand.navy!),
+      (
+        'processing',
+        context.l10n.admin_overview_status_processing,
+        const Color(0xFF8B5CF6)
+      ),
+      (
+        'delivered',
+        context.l10n.admin_overview_status_delivered,
+        brand.accentGreen!
+      ),
+      (
+        'cancelled',
+        context.l10n.admin_overview_status_cancelled,
+        const Color(0xFFEF4444)
+      ),
     ];
 
     return Container(
@@ -480,7 +502,7 @@ class _StatusBreakdown extends StatelessWidget {
   }
 }
 
-// -- Top restaurants ----------------------------------------------------------
+// -- Top restaurants -----------------------------------------------------------
 
 class _TopRestaurants extends StatelessWidget {
   final List<MapEntry<String, int>> entries;
@@ -504,7 +526,7 @@ class _TopRestaurants extends StatelessWidget {
           border: Border.all(color: scheme.outline),
         ),
         child: Center(
-          child: Text('No order data yet',
+          child: Text(context.l10n.admin_overview_no_order_data,
               style: TextStyle(fontSize: 13, color: brand.muted)),
         ),
       );
@@ -570,7 +592,7 @@ class _TopRestaurants extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text('$count orders',
+                Text(context.l10n.admin_overview_orders_count(count),
                     style: TextStyle(fontSize: 12, color: brand.muted)),
               ],
             ),

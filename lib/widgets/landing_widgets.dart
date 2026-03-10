@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/responsive_ext.dart';
+import 'package:user_app/widgets/language_button.dart';
+import 'package:user_app/extensions/context_translate_ext.dart';
 
 // -- CTA Block ---------------------------------------------------------------------
 // Usage:
@@ -33,7 +36,7 @@ class LandingCta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final brand = Theme.of(context).extension<BrandColors>()!;
-    final isWide = MediaQuery.of(context).size.width > 700;
+    final isWide = context.isWide;
 
     return Container(
       margin: const EdgeInsets.all(24),
@@ -99,7 +102,7 @@ class LandingNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final brand = Theme.of(context).extension<BrandColors>()!;
     final scheme = Theme.of(context).colorScheme;
-    final isWide = MediaQuery.of(context).size.width > 700;
+    final isWide = context.isWide;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isWide ? 60 : 20, vertical: 16),
@@ -113,14 +116,14 @@ class LandingNav extends StatelessWidget {
           const Spacer(),
           if (isWide) ...[
             LandingNavLink(
-              'How it Works',
+              context.l10n.how_it_works,
               active: activeRoute == '/how-it-works',
               onTap: () =>
                   Router.neglect(context, () => context.go('/how-it-works')),
             ),
             const SizedBox(width: 32),
             LandingNavLink(
-              'Pricing',
+              context.l10n.pricing,
               active: activeRoute == '/pricing',
               onTap: () =>
                   Router.neglect(context, () => context.go('/pricing')),
@@ -128,14 +131,16 @@ class LandingNav extends StatelessWidget {
             const SizedBox(width: 40),
           ],
           LandingOutlineButton(
-              label: 'Login',
+              label: context.l10n.log_in,
               onTap: () =>
                   Router.neglect(context, () => context.go('/auth/login'))),
           const SizedBox(width: 12),
           LandingPrimaryButton(
-              label: 'Get Started',
+              label: context.l10n.get_started,
               onTap: () =>
                   Router.neglect(context, () => context.go('/auth/register'))),
+          const SizedBox(width: 16),
+          LanguageButton(brandColors: brand, colorScheme: scheme)
         ],
       ),
     );

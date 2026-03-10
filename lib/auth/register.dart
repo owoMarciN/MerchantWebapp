@@ -80,7 +80,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_passwordController.text != _confirmPasswordController.text) {
       showDialog(
         context: context,
-        builder: (_) => ErrorDialog(message: context.t.errorNoMatchPasswords),
+        builder: (_) =>
+            ErrorDialog(message: context.l10n.errorNoMatchPasswords),
       );
       return;
     }
@@ -88,8 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) =>
-          const LoadingDialog(message: "Creating Partner Account..."),
+      builder: (_) => LoadingDialog(message: context.l10n.creating_partner_account),
     );
 
     try {
@@ -111,7 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         context.go('/');
 
         unifiedSnackBar(context,
-            "Your account is pending approval. Please sign in once verified.");
+            context.l10n.account_is_pending_approval);
       }
     } catch (error) {
       if (!mounted) return;
@@ -207,7 +207,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         _StepDot(
             number: 1,
-            label: 'Business',
+            label: context.l10n.business,
             active: _currentStep == 0,
             done: _currentStep > 0),
         Expanded(
@@ -216,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     _currentStep > 0 ? Colors.blueAccent : Colors.grey[300])),
         _StepDot(
             number: 2,
-            label: 'Admin Profile',
+            label: context.l10n.admin_profile,
             active: _currentStep == 1,
             done: false),
       ],
@@ -232,7 +232,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           CustomTextField(
             data: Icons.business_rounded,
             controller: _businessNameController,
-            hintText: 'Business Name',
+            hintText: context.l10n.business_name,
           ),
           CustomTextField(
             data: Icons.numbers_rounded,
@@ -248,7 +248,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           CustomPhoneField(
             controller: _businessMobileController,
-            label: 'Business Phone',
+            label: context.l10n.business_phone,
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -261,14 +261,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Continue',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14)),
+                  Text(context.l10n.info_continue,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14
+                    ),
+                  ),
                   SizedBox(width: 8),
                   Icon(Icons.arrow_forward_rounded,
                       color: Colors.white, size: 18),
@@ -290,28 +292,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
           CustomTextField(
             data: Icons.person_rounded,
             controller: _ownerNameController,
-            hintText: "Owner's Full Name",
+            hintText: context.l10n.owner_full_name,
             isObsecure: false,
           ),
           CustomPhoneField(
             controller: _ownerPhoneController,
-            label: "Owner's Phone",
+            label: context.l10n.owner_phone,
           ),
           CustomTextField(
             data: Icons.email_rounded,
             controller: _emailController,
-            hintText: context.t.hintEmail,
+            hintText: context.l10n.hintEmail,
             isObsecure: false,
           ),
           CustomPasswordField(
             controller: _passwordController,
-            label: context.t.hintPassword,
+            label: context.l10n.hintPassword,
             isRequired: true,
             isConfirmation: false,
           ),
           CustomPasswordField(
             controller: _confirmPasswordController,
-            label: context.t.hintConfPassword,
+            label: context.l10n.hintConfPassword,
             isRequired: true,
             isConfirmation: true,
           ),
@@ -327,12 +329,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.arrow_back_rounded, size: 18),
                         SizedBox(width: 8),
-                        Text('Back',
+                        Text(context.l10n.back,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 14)),
                       ],
@@ -351,7 +353,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text('Sign Up',
+                    child: Text(context.l10n.sign_up,
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

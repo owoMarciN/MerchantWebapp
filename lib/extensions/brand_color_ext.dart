@@ -52,7 +52,7 @@ final ThemeData darkTheme = ThemeData(
   colorScheme: const ColorScheme.dark(
     surface: Color(0xFF13131F),
     surfaceBright: Color.fromARGB(255, 36, 36, 60),
-    primary: Color(0xFF003DFF),
+    primary: Color.fromARGB(255, 70, 109, 235),
     onPrimary: Colors.white,
     outline: Color(0xFF1E1E30),
   ),
