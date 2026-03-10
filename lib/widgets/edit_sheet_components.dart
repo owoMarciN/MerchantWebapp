@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
-InputDecoration customInputDecoration({
-  required String label, 
-  required ColorScheme colorScheme, 
-  required BrandColors brandColors, 
-  String? hint,
-  String? prefixText,
-  String? errorText}
-  ) {
+InputDecoration customInputDecoration(
+    {required String label,
+    required ColorScheme colorScheme,
+    required BrandColors brandColors,
+    String? hint,
+    String? prefixText,
+    String? errorText}) {
   return InputDecoration(
     labelText: label,
     hintText: hint,
@@ -38,17 +37,18 @@ InputDecoration customInputDecoration({
   );
 }
 
-
-Widget customImagePlaceholder(BrandColors brandColors) {
+Widget customImagePlaceholder(BuildContext context, BrandColors brandColors) {
   return Container(
     color: brandColors.navy?.withValues(alpha: 0.05),
     child: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.add_photo_alternate_outlined, size: 40, color: brandColors.muted),
+          Icon(Icons.add_photo_alternate_outlined,
+              size: 40, color: brandColors.muted),
           const SizedBox(height: 8),
-          Text('Tap to upload image', style: TextStyle(fontSize: 12, color: brandColors.muted)),
+          Text(context.l10n.tap_to_upload_image,
+              style: TextStyle(fontSize: 12, color: brandColors.muted)),
         ],
       ),
     ),
@@ -56,10 +56,10 @@ Widget customImagePlaceholder(BrandColors brandColors) {
 }
 
 Widget imagePlaceholder(BrandColors brandColors) {
-    return Container(
-      color: brandColors.navy?.withValues(alpha: 0.05),
-      child: Center(
-        child: Icon(Icons.fastfood_rounded, size: 40, color: brandColors.muted),
-      ),
-    );
-  }
+  return Container(
+    color: brandColors.navy?.withValues(alpha: 0.05),
+    child: Center(
+      child: Icon(Icons.fastfood_rounded, size: 40, color: brandColors.muted),
+    ),
+  );
+}

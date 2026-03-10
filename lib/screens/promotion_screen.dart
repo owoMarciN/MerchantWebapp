@@ -4,20 +4,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/methods/assistant_methods.dart';
 import 'package:user_app/widgets/edit_sheet_components.dart';
 import 'package:user_app/widgets/unified_snackbar.dart';
-
-// -----------------------------------------------------------------------------
-// PROMOTIONS SCREEN
-//
-// Streams restaurants/{uid}/promotions ordered by createdAt (client-side sort
-// to avoid mixed DateTime/Timestamp Firestore issues).
-//
-// Each promotion card shows the banner, title, date range, active badge and
-// edit button. FAB opens the add sheet.
-// -----------------------------------------------------------------------------
 
 class PromotionsScreen extends StatelessWidget {
   const PromotionsScreen({super.key});
@@ -38,7 +29,7 @@ class PromotionsScreen extends StatelessWidget {
     final String? restaurantID = sharedPreferences?.getString('uid');
 
     if (restaurantID == null) {
-      return const Center(child: Text('Not authenticated'));
+      return Center(child: Text(context.l10n.promo_not_authenticated));
     }
 
     return Scaffold(
@@ -76,7 +67,6 @@ class PromotionsScreen extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              // Client-side sort — avoids Firestore mixed-type ordering issue
               final docs = snap.data!.docs.toList()
                 ..sort((a, b) {
                   final aRaw = (a.data() as Map)['createdAt'];
@@ -105,11 +95,11 @@ class PromotionsScreen extends StatelessWidget {
                       Icon(Icons.campaign_rounded,
                           size: 64, color: brandColors.muted),
                       const SizedBox(height: 16),
-                      const Text('No promotions yet',
-                          style: TextStyle(
+                      Text(context.l10n.promo_empty_title,
+                          style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 8),
-                      Text('Tap + to create your first promotion banner',
+                      Text(context.l10n.promo_empty_subtitle,
                           style: TextStyle(
                               fontSize: 14, color: brandColors.muted)),
                     ],
@@ -143,8 +133,8 @@ class PromotionsScreen extends StatelessWidget {
               onPressed: () => _openAddSheet(context, restaurantID),
               backgroundColor: brandColors.navy,
               icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: const Text('New Promotion',
-                  style: TextStyle(
+              label: Text(context.l10n.promo_fab,
+                  style: const TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
@@ -154,7 +144,7 @@ class PromotionsScreen extends StatelessWidget {
   }
 }
 
-// -- Promotion card ------------------------------------------------------------
+// -- Promotion card -----------------------------------------------------------
 
 class _PromotionCard extends StatelessWidget {
   final String promotionID;
@@ -196,7 +186,6 @@ class _PromotionCard extends StatelessWidget {
     final DateTime? startDate = _toDate(data['startDate']);
     final DateTime? endDate = _toDate(data['endDate']);
 
-    // Compute live active state based on dates
     final now = DateTime.now();
     final bool dateActive = startDate != null &&
         endDate != null &&
@@ -222,7 +211,6 @@ class _PromotionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner image
           Stack(
             children: [
               SizedBox(
@@ -273,14 +261,16 @@ class _PromotionCard extends StatelessWidget {
                       Container(
                         width: 6,
                         height: 6,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        effectivelyActive ? 'Live' : 'Inactive',
+                        effectivelyActive
+                            ? context.l10n.promo_badge_live
+                            : context.l10n.promo_badge_inactive,
                         style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
@@ -297,8 +287,8 @@ class _PromotionCard extends StatelessWidget {
                   top: 12,
                   left: 12,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(20),
@@ -310,7 +300,11 @@ class _PromotionCard extends StatelessWidget {
                             size: 13, color: Colors.white),
                         const SizedBox(width: 4),
                         Text(
-                          '${linkedItemIDs.length} item${linkedItemIDs.length == 1 ? '' : 's'}',
+                          linkedItemIDs.length == 1
+                              ? context.l10n
+                                  .promo_items_linked(linkedItemIDs.length)
+                              : context.l10n.promo_items_linked_plural(
+                                  linkedItemIDs.length),
                           style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -323,7 +317,6 @@ class _PromotionCard extends StatelessWidget {
             ],
           ),
 
-          // Details
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -367,7 +360,7 @@ class _PromotionCard extends StatelessWidget {
                       ),
                       onPressed: () => _openEditSheet(context),
                       child: Row(children: [
-                        Text('Edit',
+                        Text(context.l10n.promo_edit_button,
                             style: TextStyle(
                                 color: brandColors.accentGreen,
                                 fontWeight: FontWeight.bold)),
@@ -418,11 +411,11 @@ class _PromotionCard extends StatelessWidget {
       );
 }
 
-// -- Promotion sheet (add + edit) ----------------------------------------------
+// -- Promotion sheet (add + edit) ---------------------------------------------
 
 class _PromotionSheet extends StatefulWidget {
   final String restaurantID;
-  final String? promotionID; // null = add mode
+  final String? promotionID;
   final Map<String, dynamic>? existing;
 
   const _PromotionSheet({
@@ -449,9 +442,7 @@ class _PromotionSheetState extends State<_PromotionSheet> {
   bool _isActive = true;
   bool _isLoading = false;
 
-  // Item linking
   List<String> _linkedItemIDs = [];
-  // Map of itemID -> title for display
   Map<String, String> _allItems = {};
   bool _itemsLoading = false;
 
@@ -487,7 +478,6 @@ class _PromotionSheetState extends State<_PromotionSheet> {
     super.dispose();
   }
 
-  // Fetch all items across all menus so the user can link them to the promo
   Future<void> _loadAllItems() async {
     setState(() => _itemsLoading = true);
     try {
@@ -498,7 +488,6 @@ class _PromotionSheetState extends State<_PromotionSheet> {
           .get();
 
       final Map<String, String> items = {};
-
       for (final menuDoc in menusSnap.docs) {
         final itemsSnap = await menuDoc.reference.collection('items').get();
         for (final itemDoc in itemsSnap.docs) {
@@ -509,7 +498,7 @@ class _PromotionSheetState extends State<_PromotionSheet> {
 
       if (mounted) setState(() => _allItems = items);
     } catch (_) {
-      // Non-fatal — item linking is optional
+      // Non-fatal
     } finally {
       if (mounted) setState(() => _itemsLoading = false);
     }
@@ -543,7 +532,6 @@ class _PromotionSheetState extends State<_PromotionSheet> {
     setState(() {
       if (isStart) {
         _startDate = picked;
-        // Auto-bump end date if it's before the new start date
         if (_endDate != null && _endDate!.isBefore(_startDate!)) {
           _endDate = _startDate!.add(const Duration(days: 1));
         }
@@ -556,17 +544,15 @@ class _PromotionSheetState extends State<_PromotionSheet> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_startDate == null || _endDate == null) {
-      unifiedSnackBar(context, 'Please set both start and end dates.',
-          error: true);
+      unifiedSnackBar(context, context.l10n.promo_no_dates, error: true);
       return;
     }
     if (_endDate!.isBefore(_startDate!)) {
-      unifiedSnackBar(context, 'End date must be after start date.',
-          error: true);
+      unifiedSnackBar(context, context.l10n.promo_date_order_error, error: true);
       return;
     }
     if (!widget.isEditing && _imageBytes == null) {
-      unifiedSnackBar(context, 'Please select a banner image.', error: true);
+      unifiedSnackBar(context, context.l10n.promo_no_image, error: true);
       return;
     }
 
@@ -616,24 +602,23 @@ class _PromotionSheetState extends State<_PromotionSheet> {
         await docRef.update({'promotionID': docRef.id});
       }
 
-      // Delete old banner after successful write
       if (bannerChanged && oldUrl != null && oldUrl.isNotEmpty) {
         final String? err = await deleteOldFile(oldUrl);
         if (err != null && mounted) {
-          unifiedSnackBar(
-              context, 'Banner updated, but cleanup of old file failed.',
+          unifiedSnackBar(context, context.l10n.promo_banner_cleanup_error,
               error: true);
         }
       }
 
       if (!mounted) return;
       final messenger = ScaffoldMessenger.of(context);
+      final successMsg = widget.isEditing
+          ? context.l10n.promo_updated
+          : context.l10n.promo_created;
       Navigator.pop(context);
       messenger
         ..clearSnackBars()
-        ..showSnackBar(_successSnack(widget.isEditing
-            ? 'Promotion updated successfully'
-            : 'Promotion created successfully'));
+        ..showSnackBar(_successSnack(successMsg));
     } catch (e) {
       if (!mounted) return;
       unifiedSnackBar(context, e.toString(), error: true);
@@ -647,15 +632,14 @@ class _PromotionSheetState extends State<_PromotionSheet> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Delete Promotion?',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-        content: const Text(
-            'This will permanently delete the promotion and its banner. This cannot be undone.',
-            style: TextStyle(fontSize: 13)),
+        title: Text(context.l10n.promo_delete_title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+        content: Text(context.l10n.promo_delete_body,
+            style: const TextStyle(fontSize: 13)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(context.l10n.promo_delete_cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
@@ -665,7 +649,7 @@ class _PromotionSheetState extends State<_PromotionSheet> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Delete'),
+            child: Text(context.l10n.promo_delete_confirm),
           ),
         ],
       ),
@@ -690,10 +674,11 @@ class _PromotionSheetState extends State<_PromotionSheet> {
           .delete();
 
       if (!mounted) return;
+      final deletedMsg = context.l10n.promo_deleted;
       Navigator.pop(context);
       messenger
         ..clearSnackBars()
-        ..showSnackBar(_successSnack('Promotion deleted.'));
+        ..showSnackBar(_successSnack(deletedMsg));
     } catch (e) {
       if (!mounted) return;
       unifiedSnackBar(context, e.toString(), error: true);
@@ -726,7 +711,9 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.isEditing ? 'Edit Promotion' : 'New Promotion',
+                    widget.isEditing
+                        ? context.l10n.promo_sheet_edit_title
+                        : context.l10n.promo_sheet_add_title,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w700),
                   ),
@@ -738,21 +725,20 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                               backgroundColor:
                                   Colors.pink.withValues(alpha: 0.3)),
                           onPressed: _isLoading ? null : _delete,
-                          child: const Row(children: [
-                            Text('Delete',
-                                style: TextStyle(
+                          child: Row(children: [
+                            Text(context.l10n.promo_sheet_delete_button,
+                                style: const TextStyle(
                                     color: Colors.redAccent,
                                     fontWeight: FontWeight.bold)),
-                            SizedBox(width: 8),
-                            Icon(Icons.delete_rounded,
+                            const SizedBox(width: 8),
+                            const Icon(Icons.delete_rounded,
                                 color: Colors.redAccent, size: 16),
                           ]),
                         ),
                       if (widget.isEditing) const SizedBox(width: 10),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon:
-                            Icon(Icons.close_rounded, color: brandColors.muted),
+                        icon: Icon(Icons.close_rounded, color: brandColors.muted),
                       ),
                     ],
                   ),
@@ -794,8 +780,8 @@ class _PromotionSheetState extends State<_PromotionSheet> {
               Center(
                 child: Text(
                   widget.isEditing
-                      ? 'Tap to change banner'
-                      : 'Tap to upload banner image',
+                      ? context.l10n.promo_image_change_hint
+                      : context.l10n.promo_image_upload_hint,
                   style: TextStyle(fontSize: 11, color: brandColors.muted),
                 ),
               ),
@@ -805,12 +791,13 @@ class _PromotionSheetState extends State<_PromotionSheet> {
               TextFormField(
                 controller: _titleController,
                 decoration: customInputDecoration(
-                    label: 'Promotion Title',
-                    hint: 'e.g. Weekend Discount',
+                    label: context.l10n.promo_field_title_label,
+                    hint: context.l10n.promo_field_title_hint,
                     colorScheme: colorScheme,
                     brandColors: brandColors),
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Title is required' : null,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.promo_field_title_required
+                    : null,
               ),
               const SizedBox(height: 16),
 
@@ -819,12 +806,12 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: customInputDecoration(
-                    label: 'Description',
-                    hint: 'e.g. Up to 30% off all mains this weekend',
+                    label: context.l10n.promo_field_desc_label,
+                    hint: context.l10n.promo_field_desc_hint,
                     colorScheme: colorScheme,
                     brandColors: brandColors),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Description is required'
+                    ? context.l10n.promo_field_desc_required
                     : null,
               ),
               const SizedBox(height: 16),
@@ -834,8 +821,9 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                 children: [
                   Expanded(
                     child: _DateButton(
-                      label: 'Start Date',
+                      label: context.l10n.promo_date_start,
                       date: _startDate,
+                      pickLabel: context.l10n.promo_date_pick,
                       onTap: () => _pickDate(isStart: true),
                       brandColors: brandColors,
                       colorScheme: colorScheme,
@@ -844,8 +832,9 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _DateButton(
-                      label: 'End Date',
+                      label: context.l10n.promo_date_end,
                       date: _endDate,
+                      pickLabel: context.l10n.promo_date_pick,
                       onTap: () => _pickDate(isStart: false),
                       brandColors: brandColors,
                       colorScheme: colorScheme,
@@ -886,7 +875,7 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          'Promotion Active',
+                          context.l10n.promo_active_toggle,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -910,8 +899,8 @@ class _PromotionSheetState extends State<_PromotionSheet> {
 
               // Link items section
               _SectionLabel(
-                  label: 'Link Discounted Items',
-                  hint: 'Optional — select items this promotion applies to',
+                  label: context.l10n.promo_link_section_label,
+                  hint: context.l10n.promo_link_section_hint,
                   brandColors: brandColors),
               const SizedBox(height: 10),
 
@@ -927,7 +916,7 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    'No items found. Add items to your menus first.',
+                    context.l10n.promo_link_no_items,
                     style: TextStyle(fontSize: 12, color: brandColors.muted),
                   ),
                 )
@@ -993,8 +982,8 @@ class _PromotionSheetState extends State<_PromotionSheet> {
                               strokeWidth: 2, color: Colors.white))
                       : Text(
                           widget.isEditing
-                              ? 'Save Changes'
-                              : 'Create Promotion',
+                              ? context.l10n.promo_save_changes
+                              : context.l10n.promo_create,
                           style: const TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 15)),
                 ),
@@ -1009,16 +998,15 @@ class _PromotionSheetState extends State<_PromotionSheet> {
   Widget _placeholder(BrandColors brand) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.add_photo_alternate_outlined,
-              size: 40, color: brand.muted),
+          Icon(Icons.add_photo_alternate_outlined, size: 40, color: brand.muted),
           const SizedBox(height: 8),
-          Text('Upload Banner Image',
+          Text(context.l10n.promo_image_upload_label,
               style: TextStyle(
                   fontSize: 13,
                   color: brand.muted,
                   fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
-          Text('Recommended: 1200×400px',
+          Text(context.l10n.promo_image_recommended,
               style: TextStyle(fontSize: 11, color: brand.muted)),
         ],
       );
@@ -1043,10 +1031,11 @@ class _PromotionSheetState extends State<_PromotionSheet> {
       );
 }
 
-// -- Date picker button --------------------------------------------------------
+// -- Date picker button -------------------------------------------------------
 
 class _DateButton extends StatelessWidget {
   final String label;
+  final String pickLabel;
   final DateTime? date;
   final VoidCallback onTap;
   final BrandColors brandColors;
@@ -1054,6 +1043,7 @@ class _DateButton extends StatelessWidget {
 
   const _DateButton({
     required this.label,
+    required this.pickLabel,
     required this.date,
     required this.onTap,
     required this.brandColors,
@@ -1090,12 +1080,13 @@ class _DateButton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: TextStyle(fontSize: 10, color: brandColors.muted)),
+                      style:
+                          TextStyle(fontSize: 10, color: brandColors.muted)),
                   const SizedBox(height: 2),
                   Text(
                     hasDate
                         ? '${date!.day.toString().padLeft(2, '0')}.${date!.month.toString().padLeft(2, '0')}.${date!.year}'
-                        : 'Pick date',
+                        : pickLabel,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -1112,7 +1103,7 @@ class _DateButton extends StatelessWidget {
   }
 }
 
-// -- Section label -------------------------------------------------------------
+// -- Section label ------------------------------------------------------------
 
 class _SectionLabel extends StatelessWidget {
   final String label;

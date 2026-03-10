@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/widgets/progress_bar.dart';
 
@@ -31,7 +32,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
         if (snapshot.hasError) {
           return Center(
-            child: Text('Something went wrong', style: TextStyle(color: brandColors.muted)),
+            child: Text(context.l10n.orders_error,
+                style: TextStyle(color: brandColors.muted)),
           );
         }
 
@@ -47,16 +49,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: colorScheme.outline),
                   ),
-                  child: Icon(Icons.receipt_long_rounded, size: 48, color: brandColors.muted),
+                  child: Icon(Icons.receipt_long_rounded,
+                      size: 48, color: brandColors.muted),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'No orders right now',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                Text(
+                  context.l10n.orders_empty_title,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'When customers place orders they will appear here.',
+                  context.l10n.orders_empty_subtitle,
                   style: TextStyle(fontSize: 14, color: brandColors.muted),
                   textAlign: TextAlign.center,
                 ),
@@ -76,14 +80,32 @@ class _OrdersScreenState extends State<OrdersScreen> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 14),
                   child: Row(
-                    children: const [
-                      Expanded(flex: 3, child: _TableHeader('ORDER ID')),
-                      Expanded(flex: 3, child: _TableHeader('CUSTOMER')),
-                      Expanded(flex: 2, child: _TableHeader('ITEMS')),
-                      Expanded(flex: 3, child: _TableHeader('STATUS')),
-                      Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: _TableHeader('TOTAL'))),
+                    children: [
+                      Expanded(
+                          flex: 3,
+                          child: _TableHeader(
+                              context.l10n.orders_table_order_id)),
+                      Expanded(
+                          flex: 3,
+                          child:
+                              _TableHeader(context.l10n.orders_table_customer)),
+                      Expanded(
+                          flex: 2,
+                          child:
+                              _TableHeader(context.l10n.orders_table_items)),
+                      Expanded(
+                          flex: 3,
+                          child:
+                              _TableHeader(context.l10n.orders_table_status)),
+                      Expanded(
+                          flex: 2,
+                          child: Align(
+                              alignment: Alignment.centerRight,
+                              child: _TableHeader(
+                                  context.l10n.orders_table_total))),
                     ],
                   ),
                 ),
@@ -125,7 +147,8 @@ class _OrderRow extends StatelessWidget {
     final String customerName = data["customerName"] ?? "Unknown";
     final List itemIDs = data["itemIDs"] ?? [];
     final double total = (data["totalAmount"] ?? 0).toDouble();
-    final String shortId = orderId.length > 8 ? orderId.substring(0, 8) : orderId;
+    final String shortId =
+        orderId.length > 8 ? orderId.substring(0, 8) : orderId;
 
     return Column(
       children: [
@@ -137,26 +160,33 @@ class _OrderRow extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   '#$shortId...',
-                  style: TextStyle(fontSize: 13, color: brandColors.muted, fontFamily: 'monospace'),
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: brandColors.muted,
+                      fontFamily: 'monospace'),
                 ),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
                   customerName,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w500),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
-                  '${itemIDs.length} item${itemIDs.length == 1 ? '' : 's'}',
+                  itemIDs.length == 1
+                      ? context.l10n.orders_item_count(itemIDs.length)
+                      : context.l10n.orders_item_count_plural(itemIDs.length),
                   style: TextStyle(fontSize: 13, color: brandColors.muted),
                 ),
               ),
               Expanded(
                 flex: 3,
-                child: _StatusChip(status: status, brandColors: brandColors),
+                child:
+                    _StatusChip(status: status, brandColors: brandColors),
               ),
               Expanded(
                 flex: 2,
@@ -164,7 +194,8 @@ class _OrderRow extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: Text(
                     '${total.toStringAsFixed(2)} PLN',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -185,10 +216,22 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = switch (status) {
-      'Pending' => (const Color(0xFFFEF3C7).withValues(alpha: 0.3), const Color(0xFFD97706)),
-      'In Progress' => (brandColors.navy!.withValues(alpha: 0.15), brandColors.navy!),
-      'Ready' => (brandColors.accentGreen!.withValues(alpha: 0.15), brandColors.accentGreen!),
-      'Delivered' => (brandColors.muted!.withValues(alpha: 0.1), brandColors.muted!),
+      'Pending' => (
+          const Color(0xFFFEF3C7).withValues(alpha: 0.3),
+          const Color(0xFFD97706)
+        ),
+      'In Progress' => (
+          brandColors.navy!.withValues(alpha: 0.15),
+          brandColors.navy!
+        ),
+      'Ready' => (
+          brandColors.accentGreen!.withValues(alpha: 0.15),
+          brandColors.accentGreen!
+        ),
+      'Delivered' => (
+          brandColors.muted!.withValues(alpha: 0.1),
+          brandColors.muted!
+        ),
       _ => (brandColors.muted!.withValues(alpha: 0.1), brandColors.muted!),
     };
 
@@ -196,8 +239,11 @@ class _StatusChip extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
-        child: Text(status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
+        decoration:
+            BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
+        child: Text(status,
+            style: TextStyle(
+                fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
       ),
     );
   }
@@ -211,7 +257,11 @@ class _TableHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Color(0xFF8A8AA8), letterSpacing: 0.8),
+      style: const TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF8A8AA8),
+          letterSpacing: 0.8),
     );
   }
 }

@@ -2839,6 +2839,1350 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Chef'**
   String get overview_chef_fallback;
+
+  /// No description provided for @items_app_bar_fallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get items_app_bar_fallback;
+
+  /// No description provided for @items_empty_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No items yet'**
+  String get items_empty_title;
+
+  /// No description provided for @items_empty_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to add your first item'**
+  String get items_empty_subtitle;
+
+  /// No description provided for @items_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String items_error(String error);
+
+  /// No description provided for @items_fab.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item'**
+  String get items_fab;
+
+  /// No description provided for @items_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item'**
+  String get items_sheet_title;
+
+  /// No description provided for @items_image_upload_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Item Image'**
+  String get items_image_upload_label;
+
+  /// No description provided for @items_image_browse.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to browse'**
+  String get items_image_browse;
+
+  /// No description provided for @items_field_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Item Title'**
+  String get items_field_title_label;
+
+  /// No description provided for @items_field_title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Pierogi Ruskie'**
+  String get items_field_title_hint;
+
+  /// No description provided for @items_field_title_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get items_field_title_required;
+
+  /// No description provided for @items_field_info_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Short Info'**
+  String get items_field_info_label;
+
+  /// No description provided for @items_field_info_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Crispy and Tasty'**
+  String get items_field_info_hint;
+
+  /// No description provided for @items_field_info_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Info is required'**
+  String get items_field_info_required;
+
+  /// No description provided for @items_field_desc_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get items_field_desc_label;
+
+  /// No description provided for @items_field_desc_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the item...'**
+  String get items_field_desc_hint;
+
+  /// No description provided for @items_field_desc_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required'**
+  String get items_field_desc_required;
+
+  /// No description provided for @items_field_price_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Price (PLN)'**
+  String get items_field_price_label;
+
+  /// No description provided for @items_field_price_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 24.99'**
+  String get items_field_price_hint;
+
+  /// No description provided for @items_field_price_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Price is required'**
+  String get items_field_price_required;
+
+  /// No description provided for @items_field_price_invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number'**
+  String get items_field_price_invalid;
+
+  /// No description provided for @items_field_tags_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get items_field_tags_label;
+
+  /// No description provided for @items_field_tags_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Vegan'**
+  String get items_field_tags_hint;
+
+  /// No description provided for @items_tag_error_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a tag'**
+  String get items_tag_error_empty;
+
+  /// No description provided for @items_tag_error_capitalize.
+  ///
+  /// In en, this message translates to:
+  /// **'First letter must be capitalized'**
+  String get items_tag_error_capitalize;
+
+  /// No description provided for @items_tag_error_letters.
+  ///
+  /// In en, this message translates to:
+  /// **'Only letters are allowed'**
+  String get items_tag_error_letters;
+
+  /// No description provided for @items_tag_error_duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag already exists'**
+  String get items_tag_error_duplicate;
+
+  /// No description provided for @items_discount_toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Discount'**
+  String get items_discount_toggle;
+
+  /// No description provided for @items_discount_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount %'**
+  String get items_discount_label;
+
+  /// No description provided for @items_discount_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a discount percentage'**
+  String get items_discount_required;
+
+  /// No description provided for @items_discount_invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a value between 1 and 100'**
+  String get items_discount_invalid;
+
+  /// No description provided for @items_no_image.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select an item image.'**
+  String get items_no_image;
+
+  /// No description provided for @items_added.
+  ///
+  /// In en, this message translates to:
+  /// **'Item added successfully'**
+  String get items_added;
+
+  /// No description provided for @items_submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item'**
+  String get items_submit;
+
+  /// No description provided for @menus_empty_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No menus yet'**
+  String get menus_empty_title;
+
+  /// No description provided for @menus_empty_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to add your first menu'**
+  String get menus_empty_subtitle;
+
+  /// No description provided for @menus_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String menus_error(String error);
+
+  /// No description provided for @menus_fab.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Menu'**
+  String get menus_fab;
+
+  /// No description provided for @menus_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Menu'**
+  String get menus_sheet_title;
+
+  /// No description provided for @menus_image_upload_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Banner Image'**
+  String get menus_image_upload_label;
+
+  /// No description provided for @menus_image_browse.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to browse'**
+  String get menus_image_browse;
+
+  /// No description provided for @menus_field_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu Title'**
+  String get menus_field_title_label;
+
+  /// No description provided for @menus_field_title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Lunch Specials'**
+  String get menus_field_title_hint;
+
+  /// No description provided for @menus_field_title_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get menus_field_title_required;
+
+  /// No description provided for @menus_field_desc_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get menus_field_desc_label;
+
+  /// No description provided for @menus_field_desc_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Briefly describe this menu...'**
+  String get menus_field_desc_hint;
+
+  /// No description provided for @menus_field_desc_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required'**
+  String get menus_field_desc_required;
+
+  /// No description provided for @menus_no_image.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a banner image.'**
+  String get menus_no_image;
+
+  /// No description provided for @menus_created.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu created successfully'**
+  String get menus_created;
+
+  /// No description provided for @menus_submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Menu'**
+  String get menus_submit;
+
+  /// No description provided for @orders_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get orders_error;
+
+  /// No description provided for @orders_empty_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders right now'**
+  String get orders_empty_title;
+
+  /// No description provided for @orders_empty_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When customers place orders they will appear here.'**
+  String get orders_empty_subtitle;
+
+  /// No description provided for @orders_table_order_id.
+  ///
+  /// In en, this message translates to:
+  /// **'ORDER ID'**
+  String get orders_table_order_id;
+
+  /// No description provided for @orders_table_customer.
+  ///
+  /// In en, this message translates to:
+  /// **'CUSTOMER'**
+  String get orders_table_customer;
+
+  /// No description provided for @orders_table_items.
+  ///
+  /// In en, this message translates to:
+  /// **'ITEMS'**
+  String get orders_table_items;
+
+  /// No description provided for @orders_table_status.
+  ///
+  /// In en, this message translates to:
+  /// **'STATUS'**
+  String get orders_table_status;
+
+  /// No description provided for @orders_table_total.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL'**
+  String get orders_table_total;
+
+  /// No description provided for @orders_item_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} item'**
+  String orders_item_count(int count);
+
+  /// No description provided for @orders_item_count_plural.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String orders_item_count_plural(int count);
+
+  /// No description provided for @promo_not_authenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'Not authenticated'**
+  String get promo_not_authenticated;
+
+  /// No description provided for @promo_empty_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No promotions yet'**
+  String get promo_empty_title;
+
+  /// No description provided for @promo_empty_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to create your first promotion banner'**
+  String get promo_empty_subtitle;
+
+  /// No description provided for @promo_fab.
+  ///
+  /// In en, this message translates to:
+  /// **'New Promotion'**
+  String get promo_fab;
+
+  /// No description provided for @promo_badge_live.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get promo_badge_live;
+
+  /// No description provided for @promo_badge_inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get promo_badge_inactive;
+
+  /// No description provided for @promo_items_linked.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} item'**
+  String promo_items_linked(int count);
+
+  /// No description provided for @promo_items_linked_plural.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String promo_items_linked_plural(int count);
+
+  /// No description provided for @promo_edit_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get promo_edit_button;
+
+  /// No description provided for @promo_sheet_add_title.
+  ///
+  /// In en, this message translates to:
+  /// **'New Promotion'**
+  String get promo_sheet_add_title;
+
+  /// No description provided for @promo_sheet_edit_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Promotion'**
+  String get promo_sheet_edit_title;
+
+  /// No description provided for @promo_sheet_delete_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get promo_sheet_delete_button;
+
+  /// No description provided for @promo_image_change_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to change banner'**
+  String get promo_image_change_hint;
+
+  /// No description provided for @promo_image_upload_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to upload banner image'**
+  String get promo_image_upload_hint;
+
+  /// No description provided for @promo_image_upload_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Banner Image'**
+  String get promo_image_upload_label;
+
+  /// No description provided for @promo_image_recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended: 1200×400px'**
+  String get promo_image_recommended;
+
+  /// No description provided for @promo_field_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Title'**
+  String get promo_field_title_label;
+
+  /// No description provided for @promo_field_title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Weekend Discount'**
+  String get promo_field_title_hint;
+
+  /// No description provided for @promo_field_title_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get promo_field_title_required;
+
+  /// No description provided for @promo_field_desc_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get promo_field_desc_label;
+
+  /// No description provided for @promo_field_desc_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Up to 30% off all mains this weekend'**
+  String get promo_field_desc_hint;
+
+  /// No description provided for @promo_field_desc_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required'**
+  String get promo_field_desc_required;
+
+  /// No description provided for @promo_date_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get promo_date_start;
+
+  /// No description provided for @promo_date_end.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get promo_date_end;
+
+  /// No description provided for @promo_date_pick.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick date'**
+  String get promo_date_pick;
+
+  /// No description provided for @promo_active_toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion Active'**
+  String get promo_active_toggle;
+
+  /// No description provided for @promo_link_section_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Discounted Items'**
+  String get promo_link_section_label;
+
+  /// No description provided for @promo_link_section_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional — select items this promotion applies to'**
+  String get promo_link_section_hint;
+
+  /// No description provided for @promo_link_no_items.
+  ///
+  /// In en, this message translates to:
+  /// **'No items found. Add items to your menus first.'**
+  String get promo_link_no_items;
+
+  /// No description provided for @promo_save_changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get promo_save_changes;
+
+  /// No description provided for @promo_create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Promotion'**
+  String get promo_create;
+
+  /// No description provided for @promo_no_dates.
+  ///
+  /// In en, this message translates to:
+  /// **'Please set both start and end dates.'**
+  String get promo_no_dates;
+
+  /// No description provided for @promo_date_order_error.
+  ///
+  /// In en, this message translates to:
+  /// **'End date must be after start date.'**
+  String get promo_date_order_error;
+
+  /// No description provided for @promo_no_image.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a banner image.'**
+  String get promo_no_image;
+
+  /// No description provided for @promo_updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion updated successfully'**
+  String get promo_updated;
+
+  /// No description provided for @promo_created.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion created successfully'**
+  String get promo_created;
+
+  /// No description provided for @promo_banner_cleanup_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Banner updated, but cleanup of old file failed.'**
+  String get promo_banner_cleanup_error;
+
+  /// No description provided for @promo_delete_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Promotion?'**
+  String get promo_delete_title;
+
+  /// No description provided for @promo_delete_body.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete the promotion and its banner. This cannot be undone.'**
+  String get promo_delete_body;
+
+  /// No description provided for @promo_delete_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get promo_delete_cancel;
+
+  /// No description provided for @promo_delete_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get promo_delete_confirm;
+
+  /// No description provided for @promo_deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Promotion deleted.'**
+  String get promo_deleted;
+
+  /// No description provided for @promo_location_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant Location'**
+  String get promo_location_dialog_title;
+
+  /// No description provided for @promo_location_none.
+  ///
+  /// In en, this message translates to:
+  /// **'No location selected yet'**
+  String get promo_location_none;
+
+  /// No description provided for @promo_location_open_map.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Map'**
+  String get promo_location_open_map;
+
+  /// No description provided for @promo_location_change_map.
+  ///
+  /// In en, this message translates to:
+  /// **'Change on Map'**
+  String get promo_location_change_map;
+
+  /// No description provided for @promo_location_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Address'**
+  String get promo_location_confirm;
+
+  /// No description provided for @promo_location_no_pick.
+  ///
+  /// In en, this message translates to:
+  /// **'Please pick a location on the map first.'**
+  String get promo_location_no_pick;
+
+  /// No description provided for @settings_section_business.
+  ///
+  /// In en, this message translates to:
+  /// **'Business'**
+  String get settings_section_business;
+
+  /// No description provided for @settings_section_business_sub.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your restaurant profile and media'**
+  String get settings_section_business_sub;
+
+  /// No description provided for @settings_section_profile.
+  ///
+  /// In en, this message translates to:
+  /// **'User Profile'**
+  String get settings_section_profile;
+
+  /// No description provided for @settings_section_profile_sub.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your personal account details'**
+  String get settings_section_profile_sub;
+
+  /// No description provided for @settings_section_danger.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger Zone'**
+  String get settings_section_danger;
+
+  /// No description provided for @settings_section_danger_sub.
+  ///
+  /// In en, this message translates to:
+  /// **'Irreversible actions for your account'**
+  String get settings_section_danger_sub;
+
+  /// No description provided for @settings_logo_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant Logo'**
+  String get settings_logo_title;
+
+  /// No description provided for @settings_logo_status_staged.
+  ///
+  /// In en, this message translates to:
+  /// **'New logo ready'**
+  String get settings_logo_status_staged;
+
+  /// No description provided for @settings_logo_status_exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Logo uploaded'**
+  String get settings_logo_status_exists;
+
+  /// No description provided for @settings_logo_status_none.
+  ///
+  /// In en, this message translates to:
+  /// **'No logo yet'**
+  String get settings_logo_status_none;
+
+  /// No description provided for @settings_logo_recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended: 512×512px, PNG or JPG'**
+  String get settings_logo_recommended;
+
+  /// No description provided for @settings_logo_choose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get settings_logo_choose;
+
+  /// No description provided for @settings_logo_upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get settings_logo_upload;
+
+  /// No description provided for @settings_logo_uploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading…'**
+  String get settings_logo_uploading;
+
+  /// No description provided for @settings_logo_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Logo updated'**
+  String get settings_logo_success;
+
+  /// No description provided for @settings_banner_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant Banner'**
+  String get settings_banner_title;
+
+  /// No description provided for @settings_banner_choose.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to choose banner'**
+  String get settings_banner_choose;
+
+  /// No description provided for @settings_banner_recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended: 1200×800px'**
+  String get settings_banner_recommended;
+
+  /// No description provided for @settings_banner_upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Banner'**
+  String get settings_banner_upload;
+
+  /// No description provided for @settings_banner_uploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading…'**
+  String get settings_banner_uploading;
+
+  /// No description provided for @settings_banner_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Banner updated'**
+  String get settings_banner_success;
+
+  /// No description provided for @settings_business_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Info'**
+  String get settings_business_title;
+
+  /// No description provided for @settings_business_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Business info saved'**
+  String get settings_business_saved;
+
+  /// No description provided for @settings_address_set.
+  ///
+  /// In en, this message translates to:
+  /// **'Set restaurant address'**
+  String get settings_address_set;
+
+  /// No description provided for @settings_address_change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get settings_address_change;
+
+  /// No description provided for @settings_address_pick.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick on map'**
+  String get settings_address_pick;
+
+  /// No description provided for @settings_profile_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get settings_profile_title;
+
+  /// No description provided for @settings_profile_photo_ready.
+  ///
+  /// In en, this message translates to:
+  /// **'New photo ready — press Save to apply'**
+  String get settings_profile_photo_ready;
+
+  /// No description provided for @settings_profile_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved'**
+  String get settings_profile_saved;
+
+  /// No description provided for @settings_profile_name_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner\'s Name'**
+  String get settings_profile_name_hint;
+
+  /// No description provided for @settings_profile_phone_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get settings_profile_phone_label;
+
+  /// No description provided for @settings_danger_reset_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get settings_danger_reset_title;
+
+  /// No description provided for @settings_danger_reset_sub.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a password reset email to your account'**
+  String get settings_danger_reset_sub;
+
+  /// No description provided for @settings_danger_reset_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get settings_danger_reset_button;
+
+  /// No description provided for @settings_danger_reset_sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent'**
+  String get settings_danger_reset_sent;
+
+  /// No description provided for @settings_danger_delete_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get settings_danger_delete_title;
+
+  /// No description provided for @settings_danger_delete_sub.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete your restaurant and all data'**
+  String get settings_danger_delete_sub;
+
+  /// No description provided for @settings_danger_delete_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get settings_danger_delete_button;
+
+  /// No description provided for @settings_danger_delete_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get settings_danger_delete_dialog_title;
+
+  /// No description provided for @settings_danger_delete_dialog_body.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete your account and all restaurant data. This cannot be undone.'**
+  String get settings_danger_delete_dialog_body;
+
+  /// No description provided for @settings_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settings_cancel;
+
+  /// No description provided for @settings_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get settings_error;
+
+  /// No description provided for @settings_save_changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get settings_save_changes;
+
+  /// No description provided for @settings_map_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant Location'**
+  String get settings_map_dialog_title;
+
+  /// No description provided for @settings_map_no_location.
+  ///
+  /// In en, this message translates to:
+  /// **'No location selected yet'**
+  String get settings_map_no_location;
+
+  /// No description provided for @settings_map_open.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Map'**
+  String get settings_map_open;
+
+  /// No description provided for @settings_map_change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change on Map'**
+  String get settings_map_change;
+
+  /// No description provided for @settings_map_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Address'**
+  String get settings_map_confirm;
+
+  /// No description provided for @settings_map_no_pick.
+  ///
+  /// In en, this message translates to:
+  /// **'Please pick a location on the map first.'**
+  String get settings_map_no_pick;
+
+  /// No description provided for @tap_to_upload_image.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to upload image'**
+  String get tap_to_upload_image;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @password_does_not_meet_requirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Password does not meet requirements'**
+  String get password_does_not_meet_requirements;
+
+  /// No description provided for @password_is_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get password_is_required;
+
+  /// No description provided for @snackbar_dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'DISMISS'**
+  String get snackbar_dismiss;
+
+  /// No description provided for @field_error_required.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get field_error_required;
+
+  /// No description provided for @field_error_invalid_format.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid format'**
+  String get field_error_invalid_format;
+
+  /// No description provided for @field_email_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address'**
+  String get field_email_message;
+
+  /// No description provided for @field_nip_message.
+  ///
+  /// In en, this message translates to:
+  /// **'NIP must be exactly 10 digits'**
+  String get field_nip_message;
+
+  /// No description provided for @field_regon_message.
+  ///
+  /// In en, this message translates to:
+  /// **'REGON must be 9 or 14 digits'**
+  String get field_regon_message;
+
+  /// No description provided for @field_postal_code_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid postal code (XX-XXX)'**
+  String get field_postal_code_message;
+
+  /// No description provided for @field_hint_prefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter '**
+  String get field_hint_prefix;
+
+  /// No description provided for @items_design_edit_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get items_design_edit_button;
+
+  /// No description provided for @items_design_edit_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get items_design_edit_sheet_title;
+
+  /// No description provided for @items_design_delete_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Item'**
+  String get items_design_delete_button;
+
+  /// No description provided for @items_design_change_image_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to change image'**
+  String get items_design_change_image_hint;
+
+  /// No description provided for @items_design_field_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Item Title'**
+  String get items_design_field_title_label;
+
+  /// No description provided for @items_design_field_info_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Short Info'**
+  String get items_design_field_info_label;
+
+  /// No description provided for @items_design_field_info_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Crispy and Tasty'**
+  String get items_design_field_info_hint;
+
+  /// No description provided for @items_design_field_desc_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get items_design_field_desc_label;
+
+  /// No description provided for @items_design_field_price_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Price (PLN)'**
+  String get items_design_field_price_label;
+
+  /// No description provided for @items_design_field_price_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Price is required'**
+  String get items_design_field_price_required;
+
+  /// No description provided for @items_design_field_price_invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number'**
+  String get items_design_field_price_invalid;
+
+  /// No description provided for @items_design_field_tags_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get items_design_field_tags_label;
+
+  /// No description provided for @items_design_field_tags_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Vegan'**
+  String get items_design_field_tags_hint;
+
+  /// No description provided for @items_design_discount_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount %'**
+  String get items_design_discount_label;
+
+  /// No description provided for @items_design_discount_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a discount percentage'**
+  String get items_design_discount_required;
+
+  /// No description provided for @items_design_discount_invalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a value between 1 and 100'**
+  String get items_design_discount_invalid;
+
+  /// No description provided for @items_design_save_changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get items_design_save_changes;
+
+  /// No description provided for @items_design_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Item saved successfully'**
+  String get items_design_saved;
+
+  /// No description provided for @items_design_image_cleanup_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Image updated, but cleanup of old file failed.'**
+  String get items_design_image_cleanup_error;
+
+  /// No description provided for @items_design_delete_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Item'**
+  String get items_design_delete_dialog_title;
+
+  /// No description provided for @items_design_delete_dialog_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this item? This cannot be undone.'**
+  String get items_design_delete_dialog_body;
+
+  /// No description provided for @items_design_delete_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get items_design_delete_cancel;
+
+  /// No description provided for @items_design_delete_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get items_design_delete_confirm;
+
+  /// No description provided for @items_design_deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Item deleted successfully'**
+  String get items_design_deleted;
+
+  /// No description provided for @map_fetching_address.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching address...'**
+  String get map_fetching_address;
+
+  /// No description provided for @map_address_not_found.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t find the address'**
+  String get map_address_not_found;
+
+  /// No description provided for @map_confirm_button.
+  ///
+  /// In en, this message translates to:
+  /// **'CONFIRM ADDRESS'**
+  String get map_confirm_button;
+
+  /// No description provided for @menus_design_view_items.
+  ///
+  /// In en, this message translates to:
+  /// **'View Items'**
+  String get menus_design_view_items;
+
+  /// No description provided for @menus_design_edit_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Menu'**
+  String get menus_design_edit_button;
+
+  /// No description provided for @menus_design_edit_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Menu'**
+  String get menus_design_edit_sheet_title;
+
+  /// No description provided for @menus_design_delete_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Menu'**
+  String get menus_design_delete_button;
+
+  /// No description provided for @menus_design_change_image_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to change image'**
+  String get menus_design_change_image_hint;
+
+  /// No description provided for @menus_design_field_title_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu Title'**
+  String get menus_design_field_title_label;
+
+  /// No description provided for @menus_design_field_desc_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get menus_design_field_desc_label;
+
+  /// No description provided for @menus_design_field_title_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get menus_design_field_title_required;
+
+  /// No description provided for @menus_design_field_desc_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required'**
+  String get menus_design_field_desc_required;
+
+  /// No description provided for @menus_design_save_changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get menus_design_save_changes;
+
+  /// No description provided for @menus_design_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu saved successfully'**
+  String get menus_design_saved;
+
+  /// No description provided for @menus_design_banner_cleanup_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Banner updated, but cleanup of old file failed.'**
+  String get menus_design_banner_cleanup_error;
+
+  /// No description provided for @menus_design_delete_dialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Menu'**
+  String get menus_design_delete_dialog_title;
+
+  /// No description provided for @menus_design_delete_dialog_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this menu? This cannot be undone.'**
+  String get menus_design_delete_dialog_body;
+
+  /// No description provided for @menus_design_delete_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get menus_design_delete_cancel;
+
+  /// No description provided for @menus_design_delete_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get menus_design_delete_confirm;
+
+  /// No description provided for @menus_design_delete_missing_id.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: Missing Menu or Restaurant ID'**
+  String get menus_design_delete_missing_id;
+
+  /// No description provided for @menus_design_deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu deleted successfully'**
+  String get menus_design_deleted;
+
+  /// No description provided for @notif_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notif_sheet_title;
+
+  /// No description provided for @notif_unread_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread'**
+  String notif_unread_count(int count);
+
+  /// No description provided for @notif_mark_all_read.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get notif_mark_all_read;
+
+  /// No description provided for @notif_empty_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get notif_empty_title;
+
+  /// No description provided for @notif_empty_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin messages will appear here'**
+  String get notif_empty_subtitle;
+
+  /// No description provided for @notif_time_just_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get notif_time_just_now;
+
+  /// No description provided for @notif_time_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{n}m ago'**
+  String notif_time_minutes(int n);
+
+  /// No description provided for @notif_time_hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{n}h ago'**
+  String notif_time_hours(int n);
+
+  /// No description provided for @notif_time_yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get notif_time_yesterday;
+
+  /// No description provided for @notif_time_days.
+  ///
+  /// In en, this message translates to:
+  /// **'{n}d ago'**
+  String notif_time_days(int n);
 }
 
 class _AppLocalizationsDelegate

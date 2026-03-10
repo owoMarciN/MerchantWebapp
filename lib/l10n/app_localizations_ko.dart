@@ -1469,4 +1469,703 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get overview_chef_fallback => '요리사';
+
+  @override
+  String get items_app_bar_fallback => '품목';
+
+  @override
+  String get items_empty_title => '아직 상품이 없습니다';
+
+  @override
+  String get items_empty_subtitle => '+를 눌러 첫 번째 항목을 추가하세요';
+
+  @override
+  String items_error(String error) {
+    return '오류: $error';
+  }
+
+  @override
+  String get items_fab => '항목 추가';
+
+  @override
+  String get items_sheet_title => '항목 추가';
+
+  @override
+  String get items_image_upload_label => '상품 이미지 업로드';
+
+  @override
+  String get items_image_browse => '클릭하여 살펴보세요';
+
+  @override
+  String get items_field_title_label => '품목명';
+
+  @override
+  String get items_field_title_hint => '예: 피에로기 루스키';
+
+  @override
+  String get items_field_title_required => '제목을 입력해야 합니다.';
+
+  @override
+  String get items_field_info_label => '간략 정보';
+
+  @override
+  String get items_field_info_hint => '예: 바삭하고 맛있는';
+
+  @override
+  String get items_field_info_required => '정보가 필요합니다';
+
+  @override
+  String get items_field_desc_label => '설명';
+
+  @override
+  String get items_field_desc_hint => '상품을 설명해 주세요...';
+
+  @override
+  String get items_field_desc_required => '설명이 필요합니다';
+
+  @override
+  String get items_field_price_label => '가격(PLN)';
+
+  @override
+  String get items_field_price_hint => '예: 24.99';
+
+  @override
+  String get items_field_price_required => '가격이 필요합니다';
+
+  @override
+  String get items_field_price_invalid => '유효한 숫자를 입력하세요';
+
+  @override
+  String get items_field_tags_label => '태그';
+
+  @override
+  String get items_field_tags_hint => '예: 비건';
+
+  @override
+  String get items_tag_error_empty => '태그를 입력하세요';
+
+  @override
+  String get items_tag_error_capitalize => '첫 글자는 반드시 대문자여야 합니다.';
+
+  @override
+  String get items_tag_error_letters => '글자만 허용됩니다.';
+
+  @override
+  String get items_tag_error_duplicate => '태그가 이미 존재합니다';
+
+  @override
+  String get items_discount_toggle => '할인 적용';
+
+  @override
+  String get items_discount_label => '할인 %';
+
+  @override
+  String get items_discount_required => '할인율을 입력하세요';
+
+  @override
+  String get items_discount_invalid => '1에서 100 사이의 값을 입력하세요.';
+
+  @override
+  String get items_no_image => '상품 이미지를 선택해 주세요.';
+
+  @override
+  String get items_added => '항목이 성공적으로 추가되었습니다.';
+
+  @override
+  String get items_submit => '항목 추가';
+
+  @override
+  String get menus_empty_title => '아직 메뉴가 없습니다';
+
+  @override
+  String get menus_empty_subtitle => '+를 눌러 첫 번째 메뉴를 추가하세요';
+
+  @override
+  String menus_error(String error) {
+    return '오류: $error';
+  }
+
+  @override
+  String get menus_fab => '메뉴 추가';
+
+  @override
+  String get menus_sheet_title => '메뉴 추가';
+
+  @override
+  String get menus_image_upload_label => '배너 이미지 업로드';
+
+  @override
+  String get menus_image_browse => '클릭하여 살펴보세요';
+
+  @override
+  String get menus_field_title_label => '메뉴 제목';
+
+  @override
+  String get menus_field_title_hint => '예: 점심 특선 메뉴';
+
+  @override
+  String get menus_field_title_required => '제목을 입력해야 합니다.';
+
+  @override
+  String get menus_field_desc_label => '설명';
+
+  @override
+  String get menus_field_desc_hint => '이 메뉴에 대해 간략하게 설명해 주세요...';
+
+  @override
+  String get menus_field_desc_required => '설명이 필요합니다';
+
+  @override
+  String get menus_no_image => '배너 이미지를 선택해 주세요.';
+
+  @override
+  String get menus_created => '메뉴가 성공적으로 생성되었습니다.';
+
+  @override
+  String get menus_submit => '메뉴 만들기';
+
+  @override
+  String get orders_error => '뭔가 잘못됐어요';
+
+  @override
+  String get orders_empty_title => '현재 주문이 없습니다';
+
+  @override
+  String get orders_empty_subtitle => '고객이 주문을 하면 여기에 표시됩니다.';
+
+  @override
+  String get orders_table_order_id => '주문 ID';
+
+  @override
+  String get orders_table_customer => '고객';
+
+  @override
+  String get orders_table_items => '품목';
+
+  @override
+  String get orders_table_status => '상태';
+
+  @override
+  String get orders_table_total => '총';
+
+  @override
+  String orders_item_count(int count) {
+    return '$count 항목';
+  }
+
+  @override
+  String orders_item_count_plural(int count) {
+    return '$count개 항목';
+  }
+
+  @override
+  String get promo_not_authenticated => '인증되지 않음';
+
+  @override
+  String get promo_empty_title => '아직 프로모션이 없습니다.';
+
+  @override
+  String get promo_empty_subtitle => '+ 버튼을 눌러 첫 번째 프로모션 배너를 만드세요.';
+
+  @override
+  String get promo_fab => '새로운 프로모션';
+
+  @override
+  String get promo_badge_live => '살다';
+
+  @override
+  String get promo_badge_inactive => '비활성화됨';
+
+  @override
+  String promo_items_linked(int count) {
+    return '$count 항목';
+  }
+
+  @override
+  String promo_items_linked_plural(int count) {
+    return '$count개 항목';
+  }
+
+  @override
+  String get promo_edit_button => '편집하다';
+
+  @override
+  String get promo_sheet_add_title => '새로운 프로모션';
+
+  @override
+  String get promo_sheet_edit_title => '편집 프로모션';
+
+  @override
+  String get promo_sheet_delete_button => '삭제';
+
+  @override
+  String get promo_image_change_hint => '배너를 변경하려면 탭하세요.';
+
+  @override
+  String get promo_image_upload_hint => '배너 이미지를 업로드하려면 탭하세요.';
+
+  @override
+  String get promo_image_upload_label => '배너 이미지 업로드';
+
+  @override
+  String get promo_image_recommended => '권장 해상도: 1200×400px';
+
+  @override
+  String get promo_field_title_label => '승진 제목';
+
+  @override
+  String get promo_field_title_hint => '예: 주말 할인';
+
+  @override
+  String get promo_field_title_required => '제목을 입력해야 합니다.';
+
+  @override
+  String get promo_field_desc_label => '설명';
+
+  @override
+  String get promo_field_desc_hint => '예: 이번 주말 모든 메인 메뉴 최대 30% 할인';
+
+  @override
+  String get promo_field_desc_required => '설명이 필요합니다';
+
+  @override
+  String get promo_date_start => '시작일';
+
+  @override
+  String get promo_date_end => '종료일';
+
+  @override
+  String get promo_date_pick => '날짜를 선택하세요';
+
+  @override
+  String get promo_active_toggle => '프로모션 활동 중';
+
+  @override
+  String get promo_link_section_label => '할인 상품 링크';
+
+  @override
+  String get promo_link_section_hint => '(선택 사항) - 프로모션이 적용되는 품목을 선택하세요';
+
+  @override
+  String get promo_link_no_items => '항목을 찾을 수 없습니다. 먼저 메뉴에 항목을 추가하세요.';
+
+  @override
+  String get promo_save_changes => '변경 사항 저장';
+
+  @override
+  String get promo_create => '프로모션 생성';
+
+  @override
+  String get promo_no_dates => '시작일과 종료일을 모두 설정해 주세요.';
+
+  @override
+  String get promo_date_order_error => '종료일은 시작일 이후여야 합니다.';
+
+  @override
+  String get promo_no_image => '배너 이미지를 선택해 주세요.';
+
+  @override
+  String get promo_updated => '프로모션이 성공적으로 업데이트되었습니다.';
+
+  @override
+  String get promo_created => '프로모션이 성공적으로 생성되었습니다.';
+
+  @override
+  String get promo_banner_cleanup_error => '배너는 업데이트되었지만, 이전 파일 정리에는 실패했습니다.';
+
+  @override
+  String get promo_delete_title => '프로모션을 삭제하시겠습니까?';
+
+  @override
+  String get promo_delete_body =>
+      '이렇게 하면 프로모션과 배너가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.';
+
+  @override
+  String get promo_delete_cancel => '취소';
+
+  @override
+  String get promo_delete_confirm => '삭제';
+
+  @override
+  String get promo_deleted => '프로모션이 삭제되었습니다.';
+
+  @override
+  String get promo_location_dialog_title => '레스토랑 위치';
+
+  @override
+  String get promo_location_none => '아직 위치를 선택하지 않았습니다.';
+
+  @override
+  String get promo_location_open_map => '지도 열기';
+
+  @override
+  String get promo_location_change_map => '지도상의 변화';
+
+  @override
+  String get promo_location_confirm => '주소 확인';
+
+  @override
+  String get promo_location_no_pick => '먼저 지도에서 위치를 선택해 주세요.';
+
+  @override
+  String get settings_section_business => '사업';
+
+  @override
+  String get settings_section_business_sub => '레스토랑 프로필 및 미디어를 관리하세요';
+
+  @override
+  String get settings_section_profile => '사용자 프로필';
+
+  @override
+  String get settings_section_profile_sub => '개인 계정 정보를 업데이트하세요';
+
+  @override
+  String get settings_section_danger => '위험 지역';
+
+  @override
+  String get settings_section_danger_sub => '계정에 대한 돌이킬 수 없는 조치';
+
+  @override
+  String get settings_logo_title => '레스토랑 로고';
+
+  @override
+  String get settings_logo_status_staged => '새 로고 준비 완료';
+
+  @override
+  String get settings_logo_status_exists => '로고가 업로드되었습니다';
+
+  @override
+  String get settings_logo_status_none => '아직 로고가 없습니다';
+
+  @override
+  String get settings_logo_recommended => '권장 형식: 512×512px, PNG 또는 JPG';
+
+  @override
+  String get settings_logo_choose => '선택하다';
+
+  @override
+  String get settings_logo_upload => '업로드';
+
+  @override
+  String get settings_logo_uploading => '업로드 중…';
+
+  @override
+  String get settings_logo_success => '로고 업데이트됨';
+
+  @override
+  String get settings_banner_title => '레스토랑 배너';
+
+  @override
+  String get settings_banner_choose => '배너를 선택하려면 클릭하세요';
+
+  @override
+  String get settings_banner_recommended => '권장 해상도: 1200×800px';
+
+  @override
+  String get settings_banner_upload => '배너 업로드';
+
+  @override
+  String get settings_banner_uploading => '업로드 중…';
+
+  @override
+  String get settings_banner_success => '배너 업데이트됨';
+
+  @override
+  String get settings_business_title => '사업 정보';
+
+  @override
+  String get settings_business_saved => '사업 정보가 저장되었습니다';
+
+  @override
+  String get settings_address_set => '레스토랑 주소를 설정하세요';
+
+  @override
+  String get settings_address_change => '변화';
+
+  @override
+  String get settings_address_pick => '지도에서 선택하세요';
+
+  @override
+  String get settings_profile_title => '윤곽';
+
+  @override
+  String get settings_profile_photo_ready => '새 사진 준비 완료 — 저장을 눌러 적용하세요';
+
+  @override
+  String get settings_profile_saved => '프로필이 저장되었습니다';
+
+  @override
+  String get settings_profile_name_hint => '소유자 이름';
+
+  @override
+  String get settings_profile_phone_label => '전화 번호';
+
+  @override
+  String get settings_danger_reset_title => '비밀번호 변경';
+
+  @override
+  String get settings_danger_reset_sub => '계정으로 비밀번호 재설정 이메일을 보내주세요';
+
+  @override
+  String get settings_danger_reset_button => '다시 놓기';
+
+  @override
+  String get settings_danger_reset_sent => '비밀번호 재설정 이메일이 발송되었습니다.';
+
+  @override
+  String get settings_danger_delete_title => '계정 삭제';
+
+  @override
+  String get settings_danger_delete_sub => '레스토랑과 모든 데이터를 영구적으로 삭제합니다.';
+
+  @override
+  String get settings_danger_delete_button => '삭제';
+
+  @override
+  String get settings_danger_delete_dialog_title => '계정 삭제';
+
+  @override
+  String get settings_danger_delete_dialog_body =>
+      '이렇게 하면 계정과 모든 레스토랑 데이터가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.';
+
+  @override
+  String get settings_cancel => '취소';
+
+  @override
+  String get settings_error => '뭔가 잘못됐어요';
+
+  @override
+  String get settings_save_changes => '변경 사항 저장';
+
+  @override
+  String get settings_map_dialog_title => '레스토랑 위치';
+
+  @override
+  String get settings_map_no_location => '아직 위치를 선택하지 않았습니다.';
+
+  @override
+  String get settings_map_open => '지도 열기';
+
+  @override
+  String get settings_map_change => '지도상의 변화';
+
+  @override
+  String get settings_map_confirm => '주소 확인';
+
+  @override
+  String get settings_map_no_pick => '먼저 지도에서 위치를 선택해 주세요.';
+
+  @override
+  String get tap_to_upload_image => 'Tap to upload image';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get password_does_not_meet_requirements =>
+      'Password does not meet requirements';
+
+  @override
+  String get password_is_required => 'Password is required';
+
+  @override
+  String get snackbar_dismiss => 'DISMISS';
+
+  @override
+  String get field_error_required => '이 항목은 필수 입력 사항입니다.';
+
+  @override
+  String get field_error_invalid_format => '잘못된 형식입니다';
+
+  @override
+  String get field_email_message => '유효한 이메일 주소를 입력하세요';
+
+  @override
+  String get field_nip_message => 'NIP는 정확히 10자리 숫자여야 합니다.';
+
+  @override
+  String get field_regon_message => 'REGON은 9자리 또는 14자리 숫자여야 합니다.';
+
+  @override
+  String get field_postal_code_message => '유효한 우편번호(XX-XXX)를 입력하세요.';
+
+  @override
+  String get field_hint_prefix => '입력하다 ';
+
+  @override
+  String get items_design_edit_button => '항목 편집';
+
+  @override
+  String get items_design_edit_sheet_title => '항목 편집';
+
+  @override
+  String get items_design_delete_button => '항목 삭제';
+
+  @override
+  String get items_design_change_image_hint => '이미지를 변경하려면 탭하세요.';
+
+  @override
+  String get items_design_field_title_label => '품목명';
+
+  @override
+  String get items_design_field_info_label => '간략 정보';
+
+  @override
+  String get items_design_field_info_hint => '예: 바삭하고 맛있는';
+
+  @override
+  String get items_design_field_desc_label => '설명';
+
+  @override
+  String get items_design_field_price_label => '가격(PLN)';
+
+  @override
+  String get items_design_field_price_required => '가격이 필요합니다';
+
+  @override
+  String get items_design_field_price_invalid => '유효한 숫자를 입력하세요';
+
+  @override
+  String get items_design_field_tags_label => '태그';
+
+  @override
+  String get items_design_field_tags_hint => '예: 비건';
+
+  @override
+  String get items_design_discount_label => '할인 %';
+
+  @override
+  String get items_design_discount_required => '할인율을 입력하세요';
+
+  @override
+  String get items_design_discount_invalid => '1에서 100 사이의 값을 입력하세요.';
+
+  @override
+  String get items_design_save_changes => '변경 사항 저장';
+
+  @override
+  String get items_design_saved => '항목이 성공적으로 저장되었습니다.';
+
+  @override
+  String get items_design_image_cleanup_error =>
+      '이미지가 업데이트되었지만 이전 파일 정리에는 실패했습니다.';
+
+  @override
+  String get items_design_delete_dialog_title => '항목 삭제';
+
+  @override
+  String get items_design_delete_dialog_body =>
+      '이 항목을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.';
+
+  @override
+  String get items_design_delete_cancel => '취소';
+
+  @override
+  String get items_design_delete_confirm => '삭제';
+
+  @override
+  String get items_design_deleted => '항목이 성공적으로 삭제되었습니다.';
+
+  @override
+  String get map_fetching_address => '주소를 가져오는 중...';
+
+  @override
+  String get map_address_not_found => '주소를 찾을 수 없습니다';
+
+  @override
+  String get map_confirm_button => '주소 확인';
+
+  @override
+  String get menus_design_view_items => '상품 보기';
+
+  @override
+  String get menus_design_edit_button => '편집 메뉴';
+
+  @override
+  String get menus_design_edit_sheet_title => '편집 메뉴';
+
+  @override
+  String get menus_design_delete_button => '삭제 메뉴';
+
+  @override
+  String get menus_design_change_image_hint => '이미지를 변경하려면 탭하세요.';
+
+  @override
+  String get menus_design_field_title_label => '메뉴 제목';
+
+  @override
+  String get menus_design_field_desc_label => '설명';
+
+  @override
+  String get menus_design_field_title_required => '제목을 입력해야 합니다.';
+
+  @override
+  String get menus_design_field_desc_required => '설명이 필요합니다';
+
+  @override
+  String get menus_design_save_changes => '변경 사항 저장';
+
+  @override
+  String get menus_design_saved => '메뉴가 성공적으로 저장되었습니다';
+
+  @override
+  String get menus_design_banner_cleanup_error =>
+      '배너는 업데이트되었지만, 이전 파일 정리에는 실패했습니다.';
+
+  @override
+  String get menus_design_delete_dialog_title => '삭제 메뉴';
+
+  @override
+  String get menus_design_delete_dialog_body =>
+      '이 메뉴를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.';
+
+  @override
+  String get menus_design_delete_cancel => '취소';
+
+  @override
+  String get menus_design_delete_confirm => '삭제';
+
+  @override
+  String get menus_design_delete_missing_id => '오류: 메뉴 또는 레스토랑 ID가 누락되었습니다';
+
+  @override
+  String get menus_design_deleted => '메뉴가 성공적으로 삭제되었습니다.';
+
+  @override
+  String get notif_sheet_title => '알림';
+
+  @override
+  String notif_unread_count(int count) {
+    return '$count 읽지 않음';
+  }
+
+  @override
+  String get notif_mark_all_read => '모두 읽음으로 표시';
+
+  @override
+  String get notif_empty_title => '아직 알림이 없습니다.';
+
+  @override
+  String get notif_empty_subtitle => '관리자 메시지가 여기에 표시됩니다.';
+
+  @override
+  String get notif_time_just_now => '방금';
+
+  @override
+  String notif_time_minutes(int n) {
+    return '${n}m 전';
+  }
+
+  @override
+  String notif_time_hours(int n) {
+    return '$n시간 전';
+  }
+
+  @override
+  String get notif_time_yesterday => '어제';
+
+  @override
+  String notif_time_days(int n) {
+    return '$n일 전';
+  }
 }

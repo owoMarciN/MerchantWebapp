@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
 enum FieldValidator {
   email,
@@ -58,32 +59,26 @@ class _CustomTextFieldState extends State<CustomTextField> {
   static const Map<FieldValidator, _ValidatorConfig> _configs = {
     FieldValidator.email: _ValidatorConfig(
       pattern: r'^[\w\.\+\-]+@[\w\-]+\.[a-zA-Z]{2,}$',
-      message: 'Enter a valid email address',
       keyboard: TextInputType.emailAddress,
     ),
     FieldValidator.nip: _ValidatorConfig(
       pattern: r'^\d{10}$',
-      message: 'NIP must be exactly 10 digits',
       keyboard: TextInputType.number,
     ),
     FieldValidator.regon: _ValidatorConfig(
       pattern: r'^\d{9}(\d{5})?$',
-      message: 'REGON must be 9 or 14 digits',
       keyboard: TextInputType.number,
     ),
     FieldValidator.postalCode: _ValidatorConfig(
       pattern: r'^\d{2}-\d{3}$',
-      message: 'Enter a valid postal code (XX-XXX)',
       keyboard: TextInputType.number,
     ),
     FieldValidator.required: _ValidatorConfig(
       pattern: r'.+',
-      message: 'This field is required',
       keyboard: TextInputType.text,
     ),
     FieldValidator.none: _ValidatorConfig(
       pattern: null,
-      message: null,
       keyboard: TextInputType.text,
     ),
   };
@@ -107,19 +102,46 @@ class _CustomTextFieldState extends State<CustomTextField> {
     }
 
     if (widget.customValidatorPattern != null) {
-      if (value == null || value.isEmpty) return widget.customValidatorMessage ?? 'This field is required';
+      if (value == null || value.isEmpty) {
+        return widget.customValidatorMessage ??
+            context.l10n.field_error_required;
+      }
       final regex = RegExp(widget.customValidatorPattern!);
-      if (!regex.hasMatch(value)) return widget.customValidatorMessage ?? 'Invalid format';
+      if (!regex.hasMatch(value)) {
+        return widget.customValidatorMessage ??
+            context.l10n.field_error_invalid_format;
+      }
       return null;
     }
 
     final config = _configs[widget.validator];
     if (config == null || config.pattern == null) return null;
 
-    if (value == null || value.isEmpty) return config.message;
+    if (value == null || value.isEmpty) {
+      return _validatorMessage(widget.validator);
+    }
     final regex = RegExp(config.pattern!);
-    if (!regex.hasMatch(value.trim())) return config.message;
+    if (!regex.hasMatch(value.trim())) {
+      return _validatorMessage(widget.validator);
+    }
     return null;
+  }
+
+  String _validatorMessage(FieldValidator v) {
+    switch (v) {
+      case FieldValidator.email:
+        return context.l10n.field_email_message;
+      case FieldValidator.nip:
+        return context.l10n.field_nip_message;
+      case FieldValidator.regon:
+        return context.l10n.field_regon_message;
+      case FieldValidator.postalCode:
+        return context.l10n.field_postal_code_message;
+      case FieldValidator.required:
+        return context.l10n.field_error_required;
+      case FieldValidator.none:
+        return '';
+    }
   }
 
   TextInputType get _keyboardType {
@@ -149,11 +171,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
           hintText: "Enter ${widget.hintText?.toLowerCase() ?? 'details'}",
           labelText: widget.labelText,
           hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           filled: true,
           fillColor: widget.enabled ? Colors.white : Colors.grey[50],
           prefixIcon: widget.data != null
-              ? Icon(widget.data, size: 20, color: _focusNode.hasFocus ? brand.navy : Colors.grey)
+              ? Icon(widget.data,
+                  size: 20,
+                  color: _focusNode.hasFocus ? brand.navy : Colors.grey)
               : null,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -169,11 +194,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+            borderSide:
+                const BorderSide(color: Colors.redAccent, width: 1.5),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+            borderSide:
+                const BorderSide(color: Colors.redAccent, width: 1.5),
           ),
         ),
       ),
@@ -183,12 +210,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
 class _ValidatorConfig {
   final String? pattern;
-  final String? message;
   final TextInputType keyboard;
 
   const _ValidatorConfig({
     required this.pattern,
-    required this.message,
     required this.keyboard,
   });
 }

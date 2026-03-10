@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/methods/assistant_methods.dart';
 import 'package:user_app/models/items.dart';
 import 'package:user_app/widgets/edit_sheet_components.dart';
@@ -55,7 +56,8 @@ class ItemsDesignWidget extends StatelessWidget {
                           loadingBuilder: (context, child, progress) {
                             if (progress == null) return child;
                             return Container(
-                              color: brandColors.navy?.withValues(alpha: 0.05),
+                              color:
+                                  brandColors.navy?.withValues(alpha: 0.05),
                               child: Center(
                                 child: CircularProgressIndicator(
                                   value: progress.expectedTotalBytes != null
@@ -69,9 +71,9 @@ class ItemsDesignWidget extends StatelessWidget {
                             );
                           },
                           errorBuilder: (_, __, ___) =>
-                              customImagePlaceholder(brandColors),
+                              customImagePlaceholder(context, brandColors),
                         )
-                      : customImagePlaceholder(brandColors),
+                      : customImagePlaceholder(context, brandColors),
                 ),
                 // Discount badge
                 if (model?.hasDiscount == true)
@@ -99,8 +101,8 @@ class ItemsDesignWidget extends StatelessWidget {
                   top: 10,
                   right: 10,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(6),
@@ -143,8 +145,8 @@ class ItemsDesignWidget extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           model?.shortInfo ?? '',
-                          style:
-                              TextStyle(fontSize: 12, color: brandColors.muted),
+                          style: TextStyle(
+                              fontSize: 12, color: brandColors.muted),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -182,18 +184,20 @@ class ItemsDesignWidget extends StatelessWidget {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12),
                       backgroundColor:
                           brandColors.muted!.withValues(alpha: 0.3),
                     ),
                     onPressed: () => _openEditSheet(context),
                     child: Row(children: [
-                      Text('Edit Item',
+                      Text(context.l10n.items_design_edit_button,
                           style: TextStyle(
                               color: brandColors.accentGreen,
                               fontWeight: FontWeight.bold)),
                       const SizedBox(width: 10),
-                      Icon(Icons.change_circle, color: brandColors.accentGreen),
+                      Icon(Icons.change_circle,
+                          color: brandColors.accentGreen),
                     ]),
                   ),
                 ],
@@ -206,7 +210,7 @@ class ItemsDesignWidget extends StatelessWidget {
   }
 }
 
-// -- Edit sheet --------------------------------------------------------------------
+// -- Edit sheet ---------------------------------------------------------------
 
 class _EditItemSheet extends StatefulWidget {
   final Items item;
@@ -267,13 +271,13 @@ class _EditItemSheetState extends State<_EditItemSheet> {
     String? validationResult;
 
     if (tag.isEmpty) {
-      validationResult = 'Please enter a tag';
+      validationResult = context.l10n.items_tag_error_empty;
     } else if (!RegExp(r'^[A-Z]').hasMatch(tag)) {
-      validationResult = 'First letter must be capitalized';
+      validationResult = context.l10n.items_tag_error_capitalize;
     } else if (!RegExp(r'^[a-zA-Z]+$').hasMatch(tag)) {
-      validationResult = 'Only letters are allowed';
+      validationResult = context.l10n.items_tag_error_letters;
     } else if (_tags.contains(tag)) {
-      validationResult = 'Tag already exists';
+      validationResult = context.l10n.items_tag_error_duplicate;
     }
 
     setState(() {
@@ -343,43 +347,39 @@ class _EditItemSheetState extends State<_EditItemSheet> {
         if (imageChanged) 'imageUrl': finalImageUrl,
       });
 
-      // Clean up old image after successful write
       if (imageChanged && oldUrl != null && oldUrl.isNotEmpty) {
         final String? errorMsg = await deleteOldFile(oldUrl);
         if (errorMsg != null && mounted) {
-          unifiedSnackBar(
-              context, 'Image updated, but cleanup of old file failed.',
+          unifiedSnackBar(context,
+              context.l10n.items_design_image_cleanup_error,
               error: true);
         }
       }
 
       if (!mounted) return;
-      // Capture messenger before pop — once the sheet is gone its context
-      // is unmounted and any ScaffoldMessenger lookup against it will fail.
       final messenger = ScaffoldMessenger.of(context);
+      final savedMsg = context.l10n.items_design_saved;
       Navigator.pop(context);
       messenger
         ..clearSnackBars()
         ..showSnackBar(
           SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle_outline_rounded,
-                    color: Colors.white, size: 20),
-                SizedBox(width: 12),
-                Text('Item saved successfully',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500)),
-              ],
-            ),
+            content: Row(children: [
+              const Icon(Icons.check_circle_outline_rounded,
+                  color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              Text(savedMsg,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500)),
+            ]),
             backgroundColor: const Color(0xFF1E293B),
             behavior: SnackBarBehavior.floating,
             elevation: 6,
             margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
             duration: const Duration(seconds: 2),
             dismissDirection: DismissDirection.horizontal,
           ),
@@ -393,24 +393,19 @@ class _EditItemSheetState extends State<_EditItemSheet> {
   }
 
   Future<void> _delete() async {
-    // Use a local dialogContext so Navigator.pop targets the dialog,
-    // not the sheet — the original code passed `context` (the sheet)
-    // into both pop calls, which could close the sheet instead of
-    // just the dialog.
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Item'),
-        content: const Text(
-            'Are you sure you want to delete this item? This cannot be undone.'),
+        title: Text(context.l10n.items_design_delete_dialog_title),
+        content: Text(context.l10n.items_design_delete_dialog_body),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel')),
+              child: Text(context.l10n.items_design_delete_cancel)),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child:
-                const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+            child: Text(context.l10n.items_design_delete_confirm,
+                style: const TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -419,12 +414,9 @@ class _EditItemSheetState extends State<_EditItemSheet> {
     if (confirm != true || !mounted) return;
     setState(() => _isLoading = true);
 
-    // Capture messenger before the async gap and before pop.
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-      // Use deleteOldFile consistent with the rest of the codebase
-      // instead of calling FirebaseStorage.refFromURL directly.
       if (widget.item.imageUrl != null && widget.item.imageUrl!.isNotEmpty) {
         await deleteOldFile(widget.item.imageUrl!);
       }
@@ -439,29 +431,28 @@ class _EditItemSheetState extends State<_EditItemSheet> {
           .delete();
 
       if (!mounted) return;
+      final deletedMsg = context.l10n.items_design_deleted;
       Navigator.pop(context);
       messenger
         ..clearSnackBars()
         ..showSnackBar(
           SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle_outline_rounded,
-                    color: Colors.white, size: 20),
-                SizedBox(width: 12),
-                Text('Item deleted successfully',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500)),
-              ],
-            ),
+            content: Row(children: [
+              const Icon(Icons.check_circle_outline_rounded,
+                  color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              Text(deletedMsg,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500)),
+            ]),
             backgroundColor: const Color(0xFF1E293B),
             behavior: SnackBarBehavior.floating,
             elevation: 6,
             margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
             duration: const Duration(seconds: 2),
             dismissDirection: DismissDirection.horizontal,
           ),
@@ -497,9 +488,9 @@ class _EditItemSheetState extends State<_EditItemSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Edit Item',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                  Text(context.l10n.items_design_edit_sheet_title,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w700)),
                   Row(
                     children: [
                       ElevatedButton(
@@ -507,20 +498,21 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                             backgroundColor:
                                 Colors.pink.withValues(alpha: 0.3)),
                         onPressed: _isLoading ? null : _delete,
-                        child: const Row(children: [
-                          Text('Delete Item',
-                              style: TextStyle(
+                        child: Row(children: [
+                          Text(context.l10n.items_design_delete_button,
+                              style: const TextStyle(
                                   color: Colors.redAccent,
                                   fontWeight: FontWeight.bold)),
-                          SizedBox(width: 10),
-                          Icon(Icons.delete_rounded, color: Colors.redAccent),
+                          const SizedBox(width: 10),
+                          const Icon(Icons.delete_rounded,
+                              color: Colors.redAccent),
                         ]),
                       ),
                       const SizedBox(width: 10),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon:
-                            Icon(Icons.close_rounded, color: brandColors.muted),
+                        icon: Icon(Icons.close_rounded,
+                            color: brandColors.muted),
                       ),
                     ],
                   ),
@@ -552,37 +544,39 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                           ? Image.network(widget.item.imageUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
-                                  customImagePlaceholder(brandColors))
-                          : customImagePlaceholder(brandColors),
+                                  customImagePlaceholder(context, brandColors))
+                          : customImagePlaceholder(context, brandColors),
                 ),
               ),
               const SizedBox(height: 8),
               Center(
-                child: Text('Tap to change image',
-                    style: TextStyle(fontSize: 11, color: brandColors.muted)),
+                child: Text(context.l10n.items_design_change_image_hint,
+                    style:
+                        TextStyle(fontSize: 11, color: brandColors.muted)),
               ),
               const SizedBox(height: 20),
 
               TextFormField(
                 controller: _titleController,
                 decoration: customInputDecoration(
-                    label: 'Item Title',
+                    label: context.l10n.items_design_field_title_label,
                     colorScheme: colorScheme,
                     brandColors: brandColors),
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Title is required' : null,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.items_field_title_required
+                    : null,
               ),
               const SizedBox(height: 16),
 
               TextFormField(
                 controller: _shortInfoController,
                 decoration: customInputDecoration(
-                    label: 'Short Info',
-                    hint: 'e.g. Crispy and Tasty',
+                    label: context.l10n.items_design_field_info_label,
+                    hint: context.l10n.items_design_field_info_hint,
                     colorScheme: colorScheme,
                     brandColors: brandColors),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Short info is required'
+                    ? context.l10n.items_field_info_required
                     : null,
               ),
               const SizedBox(height: 16),
@@ -591,11 +585,11 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: customInputDecoration(
-                    label: 'Description',
+                    label: context.l10n.items_design_field_desc_label,
                     colorScheme: colorScheme,
                     brandColors: brandColors),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Description is required'
+                    ? context.l10n.items_field_desc_required
                     : null,
               ),
               const SizedBox(height: 16),
@@ -605,14 +599,16 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: customInputDecoration(
-                    label: 'Price (PLN)',
+                    label: context.l10n.items_design_field_price_label,
                     prefixText: 'PLN ',
                     colorScheme: colorScheme,
                     brandColors: brandColors),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Price is required';
+                  if (v == null || v.trim().isEmpty) {
+                    return context.l10n.items_design_field_price_required;
+                  }
                   if (double.tryParse(v.trim()) == null) {
-                    return 'Enter a valid number';
+                    return context.l10n.items_design_field_price_invalid;
                   }
                   return null;
                 },
@@ -626,14 +622,15 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                     child: TextFormField(
                       controller: _tagController,
                       decoration: customInputDecoration(
-                        label: 'Tags',
-                        hint: 'e.g. Vegan',
+                        label: context.l10n.items_design_field_tags_label,
+                        hint: context.l10n.items_design_field_tags_hint,
                         colorScheme: colorScheme,
                         brandColors: brandColors,
                         errorText: _tagError,
                       ),
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z]')),
                       ],
                       onChanged: (_) {
                         if (_tagError != null) {
@@ -663,18 +660,19 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                   runSpacing: 8,
                   children: _tags
                       .map((tag) => Chip(
-                            label:
-                                Text(tag, style: const TextStyle(fontSize: 12)),
+                            label: Text(tag,
+                                style: const TextStyle(fontSize: 12)),
                             deleteIcon:
                                 const Icon(Icons.close_rounded, size: 14),
                             onDeleted: () => _removeTag(tag),
                             backgroundColor:
                                 brandColors.navy?.withValues(alpha: 0.1),
                             side: BorderSide(
-                                color:
-                                    brandColors.navy?.withValues(alpha: 0.3) ??
-                                        Colors.transparent),
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                                color: brandColors.navy
+                                        ?.withValues(alpha: 0.3) ??
+                                    Colors.transparent),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 4),
                           ))
                       .toList(),
                 ),
@@ -699,7 +697,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                   children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(10),
-                      onTap: () => setState(() => _hasDiscount = !_hasDiscount),
+                      onTap: () =>
+                          setState(() => _hasDiscount = !_hasDiscount),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
@@ -711,7 +710,7 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                                     ? brandColors.accentGreen
                                     : brandColors.muted),
                             const SizedBox(width: 10),
-                            Text('Apply Discount',
+                            Text(context.l10n.items_discount_toggle,
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -722,8 +721,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                             const Spacer(),
                             Checkbox(
                               value: _hasDiscount,
-                              onChanged: (v) =>
-                                  setState(() => _hasDiscount = v ?? false),
+                              onChanged: (v) => setState(
+                                  () => _hasDiscount = v ?? false),
                               activeColor: brandColors.accentGreen,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4)),
@@ -735,16 +734,19 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                     if (_hasDiscount) ...[
                       Divider(
                           height: 1,
-                          color:
-                              brandColors.accentGreen?.withValues(alpha: 0.2)),
+                          color: brandColors.accentGreen
+                              ?.withValues(alpha: 0.2)),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                        padding:
+                            const EdgeInsets.fromLTRB(16, 12, 16, 12),
                         child: TextFormField(
                           controller: _discountController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
+                          keyboardType:
+                              const TextInputType.numberWithOptions(
+                                  decimal: true),
                           decoration: InputDecoration(
-                            labelText: 'Discount %',
+                            labelText:
+                                context.l10n.items_design_discount_label,
                             suffixText: '%',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)),
@@ -754,11 +756,13 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                           validator: (v) {
                             if (!_hasDiscount) return null;
                             if (v == null || v.trim().isEmpty) {
-                              return 'Enter a discount percentage';
+                              return context
+                                  .l10n.items_design_discount_required;
                             }
                             final val = double.tryParse(v.trim());
                             if (val == null || val <= 0 || val > 100) {
-                              return 'Enter a value between 1 and 100';
+                              return context
+                                  .l10n.items_design_discount_invalid;
                             }
                             return null;
                           },
@@ -767,9 +771,11 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                       if (_priceController.text.isNotEmpty &&
                           _discountController.text.isNotEmpty &&
                           double.tryParse(_priceController.text) != null &&
-                          double.tryParse(_discountController.text) != null)
+                          double.tryParse(_discountController.text) !=
+                              null)
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          padding:
+                              const EdgeInsets.fromLTRB(16, 0, 16, 12),
                           child: Row(
                             children: [
                               Text(
@@ -785,7 +791,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: brandColors.muted,
-                                    decoration: TextDecoration.lineThrough),
+                                    decoration:
+                                        TextDecoration.lineThrough),
                               ),
                             ],
                           ),
@@ -814,8 +821,8 @@ class _EditItemSheetState extends State<_EditItemSheet> {
                           height: 20,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
-                      : const Text('Save Changes',
-                          style: TextStyle(
+                      : Text(context.l10n.items_design_save_changes,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 15)),
                 ),
               ),

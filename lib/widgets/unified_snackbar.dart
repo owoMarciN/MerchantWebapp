@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
-import 'package:user_app/extensions/responsive_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
 void unifiedSnackBar(BuildContext context, String msg, {bool error = false}) {
   final brandColors = Theme.of(context).extension<BrandColors>();
   final colorScheme = Theme.of(context).colorScheme;
   final overlay = Overlay.of(context);
 
-  final Color bgColor = error 
-      ? Colors.redAccent.shade700 
+  final Color bgColor = error
+      ? Colors.redAccent.shade700
       : (brandColors?.navy ?? colorScheme.primary);
 
   late OverlayEntry overlayEntry;
@@ -42,7 +41,8 @@ class _SnackBarToast extends StatefulWidget {
   State<_SnackBarToast> createState() => _SnackBarToastState();
 }
 
-class _SnackBarToastState extends State<_SnackBarToast> with SingleTickerProviderStateMixin {
+class _SnackBarToastState extends State<_SnackBarToast>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -55,7 +55,7 @@ class _SnackBarToastState extends State<_SnackBarToast> with SingleTickerProvide
     );
 
     _controller.forward();
-    
+
     // Auto-dismiss when the progress bar finishes
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -91,17 +91,23 @@ class _SnackBarToastState extends State<_SnackBarToast> with SingleTickerProvide
           decoration: BoxDecoration(
             color: widget.bgColor,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
                     Icon(
-                      widget.error ? Icons.error_outline : Icons.check_circle_outline,
+                      widget.error
+                          ? Icons.error_outline
+                          : Icons.check_circle_outline,
                       color: Colors.white,
                       size: 20,
                     ),
@@ -109,12 +115,17 @@ class _SnackBarToastState extends State<_SnackBarToast> with SingleTickerProvide
                     Expanded(
                       child: Text(
                         widget.msg,
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500),
                       ),
                     ),
                     TextButton(
                       onPressed: widget.onDismiss,
-                      child: const Text('DISMISS', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      child: Text(context.l10n.snackbar_dismiss,
+                          style:
+                              TextStyle(color: Colors.white70, fontSize: 12)),
                     ),
                   ],
                 ),
@@ -127,7 +138,8 @@ class _SnackBarToastState extends State<_SnackBarToast> with SingleTickerProvide
                     value: 1.0 - _controller.value, // Shrinks as time passes
                     minHeight: 3,
                     backgroundColor: Colors.transparent,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withValues(alpha: 0.5)),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white.withValues(alpha: 0.5)),
                   );
                 },
               ),

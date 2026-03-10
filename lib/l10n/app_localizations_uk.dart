@@ -1520,4 +1520,727 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get overview_chef_fallback => 'Шеф-кухар';
+
+  @override
+  String get items_app_bar_fallback => 'Елементи';
+
+  @override
+  String get items_empty_title => 'Поки що немає товарів';
+
+  @override
+  String get items_empty_subtitle => 'Натисніть +, щоб додати перший елемент';
+
+  @override
+  String items_error(String error) {
+    return 'Помилка: $error';
+  }
+
+  @override
+  String get items_fab => 'Додати елемент';
+
+  @override
+  String get items_sheet_title => 'Додати елемент';
+
+  @override
+  String get items_image_upload_label => 'Завантажити зображення елемента';
+
+  @override
+  String get items_image_browse => 'Натисніть, щоб переглянути';
+
+  @override
+  String get items_field_title_label => 'Назва елемента';
+
+  @override
+  String get items_field_title_hint => 'наприклад, Руські вареники';
+
+  @override
+  String get items_field_title_required => 'Потрібно вказати назву';
+
+  @override
+  String get items_field_info_label => 'Коротка інформація';
+
+  @override
+  String get items_field_info_hint => 'наприклад, хрусткі та смачні';
+
+  @override
+  String get items_field_info_required => 'Потрібна інформація';
+
+  @override
+  String get items_field_desc_label => 'Опис';
+
+  @override
+  String get items_field_desc_hint => 'Опишіть предмет...';
+
+  @override
+  String get items_field_desc_required => 'Опис обов\'язковий';
+
+  @override
+  String get items_field_price_label => 'Ціна (злотих)';
+
+  @override
+  String get items_field_price_hint => 'наприклад, 24,99';
+
+  @override
+  String get items_field_price_required => 'Ціна обов\'язкова';
+
+  @override
+  String get items_field_price_invalid => 'Введіть дійсний номер';
+
+  @override
+  String get items_field_tags_label => 'Теги';
+
+  @override
+  String get items_field_tags_hint => 'наприклад, веганський';
+
+  @override
+  String get items_tag_error_empty => 'Будь ласка, введіть тег';
+
+  @override
+  String get items_tag_error_capitalize => 'Перша літера має бути великою';
+
+  @override
+  String get items_tag_error_letters => 'Дозволено використовувати лише літери';
+
+  @override
+  String get items_tag_error_duplicate => 'Тег вже існує';
+
+  @override
+  String get items_discount_toggle => 'Застосувати знижку';
+
+  @override
+  String get items_discount_label => 'Знижка %';
+
+  @override
+  String get items_discount_required => 'Введіть відсоток знижки';
+
+  @override
+  String get items_discount_invalid => 'Введіть значення від 1 до 100';
+
+  @override
+  String get items_no_image => 'Будь ласка, виберіть зображення товару.';
+
+  @override
+  String get items_added => 'Елемент успішно додано';
+
+  @override
+  String get items_submit => 'Додати елемент';
+
+  @override
+  String get menus_empty_title => 'Меню поки що немає';
+
+  @override
+  String get menus_empty_subtitle => 'Натисніть +, щоб додати своє перше меню';
+
+  @override
+  String menus_error(String error) {
+    return 'Помилка: $error';
+  }
+
+  @override
+  String get menus_fab => 'Додати меню';
+
+  @override
+  String get menus_sheet_title => 'Додати меню';
+
+  @override
+  String get menus_image_upload_label => 'Завантажити зображення банера';
+
+  @override
+  String get menus_image_browse => 'Натисніть, щоб переглянути';
+
+  @override
+  String get menus_field_title_label => 'Назва меню';
+
+  @override
+  String get menus_field_title_hint => 'наприклад, обідні пропозиції';
+
+  @override
+  String get menus_field_title_required => 'Потрібно вказати назву';
+
+  @override
+  String get menus_field_desc_label => 'Опис';
+
+  @override
+  String get menus_field_desc_hint => 'Коротко опишіть це меню...';
+
+  @override
+  String get menus_field_desc_required => 'Опис обов\'язковий';
+
+  @override
+  String get menus_no_image => 'Будь ласка, виберіть зображення банера.';
+
+  @override
+  String get menus_created => 'Меню успішно створено';
+
+  @override
+  String get menus_submit => 'Створити меню';
+
+  @override
+  String get orders_error => 'Щось пішло не так';
+
+  @override
+  String get orders_empty_title => 'Зараз немає замовлень';
+
+  @override
+  String get orders_empty_subtitle =>
+      'Коли клієнти розміщують замовлення, вони з\'являтимуться тут.';
+
+  @override
+  String get orders_table_order_id => 'ІДЕНТИФІКАТОР ЗАМОВЛЕННЯ';
+
+  @override
+  String get orders_table_customer => 'КЛІЄНТ';
+
+  @override
+  String get orders_table_items => 'ПРЕДМЕТИ';
+
+  @override
+  String get orders_table_status => 'СТАТУС';
+
+  @override
+  String get orders_table_total => 'РАЗОМ';
+
+  @override
+  String orders_item_count(int count) {
+    return '$count елемент';
+  }
+
+  @override
+  String orders_item_count_plural(int count) {
+    return '$count елементи';
+  }
+
+  @override
+  String get promo_not_authenticated => 'Не автентифіковано';
+
+  @override
+  String get promo_empty_title => 'Поки що немає акцій';
+
+  @override
+  String get promo_empty_subtitle =>
+      'Натисніть +, щоб створити свій перший рекламний банер';
+
+  @override
+  String get promo_fab => 'Нова акція';
+
+  @override
+  String get promo_badge_live => 'Живий';
+
+  @override
+  String get promo_badge_inactive => 'Неактивний';
+
+  @override
+  String promo_items_linked(int count) {
+    return '$count елемент';
+  }
+
+  @override
+  String promo_items_linked_plural(int count) {
+    return '$count елементи';
+  }
+
+  @override
+  String get promo_edit_button => 'Редагувати';
+
+  @override
+  String get promo_sheet_add_title => 'Нова акція';
+
+  @override
+  String get promo_sheet_edit_title => 'Редагувати рекламну акцію';
+
+  @override
+  String get promo_sheet_delete_button => 'Видалити';
+
+  @override
+  String get promo_image_change_hint => 'Натисніть, щоб змінити банер';
+
+  @override
+  String get promo_image_upload_hint =>
+      'Натисніть, щоб завантажити зображення банера';
+
+  @override
+  String get promo_image_upload_label => 'Завантажити зображення банера';
+
+  @override
+  String get promo_image_recommended => 'Рекомендовано: 1200×400 пікселів';
+
+  @override
+  String get promo_field_title_label => 'Назва рекламної акції';
+
+  @override
+  String get promo_field_title_hint => 'наприклад, знижка на вихідні';
+
+  @override
+  String get promo_field_title_required => 'Потрібно вказати назву';
+
+  @override
+  String get promo_field_desc_label => 'Опис';
+
+  @override
+  String get promo_field_desc_hint =>
+      'наприклад, знижки до 30% на всі основні страви цими вихідними';
+
+  @override
+  String get promo_field_desc_required => 'Опис обов\'язковий';
+
+  @override
+  String get promo_date_start => 'Дата початку';
+
+  @override
+  String get promo_date_end => 'Дата завершення';
+
+  @override
+  String get promo_date_pick => 'Виберіть дату';
+
+  @override
+  String get promo_active_toggle => 'Акція активна';
+
+  @override
+  String get promo_link_section_label => 'Посилання на товари зі знижкою';
+
+  @override
+  String get promo_link_section_hint =>
+      'Необов’язково — виберіть товари, на які поширюється ця акція';
+
+  @override
+  String get promo_link_no_items =>
+      'Не знайдено жодного елемента. Спочатку додайте елементи до своїх меню.';
+
+  @override
+  String get promo_save_changes => 'Зберегти зміни';
+
+  @override
+  String get promo_create => 'Створити рекламну акцію';
+
+  @override
+  String get promo_no_dates =>
+      'Будь ласка, встановіть обидві дати початку та завершення.';
+
+  @override
+  String get promo_date_order_error =>
+      'Дата завершення має бути після дати початку.';
+
+  @override
+  String get promo_no_image => 'Будь ласка, виберіть зображення банера.';
+
+  @override
+  String get promo_updated => 'Акцію успішно оновлено';
+
+  @override
+  String get promo_created => 'Акцію успішно створено';
+
+  @override
+  String get promo_banner_cleanup_error =>
+      'Банер оновлено, але очищення старого файлу не вдалося.';
+
+  @override
+  String get promo_delete_title => 'Видалити рекламну акцію?';
+
+  @override
+  String get promo_delete_body =>
+      'Це назавжди видалить акцію та її банер. Цю дію неможливо скасувати.';
+
+  @override
+  String get promo_delete_cancel => 'Скасувати';
+
+  @override
+  String get promo_delete_confirm => 'Видалити';
+
+  @override
+  String get promo_deleted => 'Акцію видалено.';
+
+  @override
+  String get promo_location_dialog_title => 'Розташування ресторану';
+
+  @override
+  String get promo_location_none => 'Місцезнаходження ще не вибрано';
+
+  @override
+  String get promo_location_open_map => 'Відкрити карту';
+
+  @override
+  String get promo_location_change_map => 'Зміна на карті';
+
+  @override
+  String get promo_location_confirm => 'Підтвердити адресу';
+
+  @override
+  String get promo_location_no_pick =>
+      'Будь ласка, спочатку виберіть місце на карті.';
+
+  @override
+  String get settings_section_business => 'Бізнес';
+
+  @override
+  String get settings_section_business_sub =>
+      'Керуйте профілем та медіафайлами свого ресторану';
+
+  @override
+  String get settings_section_profile => 'Профіль користувача';
+
+  @override
+  String get settings_section_profile_sub =>
+      'Оновіть дані свого особистого облікового запису';
+
+  @override
+  String get settings_section_danger => 'НЕБЕЗПЕЧНА ЗОНА';
+
+  @override
+  String get settings_section_danger_sub =>
+      'Незворотні дії для вашого облікового запису';
+
+  @override
+  String get settings_logo_title => 'Логотип ресторану';
+
+  @override
+  String get settings_logo_status_staged => 'Новий логотип готовий';
+
+  @override
+  String get settings_logo_status_exists => 'Логотип завантажено';
+
+  @override
+  String get settings_logo_status_none => 'Ще немає логотипу';
+
+  @override
+  String get settings_logo_recommended =>
+      'Рекомендовано: 512×512 пікселів, PNG або JPG';
+
+  @override
+  String get settings_logo_choose => 'Виберіть';
+
+  @override
+  String get settings_logo_upload => 'Завантажити';
+
+  @override
+  String get settings_logo_uploading => 'Завантаження…';
+
+  @override
+  String get settings_logo_success => 'Логотип оновлено';
+
+  @override
+  String get settings_banner_title => 'Банер ресторану';
+
+  @override
+  String get settings_banner_choose => 'Натисніть, щоб вибрати банер';
+
+  @override
+  String get settings_banner_recommended => 'Рекомендовано: 1200×800 пікселів';
+
+  @override
+  String get settings_banner_upload => 'Завантажити банер';
+
+  @override
+  String get settings_banner_uploading => 'Завантаження…';
+
+  @override
+  String get settings_banner_success => 'Банер оновлено';
+
+  @override
+  String get settings_business_title => 'Інформація про бізнес';
+
+  @override
+  String get settings_business_saved => 'Інформацію про компанію збережено';
+
+  @override
+  String get settings_address_set => 'Встановити адресу ресторану';
+
+  @override
+  String get settings_address_change => 'Зміна';
+
+  @override
+  String get settings_address_pick => 'Виберіть на карті';
+
+  @override
+  String get settings_profile_title => 'Профіль';
+
+  @override
+  String get settings_profile_photo_ready =>
+      'Нове фото готове — натисніть «Зберегти», щоб застосувати';
+
+  @override
+  String get settings_profile_saved => 'Профіль збережено';
+
+  @override
+  String get settings_profile_name_hint => 'Ім\'я власника';
+
+  @override
+  String get settings_profile_phone_label => 'Номер телефону';
+
+  @override
+  String get settings_danger_reset_title => 'Змінити пароль';
+
+  @override
+  String get settings_danger_reset_sub =>
+      'Надіслати електронний лист для скидання пароля на ваш обліковий запис';
+
+  @override
+  String get settings_danger_reset_button => 'Скинути';
+
+  @override
+  String get settings_danger_reset_sent => 'Лист для скидання пароля надіслано';
+
+  @override
+  String get settings_danger_delete_title => 'Видалити обліковий запис';
+
+  @override
+  String get settings_danger_delete_sub =>
+      'Видаліть свій ресторан та всі дані назавжди';
+
+  @override
+  String get settings_danger_delete_button => 'Видалити';
+
+  @override
+  String get settings_danger_delete_dialog_title => 'Видалити обліковий запис';
+
+  @override
+  String get settings_danger_delete_dialog_body =>
+      'Це назавжди видалить ваш обліковий запис і всі дані ресторану. Цю дію не можна скасувати.';
+
+  @override
+  String get settings_cancel => 'Скасувати';
+
+  @override
+  String get settings_error => 'Щось пішло не так';
+
+  @override
+  String get settings_save_changes => 'Зберегти зміни';
+
+  @override
+  String get settings_map_dialog_title => 'Розташування ресторану';
+
+  @override
+  String get settings_map_no_location => 'Місцезнаходження ще не вибрано';
+
+  @override
+  String get settings_map_open => 'Відкрити карту';
+
+  @override
+  String get settings_map_change => 'Зміна на карті';
+
+  @override
+  String get settings_map_confirm => 'Підтвердити адресу';
+
+  @override
+  String get settings_map_no_pick =>
+      'Будь ласка, спочатку виберіть місце на карті.';
+
+  @override
+  String get tap_to_upload_image => 'Tap to upload image';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get password_does_not_meet_requirements =>
+      'Password does not meet requirements';
+
+  @override
+  String get password_is_required => 'Password is required';
+
+  @override
+  String get snackbar_dismiss => 'DISMISS';
+
+  @override
+  String get field_error_required => 'Це поле обов\'язкове';
+
+  @override
+  String get field_error_invalid_format => 'Недійсний формат';
+
+  @override
+  String get field_email_message => 'Введіть дійсну адресу електронної пошти';
+
+  @override
+  String get field_nip_message =>
+      'Національний ідентифікаційний номер (NIP) має складатися рівно з 10 цифр';
+
+  @override
+  String get field_regon_message => 'REGON має складатися з 9 або 14 цифр';
+
+  @override
+  String get field_postal_code_message =>
+      'Введіть дійсний поштовий індекс (XX-XXX)';
+
+  @override
+  String get field_hint_prefix => 'Введіть';
+
+  @override
+  String get items_design_edit_button => 'Редагувати елемент';
+
+  @override
+  String get items_design_edit_sheet_title => 'Редагувати елемент';
+
+  @override
+  String get items_design_delete_button => 'Видалити елемент';
+
+  @override
+  String get items_design_change_image_hint =>
+      'Натисніть, щоб змінити зображення';
+
+  @override
+  String get items_design_field_title_label => 'Назва елемента';
+
+  @override
+  String get items_design_field_info_label => 'Коротка інформація';
+
+  @override
+  String get items_design_field_info_hint => 'наприклад, хрусткі та смачні';
+
+  @override
+  String get items_design_field_desc_label => 'Опис';
+
+  @override
+  String get items_design_field_price_label => 'Ціна (злотих)';
+
+  @override
+  String get items_design_field_price_required => 'Ціна обов\'язкова';
+
+  @override
+  String get items_design_field_price_invalid => 'Введіть дійсний номер';
+
+  @override
+  String get items_design_field_tags_label => 'Теги';
+
+  @override
+  String get items_design_field_tags_hint => 'наприклад, веганський';
+
+  @override
+  String get items_design_discount_label => 'Знижка %';
+
+  @override
+  String get items_design_discount_required => 'Введіть відсоток знижки';
+
+  @override
+  String get items_design_discount_invalid => 'Введіть значення від 1 до 100';
+
+  @override
+  String get items_design_save_changes => 'Зберегти зміни';
+
+  @override
+  String get items_design_saved => 'Елемент успішно збережено';
+
+  @override
+  String get items_design_image_cleanup_error =>
+      'Зображення оновлено, але очищення старого файлу не вдалося.';
+
+  @override
+  String get items_design_delete_dialog_title => 'Видалити елемент';
+
+  @override
+  String get items_design_delete_dialog_body =>
+      'Ви впевнені, що хочете видалити цей елемент? Цю дію неможливо скасувати.';
+
+  @override
+  String get items_design_delete_cancel => 'Скасувати';
+
+  @override
+  String get items_design_delete_confirm => 'Видалити';
+
+  @override
+  String get items_design_deleted => 'Елемент успішно видалено';
+
+  @override
+  String get map_fetching_address => 'Отримання адреси...';
+
+  @override
+  String get map_address_not_found => 'Не вдалося знайти адресу';
+
+  @override
+  String get map_confirm_button => 'ПІДТВЕРДЖЕННЯ АДРЕСИ';
+
+  @override
+  String get menus_design_view_items => 'Переглянути елементи';
+
+  @override
+  String get menus_design_edit_button => 'Меню редагування';
+
+  @override
+  String get menus_design_edit_sheet_title => 'Меню редагування';
+
+  @override
+  String get menus_design_delete_button => 'Видалити меню';
+
+  @override
+  String get menus_design_change_image_hint =>
+      'Натисніть, щоб змінити зображення';
+
+  @override
+  String get menus_design_field_title_label => 'Назва меню';
+
+  @override
+  String get menus_design_field_desc_label => 'Опис';
+
+  @override
+  String get menus_design_field_title_required => 'Потрібно вказати назву';
+
+  @override
+  String get menus_design_field_desc_required => 'Опис обов\'язковий';
+
+  @override
+  String get menus_design_save_changes => 'Зберегти зміни';
+
+  @override
+  String get menus_design_saved => 'Меню успішно збережено';
+
+  @override
+  String get menus_design_banner_cleanup_error =>
+      'Банер оновлено, але очищення старого файлу не вдалося.';
+
+  @override
+  String get menus_design_delete_dialog_title => 'Видалити меню';
+
+  @override
+  String get menus_design_delete_dialog_body =>
+      'Ви впевнені, що хочете видалити це меню? Цю дію неможливо скасувати.';
+
+  @override
+  String get menus_design_delete_cancel => 'Скасувати';
+
+  @override
+  String get menus_design_delete_confirm => 'Видалити';
+
+  @override
+  String get menus_design_delete_missing_id =>
+      'Помилка: Відсутнє меню або ідентифікатор ресторану';
+
+  @override
+  String get menus_design_deleted => 'Меню успішно видалено';
+
+  @override
+  String get notif_sheet_title => 'Сповіщення';
+
+  @override
+  String notif_unread_count(int count) {
+    return '$count непрочитані';
+  }
+
+  @override
+  String get notif_mark_all_read => 'Позначити як прочитане';
+
+  @override
+  String get notif_empty_title => 'Поки що немає сповіщень';
+
+  @override
+  String get notif_empty_subtitle =>
+      'Повідомлення адміністратора відображатимуться тут';
+
+  @override
+  String get notif_time_just_now => 'Щойно';
+
+  @override
+  String notif_time_minutes(int n) {
+    return '$nхв тому';
+  }
+
+  @override
+  String notif_time_hours(int n) {
+    return '$nгод тому';
+  }
+
+  @override
+  String get notif_time_yesterday => 'Вчора';
+
+  @override
+  String notif_time_days(int n) {
+    return '$nднів тому';
+  }
 }

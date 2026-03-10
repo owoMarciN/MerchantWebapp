@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:user_app/services/location_service.dart';
 import 'package:user_app/extensions/context_translate_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
 class MapDialog extends StatefulWidget {
   final double? initialLat;
@@ -16,11 +17,12 @@ class MapDialog extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapDialog> {
-  final String _baseUrl = "https://europe-west1-freequick.cloudfunctions.net";
-  
+  final String _baseUrl =
+      "https://europe-west1-freequick.cloudfunctions.net";
+
   late GoogleMapController _mapController;
   late LatLng _pickedLocation;
-  String _currentAddress = "Wyszukiwanie adresu...";
+  String _currentAddress = '';
   bool _isLoading = false;
   List<dynamic> _suggestions = [];
 
@@ -30,11 +32,13 @@ class _MapScreenState extends State<MapDialog> {
       return;
     }
     try {
-      final url = "$_baseUrl/googleMapsAutocomplete?input=${Uri.encodeComponent(input)}";
+      final url =
+          "$_baseUrl/googleMapsAutocomplete?input=${Uri.encodeComponent(input)}";
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         setState(() {
-          _suggestions = json.decode(response.body)['predictions'] ?? [];
+          _suggestions =
+              json.decode(response.body)['predictions'] ?? [];
         });
       }
     } catch (e) {
@@ -53,7 +57,8 @@ class _MapScreenState extends State<MapDialog> {
         final lng = data['result']['geometry']['location']['lng'];
         final newPos = LatLng(lat, lng);
 
-        _mapController.animateCamera(CameraUpdate.newLatLngZoom(newPos, 16));
+        _mapController.animateCamera(
+            CameraUpdate.newLatLngZoom(newPos, 16));
 
         setState(() {
           _suggestions = [];
@@ -70,19 +75,20 @@ class _MapScreenState extends State<MapDialog> {
 
   void _getAddress(LatLng location) async {
     setState(() => _isLoading = true);
-    try {      
-      final result = await LocationService.getUserLocationAddressFromGoogle(
-        location.latitude, 
-        location.longitude, 
+    try {
+      final result =
+          await LocationService.getUserLocationAddressFromGoogle(
+        location.latitude,
+        location.longitude,
       );
-      
+
       setState(() {
         _currentAddress = result['fullAddress'];
         _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _currentAddress = "Couldn't find the address";
+        _currentAddress = context.l10n.map_address_not_found;
         _isLoading = false;
       });
     }
@@ -92,7 +98,7 @@ class _MapScreenState extends State<MapDialog> {
   void initState() {
     super.initState();
     _pickedLocation = LatLng(
-      widget.initialLat ?? 37.4220, 
+      widget.initialLat ?? 37.4220,
       widget.initialLng ?? -122.0841,
     );
     _getAddress(_pickedLocation);
@@ -101,7 +107,8 @@ class _MapScreenState extends State<MapDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+      insetPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
@@ -109,9 +116,11 @@ class _MapScreenState extends State<MapDialog> {
         child: Stack(
           children: [
             GoogleMap(
-              initialCameraPosition: CameraPosition(target: _pickedLocation, zoom: 15),
+              initialCameraPosition: CameraPosition(
+                  target: _pickedLocation, zoom: 15),
               onMapCreated: (controller) => _mapController = controller,
-              onCameraMove: (position) => _pickedLocation = position.target,
+              onCameraMove: (position) =>
+                  _pickedLocation = position.target,
               onCameraIdle: () => _getAddress(_pickedLocation),
               myLocationEnabled: true,
               zoomControlsEnabled: false,
@@ -120,18 +129,22 @@ class _MapScreenState extends State<MapDialog> {
             const Center(
               child: Padding(
                 padding: EdgeInsets.only(bottom: 35),
-                child: Icon(Icons.location_on, size: 45, color: Colors.red),
+                child:
+                    Icon(Icons.location_on, size: 45, color: Colors.red),
               ),
             ),
 
             Positioned(
-              top: 70, left: 15, right: 15,
+              top: 70,
+              left: 15,
+              right: 15,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Card(
                     elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: context.l10n.searchAddress,
@@ -142,7 +155,6 @@ class _MapScreenState extends State<MapDialog> {
                       onChanged: (value) => _getSuggestions(value),
                     ),
                   ),
-                  
                   if (_suggestions.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
@@ -151,27 +163,32 @@ class _MapScreenState extends State<MapDialog> {
                         borderRadius: BorderRadius.circular(12),
                         color: Colors.white,
                         child: Container(
-                          constraints: const BoxConstraints(maxHeight: 250),
+                          constraints:
+                              const BoxConstraints(maxHeight: 250),
                           child: ListView.separated(
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             itemCount: _suggestions.length,
-                            separatorBuilder: (context, index) => const Divider(height: 1),
+                            separatorBuilder: (context, index) =>
+                                const Divider(height: 1),
                             itemBuilder: (context, index) {
                               return ListTile(
-                                leading: const Icon(Icons.location_on, color: Colors.blueGrey),
+                                leading: const Icon(Icons.location_on,
+                                    color: Colors.blueGrey),
                                 title: Text(
                                   _suggestions[index]['description'],
-                                  style: const TextStyle(fontSize: 14, color: Colors.black),
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 onTap: () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                  _handleSuggestionClick(_suggestions[index]['place_id']);
-                                  setState(() {
-                                    _suggestions = [];
-                                  });
+                                  FocusManager.instance.primaryFocus
+                                      ?.unfocus();
+                                  _handleSuggestionClick(
+                                      _suggestions[index]['place_id']);
+                                  setState(() => _suggestions = []);
                                 },
                               );
                             },
@@ -192,21 +209,27 @@ class _MapScreenState extends State<MapDialog> {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10)
+                        BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10)
                       ],
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.map, color: Colors.blueGrey, size: 20),
+                        const Icon(Icons.map,
+                            color: Colors.blueGrey, size: 20),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            _isLoading ? "Pobieranie adresu..." : _currentAddress,
+                            _isLoading
+                                ? context.l10n.map_fetching_address
+                                : _currentAddress,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -229,18 +252,24 @@ class _MapScreenState extends State<MapDialog> {
                       icon: const Icon(Icons.check_circle_outline, size: 24),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
-                        foregroundColor: Colors.white, 
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         elevation: 2,
                       ),
-                      onPressed: _isLoading ? null : () => Navigator.pop(context, {
-                        "address": _currentAddress,
-                        "latitude": _pickedLocation.latitude,
-                        "longitude": _pickedLocation.longitude,
-                      }),
-                      label: const Text(
-                        "POTWIERDŹ ADRES", 
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 1.1)
+                      onPressed: _isLoading
+                          ? null
+                          : () => Navigator.pop(context, {
+                                "address": _currentAddress,
+                                "latitude": _pickedLocation.latitude,
+                                "longitude": _pickedLocation.longitude,
+                              }),
+                      label: Text(
+                        context.l10n.map_confirm_button,
+                        style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.1),
                       ),
                     ),
                   ),

@@ -1505,4 +1505,717 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overview_chef_fallback => 'Chef';
+
+  @override
+  String get items_app_bar_fallback => 'Items';
+
+  @override
+  String get items_empty_title => 'No items yet';
+
+  @override
+  String get items_empty_subtitle => 'Tap + to add your first item';
+
+  @override
+  String items_error(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get items_fab => 'Add Item';
+
+  @override
+  String get items_sheet_title => 'Add Item';
+
+  @override
+  String get items_image_upload_label => 'Upload Item Image';
+
+  @override
+  String get items_image_browse => 'Click to browse';
+
+  @override
+  String get items_field_title_label => 'Item Title';
+
+  @override
+  String get items_field_title_hint => 'e.g. Pierogi Ruskie';
+
+  @override
+  String get items_field_title_required => 'Title is required';
+
+  @override
+  String get items_field_info_label => 'Short Info';
+
+  @override
+  String get items_field_info_hint => 'e.g. Crispy and Tasty';
+
+  @override
+  String get items_field_info_required => 'Info is required';
+
+  @override
+  String get items_field_desc_label => 'Description';
+
+  @override
+  String get items_field_desc_hint => 'Describe the item...';
+
+  @override
+  String get items_field_desc_required => 'Description is required';
+
+  @override
+  String get items_field_price_label => 'Price (PLN)';
+
+  @override
+  String get items_field_price_hint => 'e.g. 24.99';
+
+  @override
+  String get items_field_price_required => 'Price is required';
+
+  @override
+  String get items_field_price_invalid => 'Enter a valid number';
+
+  @override
+  String get items_field_tags_label => 'Tags';
+
+  @override
+  String get items_field_tags_hint => 'e.g. Vegan';
+
+  @override
+  String get items_tag_error_empty => 'Please enter a tag';
+
+  @override
+  String get items_tag_error_capitalize => 'First letter must be capitalized';
+
+  @override
+  String get items_tag_error_letters => 'Only letters are allowed';
+
+  @override
+  String get items_tag_error_duplicate => 'Tag already exists';
+
+  @override
+  String get items_discount_toggle => 'Apply Discount';
+
+  @override
+  String get items_discount_label => 'Discount %';
+
+  @override
+  String get items_discount_required => 'Enter a discount percentage';
+
+  @override
+  String get items_discount_invalid => 'Enter a value between 1 and 100';
+
+  @override
+  String get items_no_image => 'Please select an item image.';
+
+  @override
+  String get items_added => 'Item added successfully';
+
+  @override
+  String get items_submit => 'Add Item';
+
+  @override
+  String get menus_empty_title => 'No menus yet';
+
+  @override
+  String get menus_empty_subtitle => 'Tap + to add your first menu';
+
+  @override
+  String menus_error(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get menus_fab => 'Add Menu';
+
+  @override
+  String get menus_sheet_title => 'Add Menu';
+
+  @override
+  String get menus_image_upload_label => 'Upload Banner Image';
+
+  @override
+  String get menus_image_browse => 'Click to browse';
+
+  @override
+  String get menus_field_title_label => 'Menu Title';
+
+  @override
+  String get menus_field_title_hint => 'e.g. Lunch Specials';
+
+  @override
+  String get menus_field_title_required => 'Title is required';
+
+  @override
+  String get menus_field_desc_label => 'Description';
+
+  @override
+  String get menus_field_desc_hint => 'Briefly describe this menu...';
+
+  @override
+  String get menus_field_desc_required => 'Description is required';
+
+  @override
+  String get menus_no_image => 'Please select a banner image.';
+
+  @override
+  String get menus_created => 'Menu created successfully';
+
+  @override
+  String get menus_submit => 'Create Menu';
+
+  @override
+  String get orders_error => 'Something went wrong';
+
+  @override
+  String get orders_empty_title => 'No orders right now';
+
+  @override
+  String get orders_empty_subtitle =>
+      'When customers place orders they will appear here.';
+
+  @override
+  String get orders_table_order_id => 'ORDER ID';
+
+  @override
+  String get orders_table_customer => 'CUSTOMER';
+
+  @override
+  String get orders_table_items => 'ITEMS';
+
+  @override
+  String get orders_table_status => 'STATUS';
+
+  @override
+  String get orders_table_total => 'TOTAL';
+
+  @override
+  String orders_item_count(int count) {
+    return '$count item';
+  }
+
+  @override
+  String orders_item_count_plural(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get promo_not_authenticated => 'Not authenticated';
+
+  @override
+  String get promo_empty_title => 'No promotions yet';
+
+  @override
+  String get promo_empty_subtitle =>
+      'Tap + to create your first promotion banner';
+
+  @override
+  String get promo_fab => 'New Promotion';
+
+  @override
+  String get promo_badge_live => 'Live';
+
+  @override
+  String get promo_badge_inactive => 'Inactive';
+
+  @override
+  String promo_items_linked(int count) {
+    return '$count item';
+  }
+
+  @override
+  String promo_items_linked_plural(int count) {
+    return '$count items';
+  }
+
+  @override
+  String get promo_edit_button => 'Edit';
+
+  @override
+  String get promo_sheet_add_title => 'New Promotion';
+
+  @override
+  String get promo_sheet_edit_title => 'Edit Promotion';
+
+  @override
+  String get promo_sheet_delete_button => 'Delete';
+
+  @override
+  String get promo_image_change_hint => 'Tap to change banner';
+
+  @override
+  String get promo_image_upload_hint => 'Tap to upload banner image';
+
+  @override
+  String get promo_image_upload_label => 'Upload Banner Image';
+
+  @override
+  String get promo_image_recommended => 'Recommended: 1200×400px';
+
+  @override
+  String get promo_field_title_label => 'Promotion Title';
+
+  @override
+  String get promo_field_title_hint => 'e.g. Weekend Discount';
+
+  @override
+  String get promo_field_title_required => 'Title is required';
+
+  @override
+  String get promo_field_desc_label => 'Description';
+
+  @override
+  String get promo_field_desc_hint =>
+      'e.g. Up to 30% off all mains this weekend';
+
+  @override
+  String get promo_field_desc_required => 'Description is required';
+
+  @override
+  String get promo_date_start => 'Start Date';
+
+  @override
+  String get promo_date_end => 'End Date';
+
+  @override
+  String get promo_date_pick => 'Pick date';
+
+  @override
+  String get promo_active_toggle => 'Promotion Active';
+
+  @override
+  String get promo_link_section_label => 'Link Discounted Items';
+
+  @override
+  String get promo_link_section_hint =>
+      'Optional — select items this promotion applies to';
+
+  @override
+  String get promo_link_no_items =>
+      'No items found. Add items to your menus first.';
+
+  @override
+  String get promo_save_changes => 'Save Changes';
+
+  @override
+  String get promo_create => 'Create Promotion';
+
+  @override
+  String get promo_no_dates => 'Please set both start and end dates.';
+
+  @override
+  String get promo_date_order_error => 'End date must be after start date.';
+
+  @override
+  String get promo_no_image => 'Please select a banner image.';
+
+  @override
+  String get promo_updated => 'Promotion updated successfully';
+
+  @override
+  String get promo_created => 'Promotion created successfully';
+
+  @override
+  String get promo_banner_cleanup_error =>
+      'Banner updated, but cleanup of old file failed.';
+
+  @override
+  String get promo_delete_title => 'Delete Promotion?';
+
+  @override
+  String get promo_delete_body =>
+      'This will permanently delete the promotion and its banner. This cannot be undone.';
+
+  @override
+  String get promo_delete_cancel => 'Cancel';
+
+  @override
+  String get promo_delete_confirm => 'Delete';
+
+  @override
+  String get promo_deleted => 'Promotion deleted.';
+
+  @override
+  String get promo_location_dialog_title => 'Restaurant Location';
+
+  @override
+  String get promo_location_none => 'No location selected yet';
+
+  @override
+  String get promo_location_open_map => 'Open Map';
+
+  @override
+  String get promo_location_change_map => 'Change on Map';
+
+  @override
+  String get promo_location_confirm => 'Confirm Address';
+
+  @override
+  String get promo_location_no_pick =>
+      'Please pick a location on the map first.';
+
+  @override
+  String get settings_section_business => 'Business';
+
+  @override
+  String get settings_section_business_sub =>
+      'Manage your restaurant profile and media';
+
+  @override
+  String get settings_section_profile => 'User Profile';
+
+  @override
+  String get settings_section_profile_sub =>
+      'Update your personal account details';
+
+  @override
+  String get settings_section_danger => 'Danger Zone';
+
+  @override
+  String get settings_section_danger_sub =>
+      'Irreversible actions for your account';
+
+  @override
+  String get settings_logo_title => 'Restaurant Logo';
+
+  @override
+  String get settings_logo_status_staged => 'New logo ready';
+
+  @override
+  String get settings_logo_status_exists => 'Logo uploaded';
+
+  @override
+  String get settings_logo_status_none => 'No logo yet';
+
+  @override
+  String get settings_logo_recommended => 'Recommended: 512×512px, PNG or JPG';
+
+  @override
+  String get settings_logo_choose => 'Choose';
+
+  @override
+  String get settings_logo_upload => 'Upload';
+
+  @override
+  String get settings_logo_uploading => 'Uploading…';
+
+  @override
+  String get settings_logo_success => 'Logo updated';
+
+  @override
+  String get settings_banner_title => 'Restaurant Banner';
+
+  @override
+  String get settings_banner_choose => 'Click to choose banner';
+
+  @override
+  String get settings_banner_recommended => 'Recommended: 1200×800px';
+
+  @override
+  String get settings_banner_upload => 'Upload Banner';
+
+  @override
+  String get settings_banner_uploading => 'Uploading…';
+
+  @override
+  String get settings_banner_success => 'Banner updated';
+
+  @override
+  String get settings_business_title => 'Business Info';
+
+  @override
+  String get settings_business_saved => 'Business info saved';
+
+  @override
+  String get settings_address_set => 'Set restaurant address';
+
+  @override
+  String get settings_address_change => 'Change';
+
+  @override
+  String get settings_address_pick => 'Pick on map';
+
+  @override
+  String get settings_profile_title => 'Profile';
+
+  @override
+  String get settings_profile_photo_ready =>
+      'New photo ready — press Save to apply';
+
+  @override
+  String get settings_profile_saved => 'Profile saved';
+
+  @override
+  String get settings_profile_name_hint => 'Owner\'s Name';
+
+  @override
+  String get settings_profile_phone_label => 'Phone Number';
+
+  @override
+  String get settings_danger_reset_title => 'Change Password';
+
+  @override
+  String get settings_danger_reset_sub =>
+      'Send a password reset email to your account';
+
+  @override
+  String get settings_danger_reset_button => 'Reset';
+
+  @override
+  String get settings_danger_reset_sent => 'Password reset email sent';
+
+  @override
+  String get settings_danger_delete_title => 'Delete Account';
+
+  @override
+  String get settings_danger_delete_sub =>
+      'Permanently delete your restaurant and all data';
+
+  @override
+  String get settings_danger_delete_button => 'Delete';
+
+  @override
+  String get settings_danger_delete_dialog_title => 'Delete Account';
+
+  @override
+  String get settings_danger_delete_dialog_body =>
+      'This will permanently delete your account and all restaurant data. This cannot be undone.';
+
+  @override
+  String get settings_cancel => 'Cancel';
+
+  @override
+  String get settings_error => 'Something went wrong';
+
+  @override
+  String get settings_save_changes => 'Save Changes';
+
+  @override
+  String get settings_map_dialog_title => 'Restaurant Location';
+
+  @override
+  String get settings_map_no_location => 'No location selected yet';
+
+  @override
+  String get settings_map_open => 'Open Map';
+
+  @override
+  String get settings_map_change => 'Change on Map';
+
+  @override
+  String get settings_map_confirm => 'Confirm Address';
+
+  @override
+  String get settings_map_no_pick => 'Please pick a location on the map first.';
+
+  @override
+  String get tap_to_upload_image => 'Tap to upload image';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get password_does_not_meet_requirements =>
+      'Password does not meet requirements';
+
+  @override
+  String get password_is_required => 'Password is required';
+
+  @override
+  String get snackbar_dismiss => 'DISMISS';
+
+  @override
+  String get field_error_required => 'This field is required';
+
+  @override
+  String get field_error_invalid_format => 'Invalid format';
+
+  @override
+  String get field_email_message => 'Enter a valid email address';
+
+  @override
+  String get field_nip_message => 'NIP must be exactly 10 digits';
+
+  @override
+  String get field_regon_message => 'REGON must be 9 or 14 digits';
+
+  @override
+  String get field_postal_code_message => 'Enter a valid postal code (XX-XXX)';
+
+  @override
+  String get field_hint_prefix => 'Enter ';
+
+  @override
+  String get items_design_edit_button => 'Edit Item';
+
+  @override
+  String get items_design_edit_sheet_title => 'Edit Item';
+
+  @override
+  String get items_design_delete_button => 'Delete Item';
+
+  @override
+  String get items_design_change_image_hint => 'Tap to change image';
+
+  @override
+  String get items_design_field_title_label => 'Item Title';
+
+  @override
+  String get items_design_field_info_label => 'Short Info';
+
+  @override
+  String get items_design_field_info_hint => 'e.g. Crispy and Tasty';
+
+  @override
+  String get items_design_field_desc_label => 'Description';
+
+  @override
+  String get items_design_field_price_label => 'Price (PLN)';
+
+  @override
+  String get items_design_field_price_required => 'Price is required';
+
+  @override
+  String get items_design_field_price_invalid => 'Enter a valid number';
+
+  @override
+  String get items_design_field_tags_label => 'Tags';
+
+  @override
+  String get items_design_field_tags_hint => 'e.g. Vegan';
+
+  @override
+  String get items_design_discount_label => 'Discount %';
+
+  @override
+  String get items_design_discount_required => 'Enter a discount percentage';
+
+  @override
+  String get items_design_discount_invalid => 'Enter a value between 1 and 100';
+
+  @override
+  String get items_design_save_changes => 'Save Changes';
+
+  @override
+  String get items_design_saved => 'Item saved successfully';
+
+  @override
+  String get items_design_image_cleanup_error =>
+      'Image updated, but cleanup of old file failed.';
+
+  @override
+  String get items_design_delete_dialog_title => 'Delete Item';
+
+  @override
+  String get items_design_delete_dialog_body =>
+      'Are you sure you want to delete this item? This cannot be undone.';
+
+  @override
+  String get items_design_delete_cancel => 'Cancel';
+
+  @override
+  String get items_design_delete_confirm => 'Delete';
+
+  @override
+  String get items_design_deleted => 'Item deleted successfully';
+
+  @override
+  String get map_fetching_address => 'Fetching address...';
+
+  @override
+  String get map_address_not_found => 'Couldn\'t find the address';
+
+  @override
+  String get map_confirm_button => 'CONFIRM ADDRESS';
+
+  @override
+  String get menus_design_view_items => 'View Items';
+
+  @override
+  String get menus_design_edit_button => 'Edit Menu';
+
+  @override
+  String get menus_design_edit_sheet_title => 'Edit Menu';
+
+  @override
+  String get menus_design_delete_button => 'Delete Menu';
+
+  @override
+  String get menus_design_change_image_hint => 'Tap to change image';
+
+  @override
+  String get menus_design_field_title_label => 'Menu Title';
+
+  @override
+  String get menus_design_field_desc_label => 'Description';
+
+  @override
+  String get menus_design_field_title_required => 'Title is required';
+
+  @override
+  String get menus_design_field_desc_required => 'Description is required';
+
+  @override
+  String get menus_design_save_changes => 'Save Changes';
+
+  @override
+  String get menus_design_saved => 'Menu saved successfully';
+
+  @override
+  String get menus_design_banner_cleanup_error =>
+      'Banner updated, but cleanup of old file failed.';
+
+  @override
+  String get menus_design_delete_dialog_title => 'Delete Menu';
+
+  @override
+  String get menus_design_delete_dialog_body =>
+      'Are you sure you want to delete this menu? This cannot be undone.';
+
+  @override
+  String get menus_design_delete_cancel => 'Cancel';
+
+  @override
+  String get menus_design_delete_confirm => 'Delete';
+
+  @override
+  String get menus_design_delete_missing_id =>
+      'Error: Missing Menu or Restaurant ID';
+
+  @override
+  String get menus_design_deleted => 'Menu deleted successfully';
+
+  @override
+  String get notif_sheet_title => 'Notifications';
+
+  @override
+  String notif_unread_count(int count) {
+    return '$count unread';
+  }
+
+  @override
+  String get notif_mark_all_read => 'Mark all read';
+
+  @override
+  String get notif_empty_title => 'No notifications yet';
+
+  @override
+  String get notif_empty_subtitle => 'Admin messages will appear here';
+
+  @override
+  String get notif_time_just_now => 'Just now';
+
+  @override
+  String notif_time_minutes(int n) {
+    return '${n}m ago';
+  }
+
+  @override
+  String notif_time_hours(int n) {
+    return '${n}h ago';
+  }
+
+  @override
+  String get notif_time_yesterday => 'Yesterday';
+
+  @override
+  String notif_time_days(int n) {
+    return '${n}d ago';
+  }
 }

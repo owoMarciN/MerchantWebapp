@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
-import 'package:user_app/methods/assistant_methods.dart';
-import 'package:user_app/models/menus.dart';
-import 'package:user_app/screens/items_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
+import 'package:user_app/methods/assistant_methods.dart';
+import 'package:user_app/models/menus.dart';
+import 'package:user_app/screens/items_screen.dart';
 import 'package:user_app/widgets/edit_sheet_components.dart';
 import 'package:user_app/widgets/unified_snackbar.dart';
 
@@ -56,7 +57,8 @@ class MenusDesignWidget extends StatelessWidget {
                       loadingBuilder: (context, child, progress) {
                         if (progress == null) return child;
                         return Container(
-                          color: brandColors.navy?.withValues(alpha: 0.05),
+                          color:
+                              brandColors.navy?.withValues(alpha: 0.05),
                           child: Center(
                             child: CircularProgressIndicator(
                               value: progress.expectedTotalBytes != null
@@ -70,9 +72,9 @@ class MenusDesignWidget extends StatelessWidget {
                         );
                       },
                       errorBuilder: (_, __, ___) =>
-                          customImagePlaceholder(brandColors),
+                          customImagePlaceholder(context, brandColors),
                     )
-                  : customImagePlaceholder(brandColors),
+                  : customImagePlaceholder(context, brandColors),
             ),
 
             Padding(
@@ -105,11 +107,12 @@ class MenusDesignWidget extends StatelessWidget {
                         Row(
                           children: [
                             const Icon(Icons.arrow_forward_rounded,
-                                size: 14, color: Colors.lightBlueAccent),
+                                size: 14,
+                                color: Colors.lightBlueAccent),
                             const SizedBox(width: 4),
-                            const Text(
-                              'View Items',
-                              style: TextStyle(
+                            Text(
+                              context.l10n.menus_design_view_items,
+                              style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.lightBlueAccent),
@@ -122,14 +125,15 @@ class MenusDesignWidget extends StatelessWidget {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12),
                       backgroundColor:
                           brandColors.muted!.withValues(alpha: 0.3),
                     ),
                     onPressed: () => _openEditSheet(context),
                     child: Row(
                       children: [
-                        Text('Edit Menu',
+                        Text(context.l10n.menus_design_edit_button,
                             style: TextStyle(
                                 color: brandColors.accentGreen,
                                 fontWeight: FontWeight.bold)),
@@ -149,7 +153,7 @@ class MenusDesignWidget extends StatelessWidget {
   }
 }
 
-// -- Edit sheet --------------------------------------------------------------------
+// -- Edit sheet ---------------------------------------------------------------
 
 class _EditMenuSheet extends StatefulWidget {
   final Menus menu;
@@ -171,7 +175,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.menu.title ?? '');
+    _titleController =
+        TextEditingController(text: widget.menu.title ?? '');
     _descriptionController =
         TextEditingController(text: widget.menu.description ?? '');
   }
@@ -203,7 +208,6 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
       final String? oldUrl = widget.menu.bannerUrl;
       bool bannerChanged = false;
 
-      // Upload new banner only if one was picked
       if (_imageBytes != null) {
         final String fileName =
             '${DateTime.now().millisecondsSinceEpoch}_$_imageFileName';
@@ -219,9 +223,6 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
         bannerChanged = true;
       }
 
-      // Always write — regardless of whether the image changed.
-      // Previously this block was nested inside `if (_imageBytes != null)`,
-      // which meant text-only edits were silently discarded.
       await FirebaseFirestore.instance
           .collection('restaurants')
           .doc(widget.menu.restaurantID)
@@ -233,18 +234,17 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
         if (bannerChanged) 'bannerUrl': finalBannerUrl,
       });
 
-      // Clean up old banner only after the update succeeds
       if (bannerChanged && oldUrl != null && oldUrl.isNotEmpty) {
         final String? errorMsg = await deleteOldFile(oldUrl);
         if (errorMsg != null && mounted) {
           unifiedSnackBar(
-              context, 'Banner updated, but cleanup of old file failed.',
+              context, context.l10n.menus_design_banner_cleanup_error,
               error: true);
         }
       }
 
       if (!mounted) return;
-      unifiedSnackBar(context, 'Menu saved successfully');
+      unifiedSnackBar(context, context.l10n.menus_design_saved);
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
@@ -258,17 +258,16 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Menu'),
-        content: const Text(
-            'Are you sure you want to delete this menu? This cannot be undone.'),
+        title: Text(context.l10n.menus_design_delete_dialog_title),
+        content: Text(context.l10n.menus_design_delete_dialog_body),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(context.l10n.menus_design_delete_cancel)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child:
-                const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+            child: Text(context.l10n.menus_design_delete_confirm,
+                style: const TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -277,7 +276,7 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
     if (confirm != true || !mounted) return;
 
     if (widget.menu.restaurantID == null || widget.menu.menuID == null) {
-      unifiedSnackBar(context, 'Error: Missing Menu or Restaurant ID',
+      unifiedSnackBar(context, context.l10n.menus_design_delete_missing_id,
           error: true);
       return;
     }
@@ -285,7 +284,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
     setState(() => _isLoading = true);
 
     try {
-      if (widget.menu.bannerUrl != null && widget.menu.bannerUrl!.isNotEmpty) {
+      if (widget.menu.bannerUrl != null &&
+          widget.menu.bannerUrl!.isNotEmpty) {
         await deleteOldFile(widget.menu.bannerUrl!);
       }
 
@@ -298,7 +298,7 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
 
       if (!mounted) return;
       Navigator.pop(context);
-      unifiedSnackBar(context, 'Menu deleted successfully');
+      unifiedSnackBar(context, context.l10n.menus_design_deleted);
     } catch (e) {
       if (!mounted) return;
       unifiedSnackBar(context, e.toString(), error: true);
@@ -330,9 +330,9 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Edit Menu',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                  Text(context.l10n.menus_design_edit_sheet_title,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w700)),
                   Row(
                     children: [
                       ElevatedButton(
@@ -341,8 +341,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                                 Colors.pink.withValues(alpha: 0.3)),
                         onPressed: _isLoading ? null : _delete,
                         child: Row(children: [
-                          const Text('Delete Menu',
-                              style: TextStyle(
+                          Text(context.l10n.menus_design_delete_button,
+                              style: const TextStyle(
                                   color: Colors.redAccent,
                                   fontWeight: FontWeight.bold)),
                           const SizedBox(width: 10),
@@ -353,8 +353,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                       const SizedBox(width: 16),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon:
-                            Icon(Icons.close_rounded, color: brandColors.muted),
+                        icon: Icon(Icons.close_rounded,
+                            color: brandColors.muted),
                       ),
                     ],
                   ),
@@ -386,25 +386,28 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                           ? Image.network(widget.menu.bannerUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
-                                  customImagePlaceholder(brandColors))
-                          : customImagePlaceholder(brandColors),
+                                  customImagePlaceholder(context, brandColors))
+                          : customImagePlaceholder(context, brandColors),
                 ),
               ),
               const SizedBox(height: 8),
               Center(
-                child: Text('Tap to change image',
-                    style: TextStyle(fontSize: 11, color: brandColors.muted)),
+                child: Text(
+                    context.l10n.menus_design_change_image_hint,
+                    style: TextStyle(
+                        fontSize: 11, color: brandColors.muted)),
               ),
               const SizedBox(height: 20),
 
               TextFormField(
                 controller: _titleController,
                 decoration: customInputDecoration(
-                    label: 'Menu Title',
+                    label: context.l10n.menus_design_field_title_label,
                     colorScheme: colorScheme,
                     brandColors: brandColors),
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Title is required' : null,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.menus_design_field_title_required
+                    : null,
               ),
               const SizedBox(height: 16),
 
@@ -412,11 +415,11 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: customInputDecoration(
-                    label: 'Description',
+                    label: context.l10n.menus_design_field_desc_label,
                     colorScheme: colorScheme,
                     brandColors: brandColors),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Description is required'
+                    ? context.l10n.menus_design_field_desc_required
                     : null,
               ),
 
@@ -440,8 +443,8 @@ class _EditMenuSheetState extends State<_EditMenuSheet> {
                           height: 20,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
-                      : const Text('Save Changes',
-                          style: TextStyle(
+                      : Text(context.l10n.menus_design_save_changes,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 15)),
                 ),
               ),

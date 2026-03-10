@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/extensions/responsive_ext.dart';
 import 'package:user_app/models/items.dart';
 import 'package:user_app/models/menus.dart';
@@ -42,7 +43,7 @@ class ItemsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          model?.title ?? 'Items',
+          model?.title ?? context.l10n.items_app_bar_fallback,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
         bottom: PreferredSize(
@@ -74,7 +75,7 @@ class ItemsScreen extends StatelessWidget {
                     return SliverToBoxAdapter(
                       child: Center(
                         child: Text(
-                          "Error: ${snapshot.error}",
+                          context.l10n.items_error(snapshot.error.toString()),
                           style: TextStyle(color: brandColors.muted),
                         ),
                       ),
@@ -90,11 +91,11 @@ class ItemsScreen extends StatelessWidget {
                             Icon(Icons.fastfood_rounded,
                                 size: 64, color: brandColors.muted),
                             const SizedBox(height: 16),
-                            const Text('No items yet',
-                                style: TextStyle(
+                            Text(context.l10n.items_empty_title,
+                                style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.w600)),
                             const SizedBox(height: 8),
-                            Text('Tap + to add your first item',
+                            Text(context.l10n.items_empty_subtitle,
                                 style: TextStyle(
                                     fontSize: 14, color: brandColors.muted)),
                           ],
@@ -132,8 +133,8 @@ class ItemsScreen extends StatelessWidget {
               onPressed: () => _openAddItemSheet(context),
               backgroundColor: brandColors.navy,
               icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: const Text('Add Item',
-                  style: TextStyle(
+              label: Text(context.l10n.items_fab,
+                  style: const TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
@@ -143,7 +144,7 @@ class ItemsScreen extends StatelessWidget {
   }
 }
 
-// -- Add item sheet ------------------------------------------------------------
+// -- Add item sheet -----------------------------------------------------------
 
 class _AddItemSheet extends StatefulWidget {
   final Menus menu;
@@ -172,7 +173,6 @@ class _AddItemSheetState extends State<_AddItemSheet> {
   @override
   void initState() {
     super.initState();
-    // Rebuild when price/discount change so the live preview updates
     _priceController.addListener(() => setState(() {}));
     _discountController.addListener(() => setState(() {}));
   }
@@ -193,13 +193,13 @@ class _AddItemSheetState extends State<_AddItemSheet> {
     String? validationResult;
 
     if (tag.isEmpty) {
-      validationResult = 'Please enter a tag';
+      validationResult = context.l10n.items_tag_error_empty;
     } else if (!RegExp(r'^[A-Z]').hasMatch(tag)) {
-      validationResult = 'First letter must be capitalized';
+      validationResult = context.l10n.items_tag_error_capitalize;
     } else if (!RegExp(r'^[a-zA-Z]+$').hasMatch(tag)) {
-      validationResult = 'Only letters are allowed';
+      validationResult = context.l10n.items_tag_error_letters;
     } else if (_tags.contains(tag)) {
-      validationResult = 'Tag already exists';
+      validationResult = context.l10n.items_tag_error_duplicate;
     }
 
     setState(() {
@@ -246,7 +246,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_imageBytes == null) {
-      unifiedSnackBar(context, 'Please select an item image.', error: true);
+      unifiedSnackBar(context, context.l10n.items_no_image, error: true);
       return;
     }
 
@@ -302,17 +302,18 @@ class _AddItemSheetState extends State<_AddItemSheet> {
 
       if (!mounted) return;
       final messenger = ScaffoldMessenger.of(context);
+      final addedMsg = context.l10n.items_added;
       Navigator.pop(context);
       messenger
         ..clearSnackBars()
         ..showSnackBar(
           SnackBar(
-            content: const Row(children: [
-              Icon(Icons.check_circle_outline_rounded,
+            content: Row(children: [
+              const Icon(Icons.check_circle_outline_rounded,
                   color: Colors.white, size: 20),
-              SizedBox(width: 12),
-              Text('Item added successfully',
-                  style: TextStyle(
+              const SizedBox(width: 12),
+              Text(addedMsg,
+                  style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w500)),
@@ -354,13 +355,12 @@ class _AddItemSheetState extends State<_AddItemSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Add Item',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                  Text(context.l10n.items_sheet_title,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w700)),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(Icons.close_rounded, color: brandColors.muted),
@@ -396,13 +396,13 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                             Icon(Icons.add_photo_alternate_outlined,
                                 size: 40, color: brandColors.muted),
                             const SizedBox(height: 8),
-                            Text('Upload Item Image',
+                            Text(context.l10n.items_image_upload_label,
                                 style: TextStyle(
                                     fontSize: 13,
                                     color: brandColors.muted,
                                     fontWeight: FontWeight.w500)),
                             const SizedBox(height: 4),
-                            Text('Click to browse',
+                            Text(context.l10n.items_image_browse,
                                 style: TextStyle(
                                     fontSize: 11, color: brandColors.muted)),
                           ],
@@ -415,15 +415,16 @@ class _AddItemSheetState extends State<_AddItemSheet> {
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  labelText: 'Item Title',
-                  hintText: 'e.g. Pierogi Ruskie',
+                  labelText: context.l10n.items_field_title_label,
+                  hintText: context.l10n.items_field_title_hint,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Title is required' : null,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.items_field_title_required
+                    : null,
               ),
               const SizedBox(height: 16),
 
@@ -431,15 +432,16 @@ class _AddItemSheetState extends State<_AddItemSheet> {
               TextFormField(
                 controller: _infoController,
                 decoration: InputDecoration(
-                  labelText: 'Short Info',
-                  hintText: 'e.g. Crispy and Tasty',
+                  labelText: context.l10n.items_field_info_label,
+                  hintText: context.l10n.items_field_info_hint,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Info is required' : null,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.items_field_info_required
+                    : null,
               ),
               const SizedBox(height: 16),
 
@@ -448,15 +450,15 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  labelText: 'Description',
-                  hintText: 'Describe the item...',
+                  labelText: context.l10n.items_field_desc_label,
+                  hintText: context.l10n.items_field_desc_hint,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Description is required'
+                    ? context.l10n.items_field_desc_required
                     : null,
               ),
               const SizedBox(height: 16),
@@ -467,8 +469,8 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
-                  labelText: 'Price (PLN)',
-                  hintText: 'e.g. 24.99',
+                  labelText: context.l10n.items_field_price_label,
+                  hintText: context.l10n.items_field_price_hint,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
@@ -476,9 +478,11 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                   prefixText: 'PLN ',
                 ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Price is required';
+                  if (v == null || v.trim().isEmpty) {
+                    return context.l10n.items_field_price_required;
+                  }
                   if (double.tryParse(v.trim()) == null) {
-                    return 'Enter a valid number';
+                    return context.l10n.items_field_price_invalid;
                   }
                   return null;
                 },
@@ -492,8 +496,8 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                     child: TextFormField(
                       controller: _tagController,
                       decoration: InputDecoration(
-                        labelText: 'Tags',
-                        hintText: 'e.g. Vegan',
+                        labelText: context.l10n.items_field_tags_label,
+                        hintText: context.l10n.items_field_tags_hint,
                         errorText: _tagError,
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -549,7 +553,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
               ],
               const SizedBox(height: 16),
 
-              // -- Discount toggle ------------------------------------------
+              // Discount toggle
               Container(
                 decoration: BoxDecoration(
                   color: _hasDiscount
@@ -580,7 +584,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                                     : brandColors.muted),
                             const SizedBox(width: 10),
                             Text(
-                              'Apply Discount',
+                              context.l10n.items_discount_toggle,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -614,7 +618,7 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                           keyboardType: const TextInputType.numberWithOptions(
                               decimal: true),
                           decoration: InputDecoration(
-                            labelText: 'Discount %',
+                            labelText: context.l10n.items_discount_label,
                             suffixText: '%',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)),
@@ -624,17 +628,16 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                           validator: (v) {
                             if (!_hasDiscount) return null;
                             if (v == null || v.trim().isEmpty) {
-                              return 'Enter a discount percentage';
+                              return context.l10n.items_discount_required;
                             }
                             final val = double.tryParse(v.trim());
                             if (val == null || val <= 0 || val > 100) {
-                              return 'Enter a value between 1 and 100';
+                              return context.l10n.items_discount_invalid;
                             }
                             return null;
                           },
                         ),
                       ),
-                      // Live discounted price preview
                       if (_priceController.text.isNotEmpty &&
                           _discountController.text.isNotEmpty &&
                           double.tryParse(_priceController.text) != null &&
@@ -687,8 +690,8 @@ class _AddItemSheetState extends State<_AddItemSheet> {
                           height: 20,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
-                      : const Text('Add Item',
-                          style: TextStyle(
+                      : Text(context.l10n.items_submit,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 15)),
                 ),
               ),

@@ -1,10 +1,11 @@
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 import 'package:user_app/global/global.dart';
 import 'package:user_app/methods/assistant_methods.dart';
 import 'package:user_app/methods/validators.dart';
@@ -48,7 +49,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             if (restaurantSnap.hasError || userSnap.hasError) {
               return Center(
-                child: Text('Something went wrong',
+                child: Text(context.l10n.settings_error,
                     style: TextStyle(color: brandColors.muted)),
               );
             }
@@ -71,9 +72,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           _SectionHeader(
                             icon: Icons.storefront_rounded,
-                            title: 'Business',
+                            title: context.l10n.settings_section_business,
                             subtitle:
-                                'Manage your restaurant profile and media',
+                                context.l10n.settings_section_business_sub,
                             brandColors: brandColors,
                           ),
                           const SizedBox(height: 16),
@@ -100,8 +101,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 36),
                           _SectionHeader(
                             icon: Icons.person_rounded,
-                            title: 'User Profile',
-                            subtitle: 'Update your personal account details',
+                            title: context.l10n.settings_section_profile,
+                            subtitle:
+                                context.l10n.settings_section_profile_sub,
                             brandColors: brandColors,
                           ),
                           const SizedBox(height: 16),
@@ -114,8 +116,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 36),
                           _SectionHeader(
                             icon: Icons.warning_amber_rounded,
-                            title: 'Danger Zone',
-                            subtitle: 'Irreversible actions for your account',
+                            title: context.l10n.settings_section_danger,
+                            subtitle:
+                                context.l10n.settings_section_danger_sub,
                             brandColors: brandColors,
                             danger: true,
                           ),
@@ -137,7 +140,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// --- Section Header ----------------------------------------------------------------------------
+// --- Section Header ----------------------------------------------------------
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -171,8 +174,8 @@ class _SectionHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style:
-                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                style: const TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w700)),
             Text(subtitle,
                 style: TextStyle(fontSize: 12, color: brandColors.muted)),
           ],
@@ -182,7 +185,7 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// --- Logo Card --------------------------------------------------------------------
+// --- Logo Card ---------------------------------------------------------------
 class _LogoCard extends StatefulWidget {
   final String? restaurantID;
   final String currentUrl;
@@ -234,7 +237,6 @@ class _LogoCardState extends State<_LogoCard> {
           .update({'logoUrl': newUrl});
 
       await deleteOldFile(widget.currentUrl);
-
       await saveUserPref<String>("logoUrl", newUrl);
 
       if (mounted) {
@@ -242,7 +244,7 @@ class _LogoCardState extends State<_LogoCard> {
           _stagedBytes = null;
           _stagedName = null;
         });
-        unifiedSnackBar(context, 'Logo updated');
+        unifiedSnackBar(context, context.l10n.settings_logo_success);
       }
     } catch (e) {
       if (mounted) unifiedSnackBar(context, e.toString(), error: true);
@@ -261,7 +263,9 @@ class _LogoCardState extends State<_LogoCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _CardTitle(title: 'Restaurant Logo', brandColors: widget.brandColors),
+          _CardTitle(
+              title: context.l10n.settings_logo_title,
+              brandColors: widget.brandColors),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -294,15 +298,15 @@ class _LogoCardState extends State<_LogoCard> {
                   children: [
                     Text(
                       hasStaged
-                          ? 'New logo ready'
+                          ? context.l10n.settings_logo_status_staged
                           : hasLogo
-                              ? 'Logo uploaded'
-                              : 'No logo yet',
+                              ? context.l10n.settings_logo_status_exists
+                              : context.l10n.settings_logo_status_none,
                       style: const TextStyle(
                           fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
-                    Text('Recommended: 512×512px, PNG or JPG',
+                    Text(context.l10n.settings_logo_recommended,
                         style: TextStyle(
                             fontSize: 11, color: widget.brandColors.muted)),
                     const SizedBox(height: 10),
@@ -324,8 +328,8 @@ class _LogoCardState extends State<_LogoCard> {
                                   const EdgeInsets.symmetric(horizontal: 12),
                             ),
                             icon: const Icon(Icons.image_rounded, size: 14),
-                            label: const Text('Choose',
-                                style: TextStyle(fontSize: 12)),
+                            label: Text(context.l10n.settings_logo_choose,
+                                style: const TextStyle(fontSize: 12)),
                           ),
                         ),
                         if (hasStaged) ...[
@@ -340,17 +344,21 @@ class _LogoCardState extends State<_LogoCard> {
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8)),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12),
                               ),
                               icon: _uploading
                                   ? const SizedBox(
                                       width: 12,
                                       height: 12,
                                       child: CircularProgressIndicator(
-                                          strokeWidth: 2, color: Colors.white))
+                                          strokeWidth: 2,
+                                          color: Colors.white))
                                   : const Icon(Icons.upload_rounded, size: 14),
-                              label: Text(_uploading ? 'Uploading…' : 'Upload',
+                              label: Text(
+                                  _uploading
+                                      ? context.l10n.settings_logo_uploading
+                                      : context.l10n.settings_logo_upload,
                                   style: const TextStyle(fontSize: 12)),
                             ),
                           ),
@@ -368,7 +376,7 @@ class _LogoCardState extends State<_LogoCard> {
   }
 }
 
-// --- Banner Card -------------------------------------------------------------------------------
+// --- Banner Card -------------------------------------------------------------
 class _BannerCard extends StatefulWidget {
   final String? restaurantID;
   final String currentUrl;
@@ -420,7 +428,6 @@ class _BannerCardState extends State<_BannerCard> {
           .update({'bannerUrl': newUrl});
 
       await deleteOldFile(widget.currentUrl);
-
       await saveUserPref<String>("bannerUrl", newUrl);
 
       if (mounted) {
@@ -428,7 +435,7 @@ class _BannerCardState extends State<_BannerCard> {
           _stagedBytes = null;
           _stagedName = null;
         });
-        unifiedSnackBar(context, 'Banner updated');
+        unifiedSnackBar(context, context.l10n.settings_banner_success);
       }
     } catch (e) {
       if (mounted) unifiedSnackBar(context, e.toString(), error: true);
@@ -448,7 +455,8 @@ class _BannerCardState extends State<_BannerCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _CardTitle(
-              title: 'Restaurant Banner', brandColors: widget.brandColors),
+              title: context.l10n.settings_banner_title,
+              brandColors: widget.brandColors),
           const SizedBox(height: 16),
           GestureDetector(
             onTap: _uploading ? null : _stageImage,
@@ -498,12 +506,12 @@ class _BannerCardState extends State<_BannerCard> {
                             Icon(Icons.add_photo_alternate_outlined,
                                 size: 32, color: widget.brandColors.muted),
                             const SizedBox(height: 8),
-                            Text('Click to choose banner',
+                            Text(context.l10n.settings_banner_choose,
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: widget.brandColors.muted)),
                             const SizedBox(height: 4),
-                            Text('Recommended: 1200×800px',
+                            Text(context.l10n.settings_banner_recommended,
                                 style: TextStyle(
                                     fontSize: 10,
                                     color: widget.brandColors.muted)),
@@ -532,7 +540,10 @@ class _BannerCardState extends State<_BannerCard> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white))
                     : const Icon(Icons.upload_rounded, size: 16),
-                label: Text(_uploading ? 'Uploading…' : 'Upload Banner',
+                label: Text(
+                    _uploading
+                        ? context.l10n.settings_banner_uploading
+                        : context.l10n.settings_banner_upload,
                     style: const TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w600)),
               ),
@@ -544,7 +555,7 @@ class _BannerCardState extends State<_BannerCard> {
   }
 }
 
-// --- Business Info Card ------------------------------------------------------------------------
+// --- Business Info Card ------------------------------------------------------
 
 class _BusinessInfoCard extends StatefulWidget {
   final String? restaurantID;
@@ -659,7 +670,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
 
       if (mounted) {
         setState(() => _edited = false);
-        unifiedSnackBar(context, 'Business info saved');
+        unifiedSnackBar(context, context.l10n.settings_business_saved);
       }
     } catch (e) {
       if (mounted) unifiedSnackBar(context, e.toString(), error: true);
@@ -671,7 +682,8 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      final double horizontalPadding = constraints.maxWidth < 500 ? 16.0 : 48.0;
+      final double horizontalPadding =
+          constraints.maxWidth < 500 ? 16.0 : 48.0;
       return _Card(
         colorScheme: widget.colorScheme,
         child: Form(
@@ -680,7 +692,8 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _CardTitle(
-                  title: 'Business Info', brandColors: widget.brandColors),
+                  title: context.l10n.settings_business_title,
+                  brandColors: widget.brandColors),
               const SizedBox(height: 16),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -737,7 +750,8 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
                                           fontSize: 13, color: Colors.black),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis)
-                                  : Text('Set restaurant address',
+                                  : Text(
+                                      context.l10n.settings_address_set,
                                       style: TextStyle(
                                           fontSize: 13,
                                           color: widget.brandColors.muted)),
@@ -752,7 +766,9 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                _address.isNotEmpty ? 'Change' : 'Pick on map',
+                                _address.isNotEmpty
+                                    ? context.l10n.settings_address_change
+                                    : context.l10n.settings_address_pick,
                                 style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -778,7 +794,7 @@ class _BusinessInfoCardState extends State<_BusinessInfoCard> {
   }
 }
 
-// --- User Profile Card -------------------------------------------------------------------------
+// --- User Profile Card -------------------------------------------------------
 class _UserProfileCard extends StatefulWidget {
   final String? restaurantID;
   final Map<String, dynamic> data;
@@ -863,7 +879,6 @@ class _UserProfileCardState extends State<_UserProfileCard> {
             .child('${DateTime.now().millisecondsSinceEpoch}_$_stagedName');
         await ref.putData(_stagedBytes!);
         photoUrl = await ref.getDownloadURL();
-
         await deleteOldFile(oldPhotoUrl);
       }
 
@@ -882,7 +897,7 @@ class _UserProfileCardState extends State<_UserProfileCard> {
           _stagedBytes = null;
           _stagedName = null;
         });
-        unifiedSnackBar(context, 'Profile saved');
+        unifiedSnackBar(context, context.l10n.settings_profile_saved);
       }
     } catch (e) {
       if (mounted) unifiedSnackBar(context, e.toString(), error: true);
@@ -904,7 +919,9 @@ class _UserProfileCardState extends State<_UserProfileCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _CardTitle(title: 'Profile', brandColors: widget.brandColors),
+            _CardTitle(
+                title: context.l10n.settings_profile_title,
+                brandColors: widget.brandColors),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -917,8 +934,8 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                         height: 72,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color:
-                              widget.brandColors.navy?.withValues(alpha: 0.08),
+                          color: widget.brandColors.navy
+                              ?.withValues(alpha: 0.08),
                           border: Border.all(
                             color: hasStaged
                                 ? widget.brandColors.navy
@@ -934,7 +951,8 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                             : hasExisting
                                 ? Image.network(photoUrl, fit: BoxFit.cover)
                                 : Icon(Icons.person_rounded,
-                                    size: 32, color: widget.brandColors.muted),
+                                    size: 32,
+                                    color: widget.brandColors.muted),
                       ),
                       Positioned(
                         bottom: 0,
@@ -977,7 +995,7 @@ class _UserProfileCardState extends State<_UserProfileCard> {
                       const SizedBox(height: 4),
                       if (hasStaged)
                         Text(
-                          'New photo ready — press Save to apply',
+                          context.l10n.settings_profile_photo_ready,
                           style: TextStyle(
                               fontSize: 11,
                               color: widget.brandColors.accentGreen,
@@ -1011,14 +1029,14 @@ class _UserProfileCardState extends State<_UserProfileCard> {
               child: Column(
                 children: [
                   CustomTextField(
-                    hintText: "Owner's Name",
+                    hintText: context.l10n.settings_profile_name_hint,
                     controller: _nameController,
                     data: Icons.person_rounded,
                     validator: FieldValidator.required,
                   ),
                   const SizedBox(height: 12),
                   CustomPhoneField(
-                    label: 'Phone Number',
+                    label: context.l10n.settings_profile_phone_label,
                     controller: _phoneController,
                   ),
                 ],
@@ -1035,7 +1053,7 @@ class _UserProfileCardState extends State<_UserProfileCard> {
   }
 }
 
-// --- Danger Zone -------------------------------------------------------------------------------
+// --- Danger Zone -------------------------------------------------------------
 class _DangerCard extends StatelessWidget {
   final BrandColors brandColors;
   final ColorScheme colorScheme;
@@ -1052,32 +1070,33 @@ class _DangerCard extends StatelessWidget {
           _buildRow(
             context,
             icon: Icons.lock_reset_rounded,
-            title: 'Change Password',
-            subtitle: 'Send a password reset email to your account',
-            buttonLabel: 'Reset',
-            onTap: () => unifiedSnackBar(context, 'Password reset email sent'),
+            title: context.l10n.settings_danger_reset_title,
+            subtitle: context.l10n.settings_danger_reset_sub,
+            buttonLabel: context.l10n.settings_danger_reset_button,
+            onTap: () => unifiedSnackBar(
+                context, context.l10n.settings_danger_reset_sent),
           ),
           Divider(height: 24, color: colorScheme.outline),
           _buildRow(
             context,
             icon: Icons.delete_forever_rounded,
-            title: 'Delete Account',
-            subtitle: 'Permanently delete your restaurant and all data',
-            buttonLabel: 'Delete',
+            title: context.l10n.settings_danger_delete_title,
+            subtitle: context.l10n.settings_danger_delete_sub,
+            buttonLabel: context.l10n.settings_danger_delete_button,
             onTap: () => showDialog(
               context: context,
-              builder: (_) => AlertDialog(
-                title: const Text('Delete Account'),
-                content: const Text(
-                    'This will permanently delete your account and all restaurant data. This cannot be undone.'),
+              builder: (dialogContext) => AlertDialog(
+                title: Text(context.l10n.settings_danger_delete_dialog_title),
+                content:
+                    Text(context.l10n.settings_danger_delete_dialog_body),
                 actions: [
                   TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel')),
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text(context.l10n.settings_cancel)),
                   TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Delete',
-                        style: TextStyle(color: Colors.redAccent)),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(context.l10n.settings_danger_delete_button,
+                        style: const TextStyle(color: Colors.redAccent)),
                   ),
                 ],
               ),
@@ -1118,21 +1137,23 @@ class _DangerCard extends StatelessWidget {
           onPressed: onTap,
           style: OutlinedButton.styleFrom(
             foregroundColor: Colors.redAccent,
-            side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.5)),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            side:
+                BorderSide(color: Colors.redAccent.withValues(alpha: 0.5)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8)),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           ),
           child: Text(buttonLabel,
-              style:
-                  const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              style: const TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.w600)),
         ),
       ],
     );
   }
 }
 
-// --- Map Picker Dialog -------------------------------------------------------------------------
+// --- Map Picker Dialog -------------------------------------------------------
 class _MapPickerDialog extends StatefulWidget {
   final double? initialLat;
   final double? initialLng;
@@ -1178,7 +1199,7 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
 
   void _confirm() {
     if (_address.isEmpty) {
-      unifiedSnackBar(context, 'Please pick a location on the map first.');
+      unifiedSnackBar(context, context.l10n.settings_map_no_pick);
       return;
     }
     Navigator.pop(context, {'address': _address, 'lat': _lat, 'lng': _lng});
@@ -1189,8 +1210,10 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
     final bool hasPicked = _address.isNotEmpty;
 
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      insetPadding:
+          const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
@@ -1198,7 +1221,8 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
                 color: widget.colorScheme.surface,
                 border: Border(
@@ -1209,9 +1233,9 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                   Icon(Icons.location_on_rounded,
                       size: 20, color: widget.brandColors.navy),
                   const SizedBox(width: 10),
-                  const Expanded(
-                    child: Text('Restaurant Location',
-                        style: TextStyle(
+                  Expanded(
+                    child: Text(context.l10n.settings_map_dialog_title,
+                        style: const TextStyle(
                             fontSize: 15, fontWeight: FontWeight.w700)),
                   ),
                   IconButton(
@@ -1260,11 +1284,14 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            hasPicked ? _address : 'No location selected yet',
+                            hasPicked
+                                ? _address
+                                : context.l10n.settings_map_no_location,
                             style: TextStyle(
                                 fontSize: 13,
-                                color:
-                                    hasPicked ? null : widget.brandColors.muted,
+                                color: hasPicked
+                                    ? null
+                                    : widget.brandColors.muted,
                                 height: 1.4),
                           ),
                         ),
@@ -1287,7 +1314,10 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.map_rounded, size: 18),
-                      label: Text(hasPicked ? 'Change on Map' : 'Open Map',
+                      label: Text(
+                          hasPicked
+                              ? context.l10n.settings_map_change
+                              : context.l10n.settings_map_open,
                           style: const TextStyle(
                               fontSize: 13, fontWeight: FontWeight.w600)),
                     ),
@@ -1308,8 +1338,8 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.check_rounded, size: 18),
-                      label: const Text('Confirm Address',
-                          style: TextStyle(
+                      label: Text(context.l10n.settings_map_confirm,
+                          style: const TextStyle(
                               fontSize: 13, fontWeight: FontWeight.w700)),
                     ),
                   ),
@@ -1323,7 +1353,7 @@ class _MapPickerDialogState extends State<_MapPickerDialog> {
   }
 }
 
-// --- Shared Components -------------------------------------------------------------------------
+// --- Shared Components -------------------------------------------------------
 class _Card extends StatelessWidget {
   final Widget child;
   final ColorScheme colorScheme;
@@ -1376,8 +1406,8 @@ class _SaveButton extends StatelessWidget {
             backgroundColor: brandColors.navy,
             foregroundColor: Colors.white,
             elevation: 0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8)),
             padding: const EdgeInsets.symmetric(horizontal: 20),
           ),
           child: saving
@@ -1386,8 +1416,9 @@ class _SaveButton extends StatelessWidget {
                   height: 16,
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: Colors.white))
-              : const Text('Save Changes',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+              : Text(context.l10n.settings_save_changes,
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600)),
         ),
       ),
     );

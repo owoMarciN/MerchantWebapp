@@ -1,19 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/extensions/brand_color_ext.dart';
-
-// -----------------------------------------------------------------------------
-// NOTIFICATION BELL + SHEET
-//
-// Used in the restaurant dashboard topbar.
-//
-// Usage in dashboard_shells.dart:
-//   NotificationBell(
-//     uid: restaurantID,
-//     brandColors: brandColors,
-//     colorScheme: colorScheme,
-//   )
-// -----------------------------------------------------------------------------
+import 'package:user_app/extensions/extensions_import.dart';
 
 class NotificationBell extends StatefulWidget {
   final String? uid;
@@ -46,9 +34,12 @@ class _NotificationBellState extends State<NotificationBell>
     );
     _shakeAnimation = TweenSequence([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.12), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: 0.12, end: -0.12), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -0.12, end: 0.12), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 0.12, end: -0.12), weight: 2),
+      TweenSequenceItem(
+          tween: Tween(begin: 0.12, end: -0.12), weight: 2),
+      TweenSequenceItem(
+          tween: Tween(begin: -0.12, end: 0.12), weight: 2),
+      TweenSequenceItem(
+          tween: Tween(begin: 0.12, end: -0.12), weight: 2),
       TweenSequenceItem(tween: Tween(begin: -0.12, end: 0.0), weight: 1),
     ]).animate(
         CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
@@ -156,7 +147,7 @@ class _NotificationBellState extends State<NotificationBell>
   }
 }
 
-// -- Notification bottom sheet -------------------------------------------------
+// -- Notification bottom sheet ------------------------------------------------
 
 class _NotificationSheet extends StatelessWidget {
   final String uid;
@@ -190,11 +181,11 @@ class _NotificationSheet extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.72,
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius:
+            const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
-          // Drag handle
           const SizedBox(height: 12),
           Center(
             child: Container(
@@ -213,9 +204,9 @@ class _NotificationSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               children: [
-                const Text('Notifications',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                Text(context.l10n.notif_sheet_title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w700)),
                 const Spacer(),
                 // Live unread badge
                 StreamBuilder<QuerySnapshot>(
@@ -238,7 +229,8 @@ class _NotificationSheet extends StatelessWidget {
                         border: Border.all(
                             color: Colors.redAccent.withValues(alpha: 0.3)),
                       ),
-                      child: Text('$count unread',
+                      child: Text(
+                          context.l10n.notif_unread_count(count),
                           style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -253,7 +245,7 @@ class _NotificationSheet extends StatelessWidget {
                           horizontal: 8, vertical: 4),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  child: Text('Mark all read',
+                  child: Text(context.l10n.notif_mark_all_read,
                       style: TextStyle(
                           fontSize: 13, color: brandColors.accentGreen)),
                 ),
@@ -276,7 +268,8 @@ class _NotificationSheet extends StatelessWidget {
                   .snapshots(),
               builder: (context, snap) {
                 if (!snap.hasData) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator());
                 }
 
                 final docs = snap.data!.docs;
@@ -289,13 +282,15 @@ class _NotificationSheet extends StatelessWidget {
                         Icon(Icons.notifications_none_rounded,
                             size: 48, color: brandColors.muted),
                         const SizedBox(height: 12),
-                        const Text('No notifications yet',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w600)),
+                        Text(context.l10n.notif_empty_title,
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600)),
                         const SizedBox(height: 6),
-                        Text('Admin messages will appear here',
+                        Text(context.l10n.notif_empty_subtitle,
                             style: TextStyle(
-                                fontSize: 12, color: brandColors.muted)),
+                                fontSize: 12,
+                                color: brandColors.muted)),
                       ],
                     ),
                   );
@@ -304,7 +299,8 @@ class _NotificationSheet extends StatelessWidget {
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                   itemCount: docs.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(height: 8),
                   itemBuilder: (_, i) => _NotificationTile(
                     doc: docs[i],
                     brandColors: brandColors,
@@ -320,7 +316,7 @@ class _NotificationSheet extends StatelessWidget {
   }
 }
 
-// -- Notification tile ---------------------------------------------------------
+// -- Notification tile --------------------------------------------------------
 
 class _NotificationTile extends StatelessWidget {
   final DocumentSnapshot doc;
@@ -349,7 +345,8 @@ class _NotificationTile extends StatelessWidget {
     final String body = data['body']?.toString() ?? '';
     final bool isRead = data['isRead'] == true;
     final dynamic rawTs = data['timestamp'] ?? data['createdAt'];
-    final DateTime? date = rawTs is Timestamp ? rawTs.toDate() : null;
+    final DateTime? date =
+        rawTs is Timestamp ? rawTs.toDate() : null;
 
     return Dismissible(
       key: Key(doc.id),
@@ -386,7 +383,6 @@ class _NotificationTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Icon
               Container(
                 width: 36,
                 height: 36,
@@ -406,7 +402,6 @@ class _NotificationTile extends StatelessWidget {
               ),
               const SizedBox(width: 12),
 
-              // Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -416,11 +411,11 @@ class _NotificationTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(title,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: isRead
-                                ? FontWeight.w500
-                                : FontWeight.w700)),
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isRead
+                                      ? FontWeight.w500
+                                      : FontWeight.w700)),
                         ),
                         if (!isRead) ...[
                           const SizedBox(width: 6),
@@ -446,7 +441,7 @@ class _NotificationTile extends StatelessWidget {
                     ],
                     if (date != null) ...[
                       const SizedBox(height: 6),
-                      Text(_fmt(date),
+                      Text(_fmt(context, date),
                           style: TextStyle(
                               fontSize: 10, color: brandColors.muted)),
                     ],
@@ -454,7 +449,6 @@ class _NotificationTile extends StatelessWidget {
                 ),
               ),
 
-              // Delete button
               GestureDetector(
                 onTap: _delete,
                 child: Padding(
@@ -470,14 +464,18 @@ class _NotificationTile extends StatelessWidget {
     );
   }
 
-  String _fmt(DateTime d) {
+  String _fmt(BuildContext context, DateTime d) {
     final now = DateTime.now();
     final diff = now.difference(d);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    if (diff.inDays == 1) return 'Yesterday';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    if (diff.inMinutes < 1) return context.l10n.notif_time_just_now;
+    if (diff.inMinutes < 60) {
+      return context.l10n.notif_time_minutes(diff.inMinutes);
+    }
+    if (diff.inHours < 24) {
+      return context.l10n.notif_time_hours(diff.inHours);
+    }
+    if (diff.inDays == 1) return context.l10n.notif_time_yesterday;
+    if (diff.inDays < 7) return context.l10n.notif_time_days(diff.inDays);
     return '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
   }
 }

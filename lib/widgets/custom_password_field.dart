@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fancy_password_field/fancy_password_field.dart';
 import 'package:user_app/widgets/custom_error_message.dart';
-import 'package:user_app/extensions/brand_color_ext.dart';
+import 'package:user_app/extensions/extensions_import.dart';
 
 class CustomPasswordField extends StatefulWidget {
   final TextEditingController? controller;
@@ -84,7 +84,8 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                 color: _focusNode.hasFocus ? brand.navy : Colors.grey,
               ),
               suffixIconColor: Colors.grey,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               filled: true,
               fillColor: Colors.white,
               errorStyle: const TextStyle(fontSize: 0, height: 0),
@@ -98,22 +99,25 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+                borderSide:
+                    const BorderSide(color: Colors.redAccent, width: 1.5),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+                borderSide:
+                    const BorderSide(color: Colors.redAccent, width: 1.5),
               ),
             ),
             validator: (password) {
               if (widget.isRequired && (password == null || password.isEmpty)) {
-                _setUIError("Password is required");
+                _setUIError(context.l10n.password_is_required);
                 return "req";
               }
               if (!widget.isConfirmation) {
-                final allRulesMet = _passwordRules.every((rule) => rule.validate(password ?? ''));
+                final allRulesMet = _passwordRules
+                    .every((rule) => rule.validate(password ?? ''));
                 if (!allRulesMet) {
-                  _setUIError("Password does not meet requirements");
+                  _setUIError(context.l10n.password_does_not_meet_requirements);
                   return "inv";
                 }
               }
@@ -137,7 +141,11 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           value: strength,
           backgroundColor: Colors.grey[200],
           valueColor: AlwaysStoppedAnimation<Color>(
-            strength < 0.4 ? Colors.red : strength < 0.7 ? Colors.orange : brand.accentGreen!,
+            strength < 0.4
+                ? Colors.red
+                : strength < 0.7
+                    ? Colors.orange
+                    : brand.accentGreen!,
           ),
           minHeight: 4,
         ),
@@ -145,7 +153,8 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
     );
   }
 
-  Widget _buildRulesUI(Set<ValidationRule> rules, String value, BrandColors brand) {
+  Widget _buildRulesUI(
+      Set<ValidationRule> rules, String value, BrandColors brand) {
     if (value.isEmpty || !_focusNode.hasFocus) return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.only(top: 12),
